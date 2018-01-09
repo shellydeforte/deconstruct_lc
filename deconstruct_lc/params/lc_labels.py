@@ -27,7 +27,7 @@ class GetLabels(object):
         lca_labels = self.format_labels(lcas)
         return lca_labels
 
-    def find_entropy_values(self, all_seqs):
+    def create_lces(self, all_seqs):
         """
         Return all the possible shannon entropies in my data set for the given
         k-mer length, rounded up to the nearest 0.1.
