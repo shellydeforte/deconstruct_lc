@@ -1,19 +1,19 @@
-"""
-1. Create excel with Protein ID, PubMed ID, source (Manual if manual).
-2. Convert yeast IDs
-"""
+import configparser
 import os
 import pandas as pd
 from Bio import SeqIO
 
+config = configparser.ConfigParser()
+cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
+                                   'config.cfg'))
+config.read_file(open(cfg_fp, 'r'))
+
 class WriteGO(object):
 
     def __init__(self):
-        self.fd = os.path.join(os.path.dirname(__file__), '..', 'data', 'quickgo')
-        self.cb_fp = os.path.join(self.fd, 'quickgo_cb.xlsx')
-        self.yeast_pid_fp = os.path.join(self.fd, 'yeast_pids.txt')
-        self.fasta_in = os.path.join(self.fd, 'quickgo_cb.fasta')
-        self.yeast_map_fp = os.path.join(self.fd, 'yeast_map.xlsx')
+        self.fd = os.path.join(config['filepaths']['data_fp'], 'bc_prep')
+        self.cb_fp = os.path.join(self.fd, 'quickgo_bc.xlsx')
+        self.fasta_in = os.path.join(self.fd, 'quickgo_bc.fasta')
         self.pids_fp = os.path.join(self.fd, 'pids.txt')
 
     def go_to_ss(self):
