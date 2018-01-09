@@ -7,7 +7,7 @@ class WriteRaw(object):
     def __init__(self, k, pdb_fp, bc_fp):
         self.pdb_fp = pdb_fp
         self.bc_fp = bc_fp
-        self.all_ids, self.all_seqs = self.get_seqs()
+        self.all_ids, self.all_seqs, self.y = self.get_seqs()
         self.all_lens = tools_fasta.get_lengths(self.all_seqs)
         self.k = k
 
@@ -16,7 +16,9 @@ class WriteRaw(object):
         cb_ids, cb_seqs = tools_fasta.fasta_to_id_seq(self.bc_fp)
         all_seqs = cb_seqs + pdb_seqs
         all_ids = cb_ids + pdb_ids
-        return all_ids, all_seqs
+        y = [0]*len(cb_ids) + [1]*len(pdb_ids)
+        return all_ids, all_seqs, y
+
 
     def write_lca(self, alph):
         lc_labs = lc_labels.GetLabels(self.k)
@@ -24,11 +26,12 @@ class WriteRaw(object):
         df_dict = {}
         df_dict['Protein ID'] = self.all_ids
         df_dict['Length'] = self.all_lens
+        df_dict['y'] = self.y
         for k_lca in lcas:
             lca = k_lca.split('_')[1]
             scores = tools_lc.calc_lca_motifs(self.all_seqs, self.k, lca)
             df_dict[k_lca] = scores
-        df = pd.DataFrame(df_dict, columns=['Protein ID']+lcas+['Length'])
+        df = pd.DataFrame(df_dict, columns=['Protein ID', 'Length', 'y']+lcas)
         return df
 
     def write_lce(self):
@@ -37,11 +40,12 @@ class WriteRaw(object):
         df_dict = {}
         df_dict['Protein ID'] = self.all_ids
         df_dict['Length'] = self.all_lens
+        df_dict['y'] = self.y
         for k_lce in lces:
             lce = float(k_lce.split('_')[1])
             scores = tools_lc.calc_lce_motifs(self.all_seqs, self.k, lce)
             df_dict[k_lce] = scores
-        df = pd.DataFrame(df_dict, columns=['Protein ID']+lces+['Length'])
+        df = pd.DataFrame(df_dict, columns=['Protein ID', 'Length', 'y']+lces)
         return df
 
 
