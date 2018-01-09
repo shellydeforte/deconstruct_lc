@@ -1,5 +1,6 @@
 import os
-import requests, sys
+import requests
+import sys
 
 
 class PullGo(object):
