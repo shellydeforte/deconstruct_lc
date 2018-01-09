@@ -14,8 +14,8 @@ class PdbFasta(object):
         self.minlen = 100
         self.maxlen = 2000
         self.pdb_dp = os.path.join(config['filepaths']['data_fp'], 'pdb_prep')
-        self.pdb_miss_fp = os.path.join(self.pdb_dp, 'pdb_miss.fasta')
-        self.pdb_nomiss_fp = os.path.join(self.pdb_dp, 'pdb_nomiss.fasta')
+        self.pdb_miss_fp = os.path.join(self.pdb_dp, 'pdb_norm.fasta')
+        self.pdb_nomiss_fp = os.path.join(self.pdb_dp, 'pdb_train.fasta')
         self.ss_dis_fp = os.path.join(self.pdb_dp, 'ss_dis.txt')
         self.all_dis_fp = os.path.join(self.pdb_dp, 'all_dis.fasta')
         self.all_seq_fp = os.path.join(self.pdb_dp, 'all_seqs.fasta')
@@ -29,8 +29,7 @@ class PdbFasta(object):
         x-ray
         eukaryote
         standard amino acid alphabet
-        >= minlen, <= maxlen
-        do not apply any missing regions filtering
+        do not apply any missing region or length filtering
         """
         diffraction = self.get_diffraction()
         eukaryote = self.get_euk_pdb()
@@ -40,11 +39,9 @@ class PdbFasta(object):
                 pdb_chain = self.id_cleanup(str(seq_rec.id))
                 pdb = pdb_chain.split('_')[0]
                 sequence = str(seq_rec.seq)
-                prot_len = len(sequence)
                 if pdb_chain in eukaryote:
                     if pdb in diffraction:
                         if self.standard_aa(sequence):
-                            if self.minlen <= prot_len <= self.maxlen:
                                 new_records.append(seq_rec)
         with open(self.pdb_miss_fp, 'w') as seq_fo:
             SeqIO.write(new_records, seq_fo, 'fasta')
@@ -56,16 +53,19 @@ class PdbFasta(object):
 
     def create_pdb_nomiss(self):
         """
-        load pdb_nomiss and apply no missing regions filter
+        load pdb_miss and apply no missing regions filter, and length filter
         """
         pdb_miss = self.get_missing()
         new_records = []
         with open(self.pdb_miss_fp, 'r') as miss_fi:
             for seq_rec in SeqIO.parse(miss_fi, 'fasta'):
                 pdb_chain = self.id_cleanup(str(seq_rec.id))
+                sequence = str(seq_rec.seq)
+                prot_len = len(sequence)
                 if pdb_chain in pdb_miss:
                     if pdb_miss[pdb_chain] == 0:
-                        new_records.append(seq_rec)
+                        if self.minlen <= prot_len <= self.maxlen:
+                            new_records.append(seq_rec)
         with open(self.pdb_nomiss_fp, 'w') as seq_fo:
             SeqIO.write(new_records, seq_fo, 'fasta')
         count = 0
