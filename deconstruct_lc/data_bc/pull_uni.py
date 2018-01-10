@@ -13,7 +13,7 @@ def fetch_uniprot(uniID):
     headers = {'From': 'shelly.deforte@gmail.com'}
     try:
         r = requests.get(
-            'http://www.uniprot.org/uniprot/{}'.format(uniID),
+            'http://www.uniprot.org/uniprot/{}.fasta'.format(uniID),
             timeout=5, headers=headers)
         if r.status_code == 200:
             return r
@@ -21,11 +21,11 @@ def fetch_uniprot(uniID):
         return None
 
 
-def write_uniprot(uniIDs, fp):
+def write_fasta(uniIDs, fp):
     with open(fp, 'w') as fpo:
         for uniID in uniIDs:
             fasta = fetch_uniprot(uniID)
             if fasta:
-                fpo.write(fasta)
+                fpo.write(fasta.text)
             else:
                 raise Exception("Error pulling UniProt entry")
