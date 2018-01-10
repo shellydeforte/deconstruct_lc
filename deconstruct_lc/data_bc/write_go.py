@@ -12,11 +12,14 @@ config.read_file(open(cfg_fp, 'r'))
 
 class WriteGO(object):
     def __init__(self):
+        self.minlen = 100
+        self.maxlen = 2000
         self.fd = os.path.join(config['filepaths']['data_fp'], 'bc_prep')
         self.now = datetime.now().strftime("%y%m%d")
         self.cb_fp = os.path.join(self.fd, '{}quickgo_bc.xlsx'.format(
             self.now))
         self.fasta_in = os.path.join(self.fd, 'quickgo_bc.fasta')
+        self.fasta_len = os.path.join(self.fd, 'quickgo_bc_len.fasta')
         self.pids_fp = os.path.join(self.fd, '{}pids.txt'.format(self.now))
         # Alternatively spliced proteins must be dealt with separately
         self.pids_alt_fp = os.path.join(self.fd, '{}pids_alt.txt'.format(
@@ -104,19 +107,45 @@ class WriteGO(object):
         sheet_names = ex.sheet_names
         return sorted(sheet_names)
 
+    def filter_fasta(self):
+        """Filter CB fasta for length"""
+        new_records = []
+        with open(self.fasta_in, 'r') as cb_in:
+            for seq_rec in SeqIO.parse(cb_in, 'fasta'):
+                sequence = str(seq_rec.seq)
+                prot_len = len(sequence)
+                if self.minlen <= prot_len <= self.maxlen:
+                    if self.standard_aa(sequence):
+                        new_records.append(seq_rec)
+        with open(self.fasta_len, 'w') as seq_fo:
+            SeqIO.write(new_records, seq_fo, 'fasta')
+        count = 0
+        with open(self.fasta_len, 'r') as handle:
+            for _ in SeqIO.parse(handle, 'fasta'):
+                count += 1
+        print('There are {} records'.format(count))
+
+    def standard_aa(self, sequence):
+        aas = 'ADKERNTSQYFLIVMCWHGP'
+        for c in sequence:
+            if c not in aas:
+                return False
+        return True
+
 
 def main():
     lg = WriteGO()
-    pids = lg.get_pids_from_qg()
-    lg.write_pids(pids)
-    alt_pids = lg.read_pids(lg.pids_alt_fp)
-    pull_uni.write_fasta(alt_pids, lg.alt_fasta)
+    # pids = lg.get_pids_from_qg()
+    # lg.write_pids(pids)
+    # alt_pids = lg.read_pids(lg.pids_alt_fp)
+    # pull_uni.write_fasta(alt_pids, lg.alt_fasta)
     ###########################################################################
     # Here the PID list must be manually uploaded to uniprot to get the       #
-    # fasta file and concatenated with the alt pids
-    # Do this before creating the spreadsheet below                           #
+    # fasta file and then concatenated with the alt pids                      #
+    # Do this before creating the spreadsheet and filtering the fasta file    #
     ###########################################################################
     # lg.go_to_ss()
+    lg.filter_fasta()
 
 
 if __name__ == '__main__':
