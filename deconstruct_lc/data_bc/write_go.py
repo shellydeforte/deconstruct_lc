@@ -1,7 +1,9 @@
 import configparser
+from datetime import datetime
 import os
 import pandas as pd
 from Bio import SeqIO
+from deconstruct_lc.data_bc import pull_uni
 
 config = configparser.ConfigParser()
 cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
@@ -9,12 +11,18 @@ cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
 config.read_file(open(cfg_fp, 'r'))
 
 class WriteGO(object):
-
     def __init__(self):
         self.fd = os.path.join(config['filepaths']['data_fp'], 'bc_prep')
-        self.cb_fp = os.path.join(self.fd, 'quickgo_bc.xlsx')
+        self.now = datetime.now().strftime("%y%m%d")
+        self.cb_fp = os.path.join(self.fd, '{}quickgo_bc.xlsx'.format(
+            self.now))
         self.fasta_in = os.path.join(self.fd, 'quickgo_bc.fasta')
-        self.pids_fp = os.path.join(self.fd, 'pids.txt')
+        self.pids_fp = os.path.join(self.fd, '{}pids.txt'.format(self.now))
+        # Alternatively spliced proteins must be dealt with separately
+        self.pids_alt_fp = os.path.join(self.fd, '{}pids_alt.txt'.format(
+            self.now))
+        self.alt_fasta = os.path.join(self.fd,
+                                      '{}quickgo_bc_alt.fasta'.format(self.now))
 
     def go_to_ss(self):
         pid_gene_org = self.create_org_dict()
@@ -28,19 +36,19 @@ class WriteGO(object):
             go_df = pd.read_csv(go_fp, sep='\t', comment='!', header=None)
             go_ids = set(list(go_df[1]))
             for go_id in go_ids: # Take just the first entry info
-                if go_id in pid_gene_org:
-                    gene = pid_gene_org[go_id][0]
-                    org = pid_gene_org[go_id][1]
-                    fgo_df = go_df[go_df[1] == go_id]
-                    pmid = list(fgo_df[4])[0]
-                    source = list(fgo_df[9])[0]
-                    df_dict['Protein ID'].append(go_id)
-                    df_dict['Reference'].append(pmid)
-                    df_dict['Source'].append(source)
-                    df_dict['Gene ID'].append(gene)
-                    df_dict['Organism'].append(org)
-                else:
-                    print(go_id)
+                fgo_df = go_df[go_df[1] == go_id]
+                if go_id not in pid_gene_org:
+                    go_id = go_id.split('-')[0]
+                gene = pid_gene_org[go_id][0]
+                org = pid_gene_org[go_id][1]
+                pmid = list(fgo_df[4])[0]
+                source = list(fgo_df[9])[0]
+                df_dict['Protein ID'].append(go_id)
+                df_dict['Reference'].append(pmid)
+                df_dict['Source'].append(source)
+                df_dict['Gene ID'].append(gene)
+                df_dict['Organism'].append(org)
+
             df_out = pd.DataFrame(df_dict, columns=['Protein ID', 'Gene ID', 'Organism', 'Reference', 'Source'])
             df_out.to_excel(writer, sheet_name=sheet, index=False)
 
@@ -77,9 +85,19 @@ class WriteGO(object):
         return set(all_pids)
 
     def write_pids(self, pids):
-        with open(self.pids_fp, 'w') as fo:
+        with open(self.pids_fp, 'w') as fo, open(self.pids_alt_fp, 'w') as fao:
             for pid in pids:
-                fo.write('{}\n'.format(pid))
+                if '-' in pid:
+                    fao.write('{}\n'.format(pid))
+                else:
+                    fo.write('{}\n'.format(pid))
+
+    def read_pids(self, fp):
+        pids = []
+        with open(fp, 'r') as fpi:
+            for line in fpi:
+                pids.append(line.strip())
+        return pids
 
     def get_sheets(self):
         ex = pd.ExcelFile(self.cb_fp)
@@ -89,7 +107,16 @@ class WriteGO(object):
 
 def main():
     lg = WriteGO()
-    lg.go_to_ss()
+    pids = lg.get_pids_from_qg()
+    lg.write_pids(pids)
+    alt_pids = lg.read_pids(lg.pids_alt_fp)
+    pull_uni.write_fasta(alt_pids, lg.alt_fasta)
+    ###########################################################################
+    # Here the PID list must be manually uploaded to uniprot to get the       #
+    # fasta file and concatenated with the alt pids
+    # Do this before creating the spreadsheet below                           #
+    ###########################################################################
+    # lg.go_to_ss()
 
 
 if __name__ == '__main__':
