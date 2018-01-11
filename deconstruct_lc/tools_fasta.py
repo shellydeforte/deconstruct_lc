@@ -13,7 +13,7 @@ def fasta_to_seq(fasta_fp, minlen=0, maxlen=float('inf'), unique=True):
     with open(fasta_fp, 'r') as file_in:
         for record in SeqIO.parse(file_in, 'fasta'):
             sequence = str(record.seq)
-            if minlen < len(sequence) < maxlen:
+            if minlen <= len(sequence) <= maxlen:
                 if unique:
                     if sequence not in sequences:
                         sequences.append(sequence)
@@ -35,7 +35,7 @@ def fasta_to_id_seq(fasta_fp, minlen=0, maxlen=float('inf'), unique=True):
     with open(fasta_fp, 'r') as file_in:
         for record in SeqIO.parse(file_in, 'fasta'):
             sequence = str(record.seq)
-            if minlen < len(sequence) < maxlen:
+            if minlen <= len(sequence) <= maxlen:
                 pid = id_cleanup(str(record.id))
                 if unique:
                     if sequence not in sequences:
