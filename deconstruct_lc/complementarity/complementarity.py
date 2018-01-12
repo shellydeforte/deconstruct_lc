@@ -18,9 +18,15 @@ I am going to start by looking in the motifs.
 
 Start with charge complementarity within a stretch
 """
+import configparser
 import os
 import pandas as pd
 from deconstruct_lc.complementarity import motif_seq
+
+config = configparser.ConfigParser()
+cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
+                                   'config.cfg'))
+config.read_file(open(cfg_fp, 'r'))
 
 class Complementarity(object):
 
@@ -82,13 +88,13 @@ class Complementarity(object):
         return charge_total
 
 
-
 class Pipeline(object):
 
     def __init__(self):
-        self.base_fp = os.path.join(os.path.dirname(__file__), '..', 'data')
-        self.nmo_fpi = os.path.join(self.base_fp, 'scores',
-                                    'nmo_6_SGEQAPDTNKR_6_1.6_seq_scores.tsv')
+        self.base_fp = self.fd = os.path.join(config['filepaths'][
+                                                  'data_fp'], 'scores')
+        self.nmo_fpi = os.path.join(self.base_fp,
+                                    'quickgo_cb_cd90_6_SGEQAPDTNKR_6_1.6_norm.tsv')
         self.lca_label = '6_SGEQAPDTNKR'
         self.lce_label = '6_1.6'
 
