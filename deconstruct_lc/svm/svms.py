@@ -17,8 +17,22 @@ def smooth_rbf(X, y):
               tol=0.001,
               verbose=False)
     clf.fit(X, y)
-    score = clf.score(X, y)
-    print(score)
+    return clf
+
+def normal_rbf(X, y):
+    clf = SVC(kernel='rbf',
+              C=1,
+              cache_size=500,
+              class_weight=None,
+              random_state=0,
+              decision_function_shape='ovr',
+              gamma='auto',
+              max_iter=-1,
+              probability=False,
+              shrinking=True,
+              tol=0.001,
+              verbose=False)
+    clf.fit(X, y)
     return clf
 
 
@@ -36,8 +50,6 @@ def linear_svc(X, y):
               tol=.001,
               verbose=False)
     clf.fit(X, y)
-    score = clf.score(X, y)
-    print(score)
     return clf
 
 
