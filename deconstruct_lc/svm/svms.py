@@ -63,3 +63,11 @@ def plot_contour(clf, X, y):
     plt.xlabel('LCA score')
     plt.ylabel('LCE score')
     plt.show()
+
+
+def main():
+    pass
+
+
+if __name__ == '__main__':
+    main()
