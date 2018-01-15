@@ -81,9 +81,7 @@ def get_pid_gene_desc_seq(fasta_fp):
 
 
 def get_lengths(seqs):
-    lengths = []
-    for seq in seqs:
-        lengths.append(len(seq))
+    lengths = [len(seq) for seq in seqs]
     return lengths
 
 
