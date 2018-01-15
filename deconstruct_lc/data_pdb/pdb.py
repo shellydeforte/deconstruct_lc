@@ -1,6 +1,7 @@
 from Bio import SeqIO
 import configparser
 import os
+from deconstruct_lc import tools_fasta
 
 
 config = configparser.ConfigParser()
@@ -36,13 +37,13 @@ class PdbFasta(object):
         new_records = []
         with open(self.all_seq_fp, 'r') as seq_fi:
             for seq_rec in SeqIO.parse(seq_fi, 'fasta'):
-                pdb_chain = self.id_cleanup(str(seq_rec.id))
+                pdb_chain = tools_fasta.id_cleanup(str(seq_rec.id))
                 pdb = pdb_chain.split('_')[0]
                 sequence = str(seq_rec.seq)
                 if pdb_chain in eukaryote:
                     if pdb in diffraction:
                         if self.standard_aa(sequence):
-                                new_records.append(seq_rec)
+                            new_records.append(seq_rec)
         with open(self.pdb_miss_fp, 'w') as seq_fo:
             SeqIO.write(new_records, seq_fo, 'fasta')
         count = 0
@@ -64,7 +65,7 @@ class PdbFasta(object):
                 prot_len = len(sequence)
                 if pdb_chain in pdb_miss:
                     if pdb_miss[pdb_chain] == 0:
-                        if prot_len <= self.maxlen:
+                        if self.minlen <= prot_len <= self.maxlen:
                             new_records.append(seq_rec)
         with open(self.pdb_nomiss_fp, 'w') as seq_fo:
             SeqIO.write(new_records, seq_fo, 'fasta')
@@ -73,16 +74,6 @@ class PdbFasta(object):
             for _ in SeqIO.parse(handle, 'fasta'):
                 count += 1
         print('There are {} records without missing regions'.format(count))
-
-    def id_cleanup(self, protein_id):
-        if '|' in protein_id:
-            nid = protein_id.split('|')[1]
-        elif ':' in protein_id:
-            nid = '{}_{}'.format(protein_id.split(':')[0],
-                                 protein_id.split(':')[1])
-        else:
-            nid = protein_id
-        return nid
 
     def get_euk_pdb(self):
         """
@@ -203,9 +194,9 @@ class PdbFasta(object):
 
 def main():
     pdb = PdbFasta()
-    pdb.ss_dis_to_fasta()
+    #pdb.ss_dis_to_fasta()
     pdb.create_pdb_miss()
-    pdb.create_pdb_nomiss()
+    #pdb.create_pdb_nomiss()
 
 
 if __name__ == '__main__':
