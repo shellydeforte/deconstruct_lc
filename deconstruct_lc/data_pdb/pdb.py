@@ -194,9 +194,9 @@ class PdbFasta(object):
 
 def main():
     pdb = PdbFasta()
-    #pdb.ss_dis_to_fasta()
+    pdb.ss_dis_to_fasta()
     pdb.create_pdb_miss()
-    #pdb.create_pdb_nomiss()
+    pdb.create_pdb_nomiss()
 
 
 if __name__ == '__main__':
