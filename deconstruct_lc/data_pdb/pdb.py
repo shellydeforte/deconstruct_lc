@@ -60,7 +60,7 @@ class PdbFasta(object):
         new_records = []
         with open(self.pdb_miss_fp, 'r') as miss_fi:
             for seq_rec in SeqIO.parse(miss_fi, 'fasta'):
-                pdb_chain = self.id_cleanup(str(seq_rec.id))
+                pdb_chain = tools_fasta.id_cleanup(str(seq_rec.id))
                 sequence = str(seq_rec.seq)
                 prot_len = len(sequence)
                 if pdb_chain in pdb_miss:
@@ -144,7 +144,7 @@ class PdbFasta(object):
         pdb_miss = {}
         with open(self.all_dis_fp, 'r') as dis_fo:
             for dis_rec in SeqIO.parse(dis_fo, 'fasta'):
-                pdb_miss[self.id_cleanup(str(dis_rec.id))] = \
+                pdb_miss[tools_fasta.id_cleanup(str(dis_rec.id))] = \
                     self.missing_count(str(dis_rec.seq))
         return pdb_miss
 
@@ -186,8 +186,8 @@ class PdbFasta(object):
             with open(self.all_dis_fp, 'r') as dis_fasta:
                 for seq_rec, dis_rec in zip(SeqIO.parse(seq_fasta, 'fasta'),
                                             SeqIO.parse(dis_fasta, 'fasta')):
-                    seq_id = self.id_cleanup(seq_rec.id)
-                    dis_id = self.id_cleanup(dis_rec.id)
+                    seq_id = tools_fasta.id_cleanup(seq_rec.id)
+                    dis_id = tools_fasta.id_cleanup(dis_rec.id)
                     assert seq_id == dis_id
                     assert len(seq_rec.seq) == len(dis_rec.seq)
 
