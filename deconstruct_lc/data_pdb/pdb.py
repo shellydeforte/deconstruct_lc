@@ -13,7 +13,7 @@ class PdbFasta(object):
     def __init__(self):
         self.minlen = 100
         self.maxlen = 2000
-        self.pdb_dp = os.path.join(config['filepaths']['data_fp'], 'pdb_prep')
+        self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
         self.pdb_miss_fp = os.path.join(self.pdb_dp, 'pdb_norm.fasta')
         self.pdb_nomiss_fp = os.path.join(self.pdb_dp, 'pdb_train.fasta')
         self.ss_dis_fp = os.path.join(self.pdb_dp, 'ss_dis.txt')
@@ -49,7 +49,7 @@ class PdbFasta(object):
         with open(self.pdb_miss_fp, 'r') as handle:
             for _ in SeqIO.parse(handle, 'fasta'):
                 count += 1
-        print('There are {} records'.format(count))
+        print('There are {} records with missing regions'.format(count))
 
     def create_pdb_nomiss(self):
         """
@@ -64,7 +64,7 @@ class PdbFasta(object):
                 prot_len = len(sequence)
                 if pdb_chain in pdb_miss:
                     if pdb_miss[pdb_chain] == 0:
-                        if self.minlen <= prot_len <= self.maxlen:
+                        if prot_len <= self.maxlen:
                             new_records.append(seq_rec)
         with open(self.pdb_nomiss_fp, 'w') as seq_fo:
             SeqIO.write(new_records, seq_fo, 'fasta')
@@ -72,7 +72,7 @@ class PdbFasta(object):
         with open(self.pdb_nomiss_fp, 'r') as handle:
             for _ in SeqIO.parse(handle, 'fasta'):
                 count += 1
-        print('There are {} records'.format(count))
+        print('There are {} records without missing regions'.format(count))
 
     def id_cleanup(self, protein_id):
         if '|' in protein_id:
