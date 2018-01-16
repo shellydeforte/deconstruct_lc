@@ -3,6 +3,7 @@ import pandas as pd
 import configparser
 import os
 from deconstruct_lc import tools_fasta
+from deconstruct_lc import tools_lc
 
 
 config = configparser.ConfigParser()
@@ -18,12 +19,38 @@ class PdbAnalysis(object):
         self.all_dis = os.path.join(self.pdb_dp, 'all_dis.fasta')
         self.pdb_all_df = os.path.join(self.pdb_dp, 'pdb_norm_all.tsv')
         self.pdb_an_df = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
+        self.k_lca = 6
+        self.k_lce = 6
+        self.alph_lca = 'SGEQAPDTNKR'
+        self.thresh_lce = 1.6
+        self.lca_label = '{}_{}'.format(self.k_lca, self.alph_lca)
+        self.lce_label = '{}_{}'.format(self.k_lce, self.thresh_lce)
 
     def write_analysis(self):
         df = pd.read_csv(self.pdb_all_df, sep='\t')
         df = df.drop_duplicates(subset=['Sequence', 'Missing'], keep=False)
         df = df.reset_index()
+        df = self.add_raw_score(df)
         df.to_csv(self.pdb_an_df, sep='\t')
+
+    def add_raw_score(self, df):
+        seqs = list(df['Sequence'])
+        miss_seqs = list(df['Missing'])
+        lcas = tools_lc.calc_lca_motifs(seqs, self.k_lca, self.alph_lca)
+        lces = tools_lc.calc_lce_motifs(seqs, self.k_lce, self.thresh_lce)
+        lengths = tools_fasta.get_lengths(seqs)
+        miss = self.get_missing(miss_seqs)
+        df['Length'] = lengths
+        df['Miss Count'] = miss
+        df[self.lca_label] = lcas
+        df[self.lce_label] = lces
+        return df
+
+    def get_missing(self, miss_seqs):
+        miss = []
+        for seq in miss_seqs:
+            miss.append(seq.count('X'))
+        return miss
 
     def get_pids(self):
         pids, seqs = tools_fasta.fasta_to_id_seq(self.pdb_miss_fp)
