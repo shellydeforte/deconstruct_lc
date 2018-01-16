@@ -135,17 +135,17 @@ class WriteGO(object):
 
 def main():
     lg = WriteGO()
-    # pids = lg.get_pids_from_qg()
-    # lg.write_pids(pids)
-    # alt_pids = lg.read_pids(lg.pids_alt_fp)
-    # pull_uni.write_fasta(alt_pids, lg.alt_fasta)
+    pids = lg.get_pids_from_qg()
+    lg.write_pids(pids)
+    alt_pids = lg.read_pids(lg.pids_alt_fp)
+    pull_uni.write_fasta(alt_pids, lg.alt_fasta)
     ###########################################################################
     # Here the PID list must be manually uploaded to uniprot to get the       #
     # fasta file and then concatenated with the alt pids                      #
     # Do this before creating the spreadsheet and filtering the fasta file    #
     ###########################################################################
     # lg.go_to_ss()
-    lg.filter_fasta()
+    # lg.filter_fasta()
 
 
 if __name__ == '__main__':
