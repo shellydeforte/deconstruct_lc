@@ -15,7 +15,7 @@ class PdbFasta(object):
         self.minlen = 100
         self.maxlen = 2000
         self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
-        self.pdb_miss_fp = os.path.join(self.pdb_dp, 'pdb_norm.fasta')
+        self.pdb_miss_fp = os.path.join(self.pdb_dp, 'pdb_norm_all.fasta')
         self.pdb_nomiss_fp = os.path.join(self.pdb_dp, 'pdb_train.fasta')
         self.ss_dis_fp = os.path.join(self.pdb_dp, 'ss_dis.txt')
         self.all_dis_fp = os.path.join(self.pdb_dp, 'all_dis.fasta')
