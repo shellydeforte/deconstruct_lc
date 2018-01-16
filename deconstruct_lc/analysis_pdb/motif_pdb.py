@@ -30,19 +30,23 @@ class MissMotif(object):
 
     def read_df(self):
         df = pd.read_csv(self.pdb_an_fp, sep='\t', index_col=0)
-        bins = range(0, 20, 10)
+        bins = range(0, 20, 5)
         mean_mm = []
         std_mm = []
         mean_mp = []
         std_mp = []
         for i in bins:
             print(i)
-            df = df[(df[self.lca_label] >= i) & (df[self.lca_label] < i+5)]
-            miss_in_motifs, motif_percs = self.lc_blobs(df)
+            ndf = df[(df[self.lca_label] >= i) & (df[self.lca_label] < i+5)]
+            miss_in_motifs, motif_percs = self.lc_blobs(ndf)
             mean_mm.append(np.mean(miss_in_motifs))
             std_mm.append(np.std(miss_in_motifs))
             mean_mp.append(np.mean(motif_percs))
             std_mp.append(np.std(motif_percs))
+        print(mean_mm)
+        print(std_mm)
+        print(mean_mp)
+        print(std_mp)
         plt.errorbar(bins, mean_mm, std_mm, linestyle='None', marker='o')
         plt.errorbar(bins, mean_mp, std_mp, linestyle='None', marker='o')
         plt.show()
@@ -57,7 +61,7 @@ class MissMotif(object):
             if len(ind_miss) > 0:
                 ind_in = self.get_inds(seq)
                 miss_in_motifs.append(len(ind_in & ind_miss) / len(ind_miss))
-                motif_percs.append(len(ind_in) / len(seq))
+                motif_percs.append(len(ind_in)/len(seq))
         return miss_in_motifs, motif_percs
 
     def get_inds(self, seq):
