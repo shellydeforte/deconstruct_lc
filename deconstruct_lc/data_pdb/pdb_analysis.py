@@ -22,7 +22,8 @@ class PdbAnalysis(object):
     def write_analysis(self):
         df = pd.read_csv(self.pdb_all_df, sep='\t')
         df = df.drop_duplicates(subset=['Sequence', 'Missing'], keep=False)
-        df.to_csv()
+        df = df.reset_index()
+        df.to_csv(self.pdb_an_df, sep='\t')
 
     def get_pids(self):
         pids, seqs = tools_fasta.fasta_to_id_seq(self.pdb_miss_fp)
