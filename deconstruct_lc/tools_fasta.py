@@ -2,7 +2,7 @@ import os
 from Bio import SeqIO
 
 
-def fasta_to_seq(fasta_fp, minlen=0, maxlen=float('inf'), unique=True):
+def fasta_to_seq(fasta_fp, minlen=0, maxlen=float('inf'), unique=False):
     """
     Return a list of sequences from the given fasta file.
 
@@ -22,7 +22,7 @@ def fasta_to_seq(fasta_fp, minlen=0, maxlen=float('inf'), unique=True):
     return sequences
 
 
-def fasta_to_id_seq(fasta_fp, minlen=0, maxlen=float('inf'), unique=True):
+def fasta_to_id_seq(fasta_fp, minlen=0, maxlen=float('inf'), unique=False):
     """
     Return a list of ids and a list of the corresponding sequences from a
     fasta file.
