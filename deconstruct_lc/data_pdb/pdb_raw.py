@@ -25,7 +25,7 @@ class RawScores(object):
         self.lce_label = '{}_{}'.format(self.k_lce, self.thresh_lce)
 
     def fasta_to_raw(self):
-        pids, seqs = tools_fasta.fasta_to_id_seq(self.fasta_fp)
+        pids, seqs = tools_fasta.fasta_to_id_seq(self.fasta_fp, unique=True)
         assert len(pids) == len(seqs)
         lengths = tools_fasta.get_lengths(seqs)
         print("Calculating lca_raw")
@@ -59,7 +59,7 @@ def main():
     thresh_lce = 1.6
     rs = RawScores(k_lca, k_lce, alph_lca, thresh_lce)
     df = rs.fasta_to_raw()
-    fno = 'pdbnorm_{}_{}_raw.tsv'.format(rs.lca_label, rs.lce_label)
+    fno = 'pdbunique_{}_{}_raw.tsv'.format(rs.lca_label, rs.lce_label)
     fpo = os.path.join(config['filepaths']['data_dp'], 'scores', fno)
     df.to_csv(fpo, sep='\t')
 
