@@ -12,7 +12,7 @@ config.read_file(open(cfg_fp, 'r'))
 
 class RawScores(object):
     """Write a TSV file that is Protein ID, Length, LCA raw, LCE raw,
-    Sequence, missing"""
+    missing"""
     def __init__(self, k_lca, k_lce, alph_lca, thresh_lce):
         self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
         self.ss_dis_fp = os.path.join(self.pdb_dp, 'all_dis.fasta')
@@ -33,11 +33,9 @@ class RawScores(object):
         print("Calculating lce_raw")
         lce_raw = tools_lc.calc_lce_motifs(seqs, self.k_lce, self.thresh_lce)
         assert len(pids) == len(lca_raw) == len(lce_raw)
-        cols = ['Protein ID', 'Length', self.lca_label, self.lce_label,
-                'Sequence']
+        cols = ['Protein ID', 'Length', self.lca_label, self.lce_label]
         df_dict = {'Protein ID': pids, 'Length': lengths,
-                   self.lca_label: lca_raw, self.lce_label: lce_raw,
-                   'Sequence': seqs}
+                   self.lca_label: lca_raw, self.lce_label: lce_raw}
         df = pd.DataFrame(df_dict, columns=cols)
         print("Now adding missing column")
         df = self._add_missing(df)
