@@ -36,6 +36,29 @@ def calc_lca_motifs(sequences, k, lca):
     return motif_counts
 
 
+def calc_lc_motifs(sequences, k, lca, lce):
+    """Calculate the total number of unique lca or lce motifs
+    k must be the same"""
+    motif_counts = []
+    for sequence in sequences:
+        motif_count = count_lc_motifs(sequence, k, lca, lce)
+        motif_counts.append(motif_count)
+    return motif_counts
+
+
+def count_lc_motifs(sequence, k, lca, lce):
+    kmers = seq_to_kmers(sequence, k)
+    motif_count = 0
+    for kmer in kmers:
+        if lca_motif(kmer, lca):
+            motif_count += 1
+        elif lce_motif(kmer, lce):
+            motif_count += 1
+        else:
+            pass
+    return motif_count
+
+
 def count_lca_motifs(sequence, k, lca):
     """Count the number of lca motifs of length k in a sequence"""
     kmers = seq_to_kmers(sequence, k)
