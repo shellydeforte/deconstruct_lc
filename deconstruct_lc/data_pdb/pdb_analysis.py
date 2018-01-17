@@ -1,6 +1,7 @@
 from Bio import SeqIO
 import pandas as pd
 import configparser
+import re
 import os
 from deconstruct_lc import tools_fasta
 from deconstruct_lc import tools_lc
@@ -49,9 +50,6 @@ class PdbAnalysis(object):
         df['LCA+LCE'] = lcs
         return df
 
-    def add_unique_score(self):
-        pass
-
     def get_missing(self, miss_seqs):
         miss = []
         for seq in miss_seqs:
@@ -63,6 +61,7 @@ class PdbAnalysis(object):
         return pids
 
     def write_full(self):
+        """Write sequence, missing. Remove histags from both."""
         all_pids = self.get_pids()
         count = 0
         with open(self.all_seq, 'r') as seq_fi, \
@@ -75,9 +74,32 @@ class PdbAnalysis(object):
                     if pid in all_pids:
                         count += 1
                         print(count)
-                        miss_seq = str(dis_rec.seq)
-                        seq = str(seq_rec.seq)
+                        seq, miss_seq = self.remove_histag(str(seq_rec.seq),
+                                                           str(dis_rec.seq))
                         fo.write('{}\t{}\t{}\n'.format(pid, seq, miss_seq))
+
+    def remove_histag(self, seq, miss_seq):
+        """Remove histags from the sequence and the corresponding missing
+        sequence"""
+        regex = r'H{6}H*'
+        match = re.finditer(regex, seq)
+        indexes = []
+        for item in match:
+            indexes.append(item.start())
+            indexes.append(item.end())
+        nseq = self.slice_seq(indexes, seq)
+        nmseq = self.slice_seq(indexes, miss_seq)
+        return nseq, nmseq
+
+    def slice_seq(self, indexes, seq):
+        if len(indexes) > 0:
+            nseq = seq[:indexes[0]]
+            for i in range(1, len(indexes) - 1, 2):
+                nseq += seq[indexes[i]:indexes[i + 1]]
+            nseq += seq[indexes[-1]:]
+        else:
+            nseq = seq
+        return nseq
 
 
 def main():

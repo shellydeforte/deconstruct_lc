@@ -1,4 +1,5 @@
 import os
+import re
 from Bio import SeqIO
 
 
@@ -85,8 +86,33 @@ def get_lengths(seqs):
     return lengths
 
 
+def remove_all_histags(seqs):
+    nseqs = []
+    for seq in seqs:
+        nseqs.append(remove_histag(seq))
+    return nseqs
+
+
+def remove_histag(seq):
+    """If H*6 or greater, remove from sequence"""
+    regex = r'H{6}H*'
+    #nseq = re.sub(regex, '', seq)
+    match = re.finditer(regex, seq)
+    indexes = []
+    for item in match:
+        indexes.append(item.start())
+        indexes.append(item.end())
+    nseq = seq[:indexes[0]]
+    for i in range(1,len(indexes)-1, 2):
+        nseq += seq[indexes[i]:indexes[i+1]]
+    nseq += seq[indexes[-1]:]
+    return nseq
+
+
 def main():
-    pass
+    seq = 'ABCHHHHHHHREBHHHHHHQ'
+    nseq = remove_histag(seq)
+    print(nseq)
 
 
 if __name__ == '__main__':
