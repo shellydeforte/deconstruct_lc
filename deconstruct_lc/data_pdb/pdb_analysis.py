@@ -29,7 +29,7 @@ class PdbAnalysis(object):
     def write_analysis(self):
         df = pd.read_csv(self.pdb_all_df, sep='\t')
         df = df.drop_duplicates(subset=['Sequence', 'Missing'], keep=False)
-        df = df.reset_index()
+        df = df.reset_index(drop=True)
         df = self.add_raw_score(df)
         df.to_csv(self.pdb_an_df, sep='\t')
 
@@ -38,13 +38,19 @@ class PdbAnalysis(object):
         miss_seqs = list(df['Missing'])
         lcas = tools_lc.calc_lca_motifs(seqs, self.k_lca, self.alph_lca)
         lces = tools_lc.calc_lce_motifs(seqs, self.k_lce, self.thresh_lce)
+        lcs = tools_lc.calc_lc_motifs(seqs, self.k_lca, self.alph_lca,
+                                      self.thresh_lce)
         lengths = tools_fasta.get_lengths(seqs)
         miss = self.get_missing(miss_seqs)
         df['Length'] = lengths
         df['Miss Count'] = miss
         df[self.lca_label] = lcas
         df[self.lce_label] = lces
+        df['LCA+LCE'] = lcs
         return df
+
+    def add_unique_score(self):
+        pass
 
     def get_missing(self, miss_seqs):
         miss = []
