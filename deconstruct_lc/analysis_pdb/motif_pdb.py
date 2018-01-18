@@ -1,3 +1,4 @@
+# look at https://stackoverflow.com/questions/3949226/calculating-pearson-correlation-and-significance-in-python
 import configparser
 import os
 from Bio import SeqIO
@@ -35,15 +36,53 @@ class MissMotif(object):
         self.lce_label = '{}_{}'.format(self.k_lce, self.thresh_lce)
         self.lc_vs_miss_fp = os.path.join(self.pdb_an_dp, 'lc_vs_miss.tsv')
 
+    def plot_corr(self):
+        """Result: The difference in the correlations isn't that great,
+        not enough to be able to say that the motifs are the primary driving force
+        I could use this if I want to make the point that they BOTH
+        influence the number of missing residues."""
+        fl_x, fl_corr = self.corr_fix_len()
+        fs_x, fs_corr = self.corr_fix_score()
+        plt.scatter(fl_x, fl_corr)
+        plt.show()
+        plt.scatter(fs_x, fs_corr)
+        plt.show()
 
-    def check_correlation(self):
-        # look at https://stackoverflow.com/questions/3949226/calculating-pearson-correlation-and-significance-in-python
+    def corr_fix_len(self):
         df = pd.read_csv(self.pdb_an_fp, sep='\t', index_col=0)
-        #df = df[(df['LCA+LCE'] >= 30) & (df['LCA+LCE'] <= 40)]
-        df = df[(df['Length'] >= 500) & (df['Length'] <= 550)]
-        scores = list(df['Miss Count'])
-        miss = list(df['LCA+LCE'])
-        print(pearsonr(miss, scores))
+        bin = range(100, 1000, 1)
+        num_prots = []
+        pcorr = []
+        x = []
+        for i in bin:
+            ndf = df[(df['Length'] >= i) & (df['Length'] < i+50)]
+            num_prots.append(len(ndf))
+            scores = list(ndf['Miss Count'])
+            miss = list(ndf['LCA+LCE'])
+            corr = pearsonr(miss, scores)
+            if corr[1] < 0.05:
+                x.append(i)
+                pcorr.append(corr[0])
+        return x, pcorr
+
+    def corr_fix_score(self):
+        df = pd.read_csv(self.pdb_an_fp, sep='\t', index_col=0)
+        df = df[(df['Length'] >= 100) & (df['Length'] <= 2000)]
+        bin = range(0, 35, 1)
+        num_prots = []
+        pcorr = []
+        x = []
+        for i in bin:
+            ndf = df[(df['LCA+LCE'] >= i) & (df['LCA+LCE'] < i+2)]
+            num_prots.append(len(ndf))
+            scores = list(ndf['Miss Count'])
+            miss = list(ndf['Length'])
+            corr = pearsonr(miss, scores)
+            if corr[1] < 0.05:
+                x.append(i)
+                pcorr.append(corr[0])
+        return x, pcorr
+
 
     def plot_lc_vs_miss(self):
         df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
@@ -237,7 +276,7 @@ class MissMotif(object):
 
 def main():
     mm = MissMotif()
-    mm.check_correlation()
+    mm.plot_corr()
 
 
 if __name__ == '__main__':
