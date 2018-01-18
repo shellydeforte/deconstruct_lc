@@ -2,6 +2,7 @@
 import configparser
 import os
 from Bio import SeqIO
+import random
 import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
 import numpy as np
@@ -36,6 +37,68 @@ class MissMotif(object):
         self.lce_label = '{}_{}'.format(self.k_lce, self.thresh_lce)
         self.lc_vs_miss_fp = os.path.join(self.pdb_an_dp, 'lc_vs_miss.tsv')
 
+    def motif_vs_coverage(self):
+        df = pd.read_csv(self.pdb_an_fp, sep='\t', index_col=0)
+        bin = range(100, 1000, 100)
+        all_motif_percs = []
+        all_motif_stds = []
+        x = []
+        for i in bin:
+            motif_percs = []
+            print(i)
+            ndf = df[(df['Length'] >= i) & (df['Length'] < i + 100)]
+            for i, row in ndf.iterrows():
+                seq = row['Sequence']
+                ind_in = self.get_inds(seq)
+                motif_percs.append(len(ind_in) / len(seq))
+            x.append(i)
+            all_motif_percs.append(np.mean(motif_percs))
+            all_motif_stds.append(np.std(motif_percs))
+            print(all_motif_percs)
+            print(all_motif_stds)
+
+    def coverage_random(self):
+        df = pd.read_csv(self.pdb_an_fp, sep='\t', index_col=0)
+        bin = range(100, 1000, 100)
+        all_motif_percs = []
+        all_motif_stds = []
+        x = []
+        for i in bin:
+            motif_percs = []
+            print(i)
+            ndf = df[(df['Length'] >= i) & (df['Length'] < i + 100)]
+            aseq = list(ndf['Sequence'])
+            seqs = self.create_random(aseq)
+            for seq in seqs:
+                ind_in = self.get_inds(seq)
+                motif_percs.append(len(ind_in) / len(seq))
+            x.append(i)
+            all_motif_percs.append(np.mean(motif_percs))
+            all_motif_stds.append(np.std(motif_percs))
+            print(all_motif_percs)
+            print(all_motif_stds)
+
+    def create_random(self, seqs):
+        nseqs = []
+        for seq in seqs:
+            lseq = [a for a in seq]
+            random.shuffle(lseq)
+            nseqs.append(''.join(lseq))
+        return nseqs
+
+    def plot_coverage(self):
+        tmean = [0.23613392480397224, 0.24129299067670479, 0.20363240784003156,
+         0.21521984605747985, 0.21560380306075025, 0.2126832223655015,
+         0.20074931437836224, 0.19808298265652774, 0.20585607288722238]
+        tstd = [0.098707938782962051, 0.093531289182195776,
+               0.065869324533671433,
+         0.059857030693938475, 0.055764428149622389, 0.052605567548994127,
+         0.056823970944672043, 0.0423112359041719, 0.033929398744321125]
+        x = [100, 200, 300, 400, 500, 600, 700, 800, 900]
+        plt.xlim([0, 1000])
+        plt.errorbar(x, tmean, tstd, linestyle='None', marker='o',
+                     capsize=3)
+        plt.show()
 
     def plot_lc_vs_miss(self):
         df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
@@ -229,7 +292,7 @@ class MissMotif(object):
 
 def main():
     mm = MissMotif()
-    mm.plot_lc_vs_miss()
+    mm.coverage_random()
 
 
 if __name__ == '__main__':
