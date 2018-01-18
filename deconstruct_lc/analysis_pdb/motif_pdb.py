@@ -229,7 +229,7 @@ class MissMotif(object):
 
 def main():
     mm = MissMotif()
-    mm.plot_corr()
+    mm.plot_lc_vs_miss()
 
 
 if __name__ == '__main__':
