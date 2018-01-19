@@ -13,6 +13,11 @@ cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
 config.read_file(open(cfg_fp, 'r'))
 
 class PdbAnalysis(object):
+    """
+    Need to add secondary structure, and also, need to do normalized score I think.
+    I need to make this point about LC motifs being destablized in the
+    context of the normalized score or the message isn't as powerful.
+    """
     def __init__(self):
         self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
         self.pdb_miss_fp = os.path.join(self.pdb_dp, 'pdb_norm_all.fasta')
