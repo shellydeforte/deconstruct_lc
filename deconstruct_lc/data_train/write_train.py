@@ -21,7 +21,7 @@ class WriteTrain(object):
         self.pdb_fpi = os.path.join(self.dp, 'pdb_prep',
                                       'pdb_train_cd90.tsv')
         self.bc_fpi = os.path.join(self.dp, 'bc_prep', 'bc_train_cd90.fasta')
-        self.fpo = os.path.join(self.dp, 'train.tsv')
+        self.fpo = config['filepaths']['train_fp']
 
     def concat_train(self):
         bc_pids, bc_seqs = tools_fasta.fasta_to_id_seq(self.bc_fpi)
