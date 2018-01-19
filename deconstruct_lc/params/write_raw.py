@@ -1,12 +1,19 @@
+import configparser
+import os
 import pandas as pd
 from deconstruct_lc.params import lc_labels
 from deconstruct_lc import tools_fasta
 from deconstruct_lc import tools_lc
 
+config = configparser.ConfigParser()
+cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
+                                   'config.cfg'))
+config.read_file(open(cfg_fp, 'r'))
+
 class WriteRaw(object):
-    def __init__(self, k, pdb_fp, bc_fp):
-        self.pdb_fp = pdb_fp
-        self.bc_fp = bc_fp
+    """I NEED TO FIX ALL THIS"""
+    def __init__(self, k):
+        self.train_fp = config['filepaths']['train_fp']
         self.all_ids, self.all_seqs, self.y = self.get_seqs()
         self.all_lens = tools_fasta.get_lengths(self.all_seqs)
         self.k = k
