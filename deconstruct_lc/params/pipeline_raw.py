@@ -14,10 +14,10 @@ class PipeRaw(object):
         self.train_fp = config['filepaths']['train_fp']
         self.param_dp = os.path.join(config['filepaths']['data_dp'], 'params')
         self.all_ids, self.all_seqs, self.all_lens, self.y = self.get_seqs()
-        #self.kr = (3, 21)
-        self.kr = (3, 4)
-        #self.alph = 'SGEQAPDTNKRL'
-        self.alph = 'SGE'
+        self.kr = (2, 21)
+        self.alph = 'SGEQAPDTNKRL'
+        #self.kr = (2, 3)
+        #self.alph = 'SGE'
 
     def get_seqs(self):
         df = pd.read_csv(self.train_fp, sep='\t', index_col=0)
