@@ -112,6 +112,29 @@ def shannon(astring):
     return entropy
 
 
+def lc_to_indexes(sequence, k, lca, lce):
+    kmers = seq_to_kmers(sequence, k)
+    ind_in = set()
+    for i, kmer in enumerate(kmers):
+        if lca_motif(kmer, lca):
+            for j in range(i, i+k):
+                ind_in.add(j)
+        elif lce_motif(kmer, lce):
+            for j in range(i, i+k):
+                ind_in.add(j)
+        else:
+            pass
+    return ind_in
+
+def lc_to_lens(sequence, k, lca, lce):
+    ind_in = lc_to_indexes(sequence, k, lca, lce)
+    intervals = tools.ints_to_ranges(sorted(list(ind_in)))
+    lens = []
+    for inter in intervals:
+        lens.append((inter[1]-inter[0])+1)
+    return lens
+
+
 def lca_to_interval(sequence, k, lca):
     """
     Returns inclusive interval, where all numbers are in the motif, ie (0, 6)
