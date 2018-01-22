@@ -71,7 +71,7 @@ class NormRaw(object):
         lca = 0.810
         lce = 0.780
         lca + lce = 0.817
-        lc + lca + lce = 0.820
+        lc + lca + lce = 0.820 (linear - 0.865 normal rbf)
         :return:
         """
         df = pd.read_csv(self.train_fpi, sep='\t', index_col=0)
@@ -79,18 +79,21 @@ class NormRaw(object):
         lengths = df['Length']
         scores = self.calc_lce(seqs)
         lc, lca, lce = self.get_m_b()
+
         m, b = lce
         lce_norm = self.norm_function(m, b, scores, lengths)
         scores = self.calc_lca(seqs)
+
         m, b = lca
         lca_norm = self.norm_function(m, b, scores, lengths)
         #X = np.array([lca_norm, lce_norm]).T.reshape(-1, 1)
         scores = self.calc_lc(seqs)
+
         m, b = lc
         lc_norm = self.norm_function(m, b, scores, lengths)
         X = np.array([lca_norm, lce_norm, lc_norm]).T
         y = np.array(df['y']).T
-        clf = svms.linear_svc(X, y)
+        clf = svms.normal_rbf(X, y)
         print(clf.score(X, y))
 
     def write_raw(self):
