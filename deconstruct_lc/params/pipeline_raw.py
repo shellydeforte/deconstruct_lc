@@ -16,6 +16,8 @@ class PipeRaw(object):
         self.all_ids, self.all_seqs, self.all_lens, self.y = self.get_seqs()
         #self.kr = (3, 21)
         self.kr = (3, 4)
+        #self.alph = 'SGEQAPDTNKRL'
+        self.alph = 'SGE'
 
     def get_seqs(self):
         df = pd.read_csv(self.train_fp, sep='\t', index_col=0)
@@ -26,14 +28,12 @@ class PipeRaw(object):
         return all_ids, all_seqs, all_lens, y
 
     def all_lca(self):
-        #alph = 'SGEQAPDTNKRL'
-        alph = 'SGE'
         df_dict = self.init_df_dict()
         for k in range(self.kr[0], self.kr[1]):
-            fno = 'raw_{}_{}.tsv'.format(k, alph)
+            fno = 'raw_{}_lca.tsv'.format(k)
             fpo = os.path.join(self.param_dp, fno)
             wr = WriteRaw(k, self.all_seqs, df_dict)
-            df = wr.write_lca(alph)
+            df = wr.write_lca(self.alph)
             df.to_csv(fpo, sep='\t')
 
     def all_lce(self):
@@ -52,6 +52,7 @@ class PipeRaw(object):
 
 def main():
     pipe = PipeRaw()
+    pipe.all_lca()
     pipe.all_lce()
 
 
