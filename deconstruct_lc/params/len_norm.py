@@ -1,65 +1,57 @@
+import configparser
+import os
+from scipy.stats import linregress
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn import linear_model
+from deconstruct_lc import tools_fasta
+from deconstruct_lc import tools_lc
+
+config = configparser.ConfigParser()
+cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
+                                   'config.cfg'))
+config.read_file(open(cfg_fp, 'r'))
 
 
-class PdbNorm(object):
-    def __init__(self, lca_label, lce_label, pdb_df):
-        self.lca_label = lca_label
-        self.lce_label = lce_label
-        self.pdb_df = pdb_df
-        self.bin_range = [100, 700]
+class LenNorm(object):
+    def __init__(self):
+        self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
+        self.pdb_fp = os.path.join(self.pdb_dp, 'pdb_norm_cd100.tsv')
+        self.seqs = self.read_seqs()
+        self.lens = tools_fasta.get_lengths(self.seqs)
 
-    def mb_from_bins(self, pl):
-        lca_m, lca_b = self._score_bins(self.pdb_df, self.lca_label, pl)
-        lce_m, lce_b = self._score_bins(self.pdb_df, self.lce_label, pl)
-        cols = ['lca', 'lce', 'lca_m', 'lca_b', 'lce_m', 'lce_b']
-        df_dict = {'lca': [self.lca_label], 'lce': [self.lce_label],
-                   'lca_m': [lca_m], 'lca_b': [lca_b],
-                   'lce_m': [lce_m], 'lce_b': [lce_b]}
-        df = pd.DataFrame(df_dict)
-        return df, cols
+    def read_seqs(self):
+        df = pd.read_csv(self.pdb_fp, sep='\t', index_col=0)
+        seqs = list(df['Sequence'])
+        return seqs
 
-    def _score_bins(self, pdb_df, label, pl=False):
-        means = []
-        stds = []
-        x = []
-        for i in range(self.bin_range[0], self.bin_range[1], 50):
-            df = pdb_df.loc[(pdb_df['Length'] <= i+50)
-                             & (pdb_df['Length'] > i)]
-            if len(df) > 0:
-                dm = df[label].mean()
-                x.append(i+25)
-                means.append(dm)
-                ds = df[label].std()
-                stds.append(ds)
-        regr = linear_model.LinearRegression()
-        X = np.array(x).reshape(-1, 1)
-        y = np.array(means).reshape(-1, 1)
-        regr.fit(X, y)
-        m = regr.coef_
-        b = regr.intercept_
-        if pl == True:
-            self._plot_bins(m, b, x, means, stds)
-        return m[0][0], b[0]
+    def mb_lca(self, k, lca):
+        scores = tools_lc.calc_lca_motifs(self.seqs, k, lca)
+        lr = linregress(self.lens, scores)
+        m = lr[0]
+        b = lr[1]
+        return m, b
 
-    def _plot_bins(self, m, b, x, means, stds):
-        x_line = np.arange(self.bin_range[1])
-        y_line = self._line_equation(x_line, m, b)
-        plt.errorbar(x, means, stds, linestyle='None', marker='o')
-        plt.plot(x_line, y_line[0])
-        plt.xlabel('Protein Length')
-        plt.ylabel('Mean score')
-        plt.title('Mean score in bins of protein length = 50')
-        plt.show()
+    def mb_lce(self, k, lce):
+        scores = tools_lc.calc_lce_motifs(self.seqs, k, lce)
+        lr = linregress(self.lens, scores)
+        m = lr[0]
+        b = lr[1]
+        return m, b
 
-    def _line_equation(self, x, m, b):
-        y = m*x + b
-        return y
+    def mb_lc(self, k, lca, lce):
+        scores = tools_lc.calc_lc_motifs(self.seqs, k, lca, lce)
+        lr = linregress(self.lens, scores)
+        m = lr[0]
+        b = lr[1]
+        return m, b
+
 
 def main():
-    pass
+    ln = LenNorm()
+    k = 6
+    lca = 'SGEQAPDTNKR'
+    m, b = ln.mb_lca(k, lca)
+    print(m)
+    print(b)
 
 
 if __name__ == '__main__':
