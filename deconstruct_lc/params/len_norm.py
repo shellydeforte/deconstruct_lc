@@ -49,7 +49,8 @@ def main():
     ln = LenNorm()
     k = 6
     lca = 'SGEQAPDTNKR'
-    m, b = ln.mb_lca(k, lca)
+    lce = 1.6
+    m, b = ln.mb_lc(k, lca, lce)
     print(m)
     print(b)
 
