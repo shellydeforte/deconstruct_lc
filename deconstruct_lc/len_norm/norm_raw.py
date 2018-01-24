@@ -100,10 +100,3 @@ class NormRaw(object):
         pass
 
 
-def main():
-    nr = NormRaw()
-    nr.classify()
-
-
-if __name__ == '__main__':
-    main()
