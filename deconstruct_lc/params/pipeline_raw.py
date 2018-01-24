@@ -30,6 +30,7 @@ class PipeRaw(object):
     def all_lca(self):
         df_dict = self.init_df_dict()
         for k in range(self.kr[0], self.kr[1]):
+            print(k)
             fno = 'raw_{}_lca.tsv'.format(k)
             fpo = os.path.join(self.param_dp, fno)
             wr = WriteRaw(k, self.all_seqs, df_dict)
@@ -39,6 +40,7 @@ class PipeRaw(object):
     def all_lce(self):
         df_dict = self.init_df_dict()
         for k in range(self.kr[0], self.kr[1]):
+            print(k)
             fno = 'raw_{}_lce.tsv'.format(k)
             fpo = os.path.join(self.param_dp, fno)
             wr = WriteRaw(k, self.all_seqs, df_dict)
