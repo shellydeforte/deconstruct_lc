@@ -8,7 +8,8 @@ class NormScore(object):
         self.lce = 1.6
         self.lca = 'SGEQAPDTNKR'
         self.lc_m = 0.066213297264721263
-        self.lc_b = 1.7520712972708843
+        #self.lc_b = 1.7520712972708843 + 15
+        self.lc_b = 16.5
         self.lca_m = 0.049569081348185169
         self.lca_b = 1.5446026962158523
         self.lce_m = 0.022592872067308627
