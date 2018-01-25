@@ -16,6 +16,17 @@ def seq_to_kmers(sequence, k):
     return kmers
 
 
+def seq_to_kmers_nomiss(seq, miss_seq, k):
+    """Only return kmers without a missing residue"""
+    seq_kmers = seq_to_kmers(seq, k)
+    miss_kmers = seq_to_kmers(miss_seq, k)
+    new_kmers = []
+    for seq_kmer, miss_kmer in zip(seq_kmers, miss_kmers):
+        if miss_kmer.count('X') == 0:
+            new_kmers.append(seq_kmer)
+    return new_kmers
+
+
 def calc_lce_motifs(sequences, k, lce):
     """Given a list of sequences, return a list of motif counts for each
     sequence"""
@@ -44,6 +55,27 @@ def calc_lc_motifs(sequences, k, lca, lce):
         motif_count = count_lc_motifs(sequence, k, lca, lce)
         motif_counts.append(motif_count)
     return motif_counts
+
+
+def calc_lc_motifs_nomiss(seqs, miss_seqs, k, lca, lce):
+    motif_counts = []
+    for seq, miss_seq in zip(seqs, miss_seqs):
+        motif_count = count_lc_motifs_nomiss(seq, miss_seq, k, lca, lce)
+        motif_counts.append(motif_count)
+    return motif_counts
+
+
+def count_lc_motifs_nomiss(seq, miss_seq, k, lca, lce):
+    kmers = seq_to_kmers_nomiss(seq, miss_seq, k)
+    motif_count = 0
+    for kmer in kmers:
+        if lca_motif(kmer, lca):
+            motif_count += 1
+        elif lce_motif(kmer, lce):
+            motif_count += 1
+        else:
+            pass
+    return motif_count
 
 
 def count_lc_motifs(sequence, k, lca, lce):
@@ -125,6 +157,7 @@ def lc_to_indexes(sequence, k, lca, lce):
         else:
             pass
     return ind_in
+
 
 def lc_to_lens(sequence, k, lca, lce):
     ind_in = lc_to_indexes(sequence, k, lca, lce)

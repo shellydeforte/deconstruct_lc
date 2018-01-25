@@ -8,15 +8,17 @@ class NormScore(object):
         self.lce = 1.6
         self.lca = 'SGEQAPDTNKR'
         self.lc_m = 0.066213297264721263
-        #self.lc_b = 1.7520712972708843 + 15
         self.lc_b = 16.5
-        self.lca_m = 0.049569081348185169
-        self.lca_b = 1.5446026962158523
-        self.lce_m = 0.022592872067308627
-        self.lce_b = 0.37785221922942025
 
     def lc_norm_score(self):
         scores = tools_lc.calc_lc_motifs(self.seqs, self.k, self.lca, self.lce)
+        lc_norm = self.norm_function(self.lc_m, self.lc_b, scores, self.lens)
+        return lc_norm
+
+    def lc_miss_norm(self, miss_seqs):
+        """For PDB chains, do not count the kmer if it has a missing residue"""
+        scores = tools_lc.calc_lc_motifs_nomiss(self.seqs, miss_seqs, self.k,
+                                                self.lca, self.lce)
         lc_norm = self.norm_function(self.lc_m, self.lc_b, scores, self.lens)
         return lc_norm
 
