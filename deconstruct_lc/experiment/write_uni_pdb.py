@@ -1,7 +1,7 @@
+from collections import defaultdict
 import configparser
 import os
 import pandas as pd
-from collections import defaultdict
 from deconstruct_lc import tools_fasta
 
 config = configparser.ConfigParser()
@@ -93,7 +93,7 @@ class UniPdb(object):
 
 def main():
     pipe = UniPdb()
-    pdb_uni = pipe.write_uni_pdb_org_comp()
+    pipe.write_uni_pdb_org_comp()
 
 
 if __name__ == '__main__':
