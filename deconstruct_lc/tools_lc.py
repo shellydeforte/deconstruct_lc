@@ -228,6 +228,17 @@ def display_lca(sequence, alph_lca, k_lca):
     return new_sequence
 
 
+def display_lc(sequence, k, lca, lce):
+    inds = lc_to_indexes(sequence, k, lca, lce)
+    new_sequence = ''
+    for i, let in enumerate(sequence):
+        if i in inds:
+            new_sequence += '-'
+        else:
+            new_sequence += let
+    return new_sequence
+
+
 def main():
     pass
 
