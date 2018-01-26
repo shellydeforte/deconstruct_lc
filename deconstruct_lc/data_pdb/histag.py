@@ -1,7 +1,9 @@
 import re
 
 
-def remove_histag(seqs):
+def remove_histags(seqs):
+    """Remove histags from a list of sequences and return a list of the new
+    histags as well as the number of sequences with histags removed"""
     nseqs = []
     num_his = 0
     for seq in seqs:
@@ -11,6 +13,16 @@ def remove_histag(seqs):
         nseq = slice_seq(indexes, seq)
         nseqs.append(nseq)
     return nseqs, num_his
+
+
+def remove_histag_miss(seq, miss_seq):
+    """Remove histags from the sequence and the corresponding missing
+    sequence"""
+    indexes = find_histag(seq)
+    nseq = slice_seq(indexes, seq)
+    nmseq = slice_seq(indexes, miss_seq)
+    return nseq, nmseq
+
 
 def find_histag(seq):
     regex = r'H{6}H*'
