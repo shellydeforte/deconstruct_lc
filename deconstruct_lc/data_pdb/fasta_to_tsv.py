@@ -26,11 +26,12 @@ class FastaTsv(object):
         self.all_fpo = os.path.join(self.pdb_dp, 'pdb_all.tsv')
         self.all_seq = os.path.join(self.pdb_dp, 'all_seqs.fasta')
         self.all_dis = os.path.join(self.pdb_dp, 'all_dis.fasta')
+        self.all_ss = os.path.join(self.pdb_dp, 'all_ss.fasta')
 
     def write_tsv(self):
-        #self.train_df()
-        #self.write_full(self.all_fpi, self.all_fpo)
-        self.write_full(self.norm_fpi, self.norm_fpi)
+        self.train_df()
+        self.write_full(self.all_fpi, self.all_fpo)
+        self.write_full(self.norm_fpi, self.norm_fpo)
 
     def train_df(self):
         pids, seqs = tools_fasta.fasta_to_id_seq(self.train_fpi)
@@ -50,23 +51,37 @@ class FastaTsv(object):
         print("There are {} entries in train_df".format(len(train_df)))
 
     def write_full(self, fasta, fpo):
-        """Write sequence, missing, if in the list of pids. Remove histags
-        from both."""
+        """
+        Write sequence, missing, secondary structure if in the list of pids.
+        Remove histags from all. This is for longer files where you can't load
+        sequences into memory
+        """
         all_pids = self.get_pids(fasta)
         count = 0
         with open(self.all_seq, 'r') as seq_fi, \
-             open(self.all_dis, 'r') as dis_fi:
+             open(self.all_dis, 'r') as dis_fi, \
+             open(self.all_ss, 'r') as ss_fi:
             with open(fpo, 'w') as fo:
-                fo.write('Protein ID\tSequence\tMissing\n')
-                for seq_rec, dis_rec in zip(SeqIO.parse(seq_fi, 'fasta'),
-                                        SeqIO.parse(dis_fi, 'fasta')):
+                fo.write('Protein ID\tSequence\tMissing\tSecondary '
+                         'Structure\n')
+                for seq_rec, dis_rec, ss_rec in zip(SeqIO.parse(seq_fi, 'fasta'),
+                                                    SeqIO.parse(dis_fi, 'fasta'),
+                                                    SeqIO.parse(ss_fi, 'fasta')):
                     pid = tools_fasta.id_cleanup(seq_rec.id)
                     if pid in all_pids:
                         count += 1
                         print(count)
-                        seq, miss_seq = histag.remove_histag_miss(str(
-                            seq_rec.seq), str(dis_rec.seq))
-                        fo.write('{}\t{}\t{}\n'.format(pid, seq, miss_seq))
+                        seq = str(seq_rec.seq)
+                        mseq = str(dis_rec.seq)
+                        ss_seq = str(ss_rec.seq)
+                        his_inds = histag.find_histag(str(seq_rec.seq))
+
+                        nseq = histag.slice_seq(his_inds, seq)
+                        nmseq = histag.slice_seq(his_inds, mseq)
+                        nss_seq = histag.slice_seq(his_inds, ss_seq)
+                        assert len(nseq) == len(nmseq) == len(nss_seq)
+                        fo.write('{}\t{}\t{}\t{}\n'.format(pid, nseq, nmseq,
+                                                           nss_seq))
 
     def get_pids(self, fasta):
         pids, seqs = tools_fasta.fasta_to_id_seq(fasta)
