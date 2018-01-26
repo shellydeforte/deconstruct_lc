@@ -36,7 +36,7 @@ class LcLens(object):
 
     def lens_vs_lc(self):
         df = pd.read_csv(self.pdb_an_fp, sep='\t', index_col=0)
-        ndf = df[(df['LCA+LCE'] >= 30)]
+        ndf = df[(df['LC'] >= 30)]
         seqs = ndf['Sequence']
         all_lens = []
         for seq in seqs:
@@ -52,7 +52,7 @@ class LcLens(object):
         df = pd.read_csv(self.train_fp, sep='\t', index_col=0)
         bc_df = df[df['y'] == 0]
         pdb_df = df[df['y'] == 1]
-        pdb_df = pdb_df[pdb_df['LCA+LCE'] > 30]
+        pdb_df = pdb_df[pdb_df['LC'] > 30]
         bc_seqs = bc_df['Sequence']
         pdb_seqs = pdb_df['Sequence']
         all_bc_lens = []
