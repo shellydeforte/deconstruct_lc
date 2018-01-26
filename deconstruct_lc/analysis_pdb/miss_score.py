@@ -20,25 +20,6 @@ class MissScore(object):
         self.an_fpi = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
         self.lc_vs_miss_fp = os.path.join(self.pdb_an_dp, 'lc_vs_miss.tsv')
 
-    def plot_lc_vs_miss(self):
-        df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
-        frac_w_miss = list(df['Fraction Missing'])
-        num_miss = list(df['Average Missing Residues'])
-        std_num_miss = list(df['STD Missing Residues'])
-        labels = list(df['Labels'])
-        x = list(range(len(frac_w_miss)))
-        plt.xticks(x, labels, rotation=45)
-        plt.xlim([-1, len(x)+1])
-        #plt.errorbar(x, num_miss, std_num_miss, linestyle='None', marker='o',
-        #             capsize=3, label='Average missing residues')
-        #plt.ylabel('Average Missing Residues')
-        plt.xlabel('LC motifs')
-        #plt.ylim([0,200])
-        plt.ylabel('Fraction of proteins with missing residues')
-        plt.scatter(x, frac_w_miss)
-        plt.plot(x, frac_w_miss)
-        plt.show()
-
     def plot_lc_miss(self):
         df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
         frac_w_miss = list(df['Fraction Missing'])
