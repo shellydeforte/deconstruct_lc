@@ -1,18 +1,17 @@
 import configparser
+import matplotlib.pyplot as plt
+import numpy as np
 import os
 import pandas as pd
-import numpy as np
-from scipy.stats import linregress
-import matplotlib.pyplot as plt
+
 from deconstruct_lc import tools_lc
-from deconstruct_lc.svm import svms
 from deconstruct_lc.len_norm.len_norm import LenNorm
-from deconstruct_lc.scores.norm_score import NormScore
 
 config = configparser.ConfigParser()
 cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
                                    'config.cfg'))
 config.read_file(open(cfg_fp, 'r'))
+
 
 class PlotLenNorm(object):
     def __init__(self):
@@ -53,6 +52,28 @@ class PlotLenNorm(object):
         plt.ylabel('Raw LC score')
         plt.show()
 
+    def plot_nomiss(self):
+        """Show that the PDB norm dataset moves below the trendline when you
+        don't count missing residues"""
+        df = pd.read_csv(self.norm_fpi, sep='\t', index_col=0)
+        seqs = df['Sequence']
+        miss_seqs = df['Missing']
+        lens = [len(seq) for seq in seqs]
+        raw_scores = tools_lc.calc_lc_motifs_nomiss(seqs, miss_seqs, self.k,
+                                                    self.lca, self.lce)
+        plt.scatter(lens, raw_scores, alpha=0.1, color='darkblue')
+        x = np.arange(0, 1500, 0.01)
+        y1 = self.plot_line(self.lc_m, self.lc_b, x)
+        y2 = self.plot_line(self.lc_m, self.lc_b_up, x)
+        plt.plot(x, y1, color='black', lw=2)
+        plt.plot(x, y2, color='black', lw=2, linestyle='--')
+        plt.xlim([0, 1500])
+        plt.ylim([0, 150])
+        plt.xlabel('Protein sequence length')
+        plt.ylabel('Raw LC score')
+        plt.show()
+
+
     def plot_line(self, m, b, x):
         y = m*x + b
         return y
@@ -60,7 +81,7 @@ class PlotLenNorm(object):
 
 def main():
     pln = PlotLenNorm()
-    pln.plot_scatter()
+    pln.plot_nomiss()
 
 
 if __name__ == '__main__':
