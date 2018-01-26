@@ -1,3 +1,4 @@
+from Bio import SeqIO
 import configparser
 import os
 import pandas as pd
@@ -19,25 +20,28 @@ class FastaTsv(object):
         self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
         self.norm_fpi = os.path.join(self.pdb_dp, 'pdb_norm_cd100.fasta')
         self.train_fpi = os.path.join(self.pdb_dp, 'pdb_train_cd90.fasta')
+        self.all_fpi = os.path.join(self.pdb_dp, 'pdb_all.fasta')
         self.norm_fpo = os.path.join(self.pdb_dp, 'pdb_norm_cd100.tsv')
         self.train_fpo = os.path.join(self.pdb_dp, 'pdb_train_cd90.tsv')
+        self.all_fpo = os.path.join(self.pdb_dp, 'pdb_all.tsv')
+        self.all_seq = os.path.join(self.pdb_dp, 'all_seqs.fasta')
+        self.all_dis = os.path.join(self.pdb_dp, 'all_dis.fasta')
 
     def write_tsv(self):
-        norm_df = self.new_df(self.norm_fpi)
-        norm_df.to_csv(self.norm_fpo, sep='\t')
-        train_df = self.new_df(self.train_fpi)
-        train_df.to_csv(self.train_fpo, sep='\t')
+        #self.train_df()
+        #self.write_full(self.all_fpi, self.all_fpo)
+        self.write_full(self.norm_fpi, self.norm_fpi)
 
-    def new_df(self, fpi):
-        pids, seqs = tools_fasta.fasta_to_id_seq(fpi)
-        nseqs, num_his = histag.remove_histag(seqs)
+    def train_df(self):
+        pids, seqs = tools_fasta.fasta_to_id_seq(self.train_fpi)
+        nseqs, num_his = histag.remove_histags(seqs)
         lens = tools_fasta.get_lengths(nseqs)
         df_dict = {'Protein ID': pids, 'Sequence': nseqs, 'Length': lens}
         cols = ['Protein ID', 'Sequence', 'Length']
         df = pd.DataFrame(df_dict, columns=cols)
         print("{} PDB chains had at least one His-Tag removed from {}".format(
-            num_his, fpi))
-        return df
+            num_his, self.train_fpi))
+        df.to_csv(self.train_fpo, sep='\t')
 
     def df_stats(self):
         norm_df = pd.read_csv(self.norm_fpo, sep='\t', index_col=0)
@@ -45,11 +49,33 @@ class FastaTsv(object):
         print("There are {} entries in norm_df".format(len(norm_df)))
         print("There are {} entries in train_df".format(len(train_df)))
 
+    def write_full(self, fasta, fpo):
+        """Write sequence, missing, if in the list of pids. Remove histags
+        from both."""
+        all_pids = self.get_pids(fasta)
+        count = 0
+        with open(self.all_seq, 'r') as seq_fi, \
+             open(self.all_dis, 'r') as dis_fi:
+            with open(fpo, 'w') as fo:
+                fo.write('Protein ID\tSequence\tMissing\n')
+                for seq_rec, dis_rec in zip(SeqIO.parse(seq_fi, 'fasta'),
+                                        SeqIO.parse(dis_fi, 'fasta')):
+                    pid = tools_fasta.id_cleanup(seq_rec.id)
+                    if pid in all_pids:
+                        count += 1
+                        print(count)
+                        seq, miss_seq = histag.remove_histag_miss(str(
+                            seq_rec.seq), str(dis_rec.seq))
+                        fo.write('{}\t{}\t{}\n'.format(pid, seq, miss_seq))
+
+    def get_pids(self, fasta):
+        pids, seqs = tools_fasta.fasta_to_id_seq(fasta)
+        return pids
+
 
 def main():
     ft = FastaTsv()
     ft.write_tsv()
-    ft.df_stats()
 
 
 if __name__ == '__main__':
