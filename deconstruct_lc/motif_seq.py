@@ -1,7 +1,7 @@
 from deconstruct_lc import tools_lc
 
 class LcSeq(object):
-
+    """Tools for exploring the sequence inside and outside of motifs"""
     def __init__(self, sequence, k, lc, lctype):
         self.sequence = sequence
         self.k = k
