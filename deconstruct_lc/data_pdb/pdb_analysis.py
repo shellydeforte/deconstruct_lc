@@ -3,6 +3,7 @@ import os
 import pandas as pd
 
 from deconstruct_lc import tools_fasta
+from deconstruct_lc import tools_lc
 from deconstruct_lc.scores.norm_score import NormScore
 
 config = configparser.ConfigParser()
@@ -34,12 +35,15 @@ class PdbAnalysis(object):
         seqs = list(df['Sequence'])
         miss_seqs = list(df['Missing'])
         ns = NormScore(seqs)
+        lc_raw = tools_lc.calc_lc_motifs(seqs, self.k_lca, self.alph_lca,
+                                         self.thresh_lce)
         lc_norms = ns.lc_norm_score()
         lengths = tools_fasta.get_lengths(seqs)
         miss_count = self.get_missing(miss_seqs)
         df['Length'] = lengths
         df['Miss Count'] = miss_count
         df['LC Norm'] = lc_norms
+        df['LC Raw'] = lc_raw
         return df
 
     def get_missing(self, miss_seqs):
