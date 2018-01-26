@@ -4,6 +4,7 @@ import numpy as np
 import os
 import pandas as pd
 
+from deconstruct_lc import motif_seq
 from deconstruct_lc import tools_fasta
 from deconstruct_lc.scores.norm_score import NormScore
 
@@ -91,6 +92,57 @@ class MissScore(object):
                    'Labels': labels}
         df_out = pd.DataFrame(df_dict)
         df_out.to_csv(self.lc_vs_miss_fp, sep='\t')
+
+    def write_in_motif(self):
+        df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
+        bins = range(0, 50, 5)
+        mean_mm = []
+        std_mm = []
+        mean_mp = []
+        std_mp = []
+        for i in bins:
+            print(i)
+            ndf = df[(df['LCA+LCE'] >= i) & (df['LCA+LCE'] < i+5)]
+            print(len(ndf))
+            miss_in_motifs, motif_percs = self.lc_blobs(ndf)
+            mean_mm.append(np.mean(miss_in_motifs))
+            std_mm.append(np.std(miss_in_motifs))
+            mean_mp.append(np.mean(motif_percs))
+            std_mp.append(np.std(motif_percs))
+        ndf = df[(df['LCA+LCE'] >= 50)]
+        miss_in_motifs, motif_percs = self.lc_blobs(ndf)
+        mean_mm.append(np.mean(miss_in_motifs))
+        std_mm.append(np.std(miss_in_motifs))
+        mean_mp.append(np.mean(motif_percs))
+        std_mp.append(np.std(motif_percs))
+        print(mean_mm)
+        print(std_mm)
+        print(mean_mp)
+        print(std_mp)
+        plt.errorbar(bins, mean_mm, std_mm, linestyle='None', marker='o')
+        plt.errorbar(bins, mean_mp, std_mp, linestyle='None', marker='o')
+        plt.show()
+
+    def lc_blobs(self, df):
+        miss_in_motifs = []
+        motif_percs = []
+        for i, row in df.iterrows():
+            miss = row['Missing']
+            seq = row['Sequence']
+            ind_miss = set([i for i, c in enumerate(miss) if c == 'X'])
+            if len(ind_miss) > 0:
+                ind_in = self.get_inds(seq)
+                miss_in_motifs.append(len(ind_in & ind_miss) / len(ind_miss))
+                motif_percs.append(len(ind_in)/len(seq))
+        return miss_in_motifs, motif_percs
+
+    def get_inds(self, seq):
+        lcas = motif_seq.LcSeq(seq, self.k_lca, self.alph_lca, 'lca')
+        lces = motif_seq.LcSeq(seq, self.k_lce, self.thresh_lce, 'lce')
+        lca_in, lca_out = lcas._get_motif_indexes()
+        lce_in, lce_out = lces._get_motif_indexes()
+        ind_in = lca_in.union(lce_in)
+        return ind_in
 
     def mean_data(self):
         mean_mm = [0.15119716529756219, 0.2758867067395091,

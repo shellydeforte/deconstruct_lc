@@ -1,4 +1,3 @@
-# look at https://stackoverflow.com/questions/3949226/calculating-pearson-correlation-and-significance-in-python
 import configparser
 import os
 from Bio import SeqIO
@@ -37,25 +36,6 @@ class MissMotif(object):
         self.lce_label = '{}_{}'.format(self.k_lce, self.thresh_lce)
         self.lc_vs_miss_fp = os.path.join(self.pdb_an_dp, 'lc_vs_miss.tsv')
 
-    def plot_lc_vs_miss(self):
-        df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
-        frac_w_miss = list(df['Fraction Missing'])
-        num_miss = list(df['Average Missing Residues'])
-        std_num_miss = list(df['STD Missing Residues'])
-        labels = list(df['Labels'])
-        x = list(range(len(frac_w_miss)))
-        plt.xticks(x, labels, rotation=45)
-        plt.xlim([-1, len(x)+1])
-        #plt.errorbar(x, num_miss, std_num_miss, linestyle='None', marker='o',
-        #             capsize=3, label='Average missing residues')
-        #plt.ylabel('Average Missing Residues')
-        plt.xlabel('LC motifs')
-        #plt.ylim([0,200])
-        plt.ylabel('Fraction of proteins with missing residues')
-        plt.scatter(x, frac_w_miss)
-        plt.plot(x, frac_w_miss)
-        plt.show()
-
     def plot_mean(self):
         mean_mm, std_mm, mean_mp, std_mp = self.mean_data()
         x = list(range(len(mean_mm)))
@@ -71,33 +51,6 @@ class MissMotif(object):
         plt.xlabel('LC motifs')
         plt.legend(loc=4)
         plt.show()
-
-    def write_lc_vs_miss(self):
-        df = pd.read_csv(self.pdb_an_fp, sep='\t', index_col=0)
-        labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
-                  '30-35', '35-40', '40-45', '45-50', '50+']
-        bins = range(0, 50, 5)
-        frac_w_miss = []
-        num_miss = []
-        std_num_miss = []
-        for i in bins:
-            print(i)
-            ndf = df[(df['LCA+LCE'] >= i) & (df['LCA+LCE'] < i + 5)]
-            nm_ndf = ndf[ndf['Miss Count'] > 0]
-            frac_w_miss.append(len(nm_ndf)/len(ndf))
-            num_miss.append(np.mean(list(nm_ndf['Miss Count'])))
-            std_num_miss.append(np.std(list(nm_ndf['Miss Count'])))
-        ndf = df[(df['LCA+LCE'] >= 50)]
-        nm_ndf = ndf[ndf['Miss Count'] > 0]
-        frac_w_miss.append(len(nm_ndf) / len(ndf))
-        num_miss.append(np.mean(list(nm_ndf['Miss Count'])))
-        std_num_miss.append(np.std(list(nm_ndf['Miss Count'])))
-        df_dict = {'Fraction Missing': frac_w_miss,
-                   'Average Missing Residues': num_miss,
-                   'STD Missing Residues': std_num_miss,
-                   'Labels': labels}
-        df_out = pd.DataFrame(df_dict)
-        df_out.to_csv(self.lc_vs_miss_fp, sep='\t')
 
     def motif_vs_coverage(self):
         df = pd.read_csv(self.pdb_an_fp, sep='\t', index_col=0)
