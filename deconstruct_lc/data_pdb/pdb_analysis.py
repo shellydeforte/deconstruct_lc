@@ -3,7 +3,6 @@ import os
 import pandas as pd
 
 from deconstruct_lc import tools_fasta
-from deconstruct_lc import tools_lc
 from deconstruct_lc.scores.norm_score import NormScore
 
 config = configparser.ConfigParser()
