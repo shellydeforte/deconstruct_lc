@@ -20,8 +20,6 @@ class PdbAnalysis(object):
         self.k_lce = 6
         self.alph_lca = 'SGEQAPDTNKR'
         self.thresh_lce = 1.6
-        self.lca_label = '{}_{}'.format(self.k_lca, self.alph_lca)
-        self.lce_label = '{}_{}'.format(self.k_lce, self.thresh_lce)
 
     def write_analysis(self):
         df = pd.read_csv(self.all_fpi, sep='\t')
@@ -35,18 +33,17 @@ class PdbAnalysis(object):
     def add_scores(self, df):
         seqs = list(df['Sequence'])
         miss_seqs = list(df['Missing'])
-        lcas = tools_lc.calc_lca_motifs(seqs, self.k_lca, self.alph_lca)
-        lces = tools_lc.calc_lce_motifs(seqs, self.k_lce, self.thresh_lce)
         lcs = tools_lc.calc_lc_motifs(seqs, self.k_lca, self.alph_lca,
                                       self.thresh_lce)
         lengths = tools_fasta.get_lengths(seqs)
         miss_count = self.get_missing(miss_seqs)
         df['Length'] = lengths
         df['Miss Count'] = miss_count
-        df[self.lca_label] = lcas
-        df[self.lce_label] = lces
         df['LC'] = lcs
         return df
+
+    def add_norm(self):
+        pass
 
     def get_missing(self, miss_seqs):
         miss = []
