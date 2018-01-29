@@ -35,13 +35,10 @@ class FastaTsv(object):
 
     def train_df(self):
         pids, seqs = tools_fasta.fasta_to_id_seq(self.train_fpi)
-        nseqs, num_his = histag.remove_histags(seqs)
-        lens = tools_fasta.get_lengths(nseqs)
-        df_dict = {'Protein ID': pids, 'Sequence': nseqs, 'Length': lens}
+        lens = tools_fasta.get_lengths(seqs)
+        df_dict = {'Protein ID': pids, 'Sequence': seqs, 'Length': lens}
         cols = ['Protein ID', 'Sequence', 'Length']
         df = pd.DataFrame(df_dict, columns=cols)
-        print("{} PDB chains had at least one His-Tag removed from {}".format(
-            num_his, self.train_fpi))
         df.to_csv(self.train_fpo, sep='\t')
 
     def df_stats(self):
@@ -53,8 +50,6 @@ class FastaTsv(object):
     def write_full(self, fasta, fpo):
         """
         Write sequence, missing, secondary structure if in the list of pids.
-        Remove histags from all. This is for longer files where you can't load
-        sequences into memory
         """
         all_pids = self.get_pids(fasta)
         count = 0
@@ -74,14 +69,9 @@ class FastaTsv(object):
                         seq = str(seq_rec.seq)
                         mseq = str(dis_rec.seq)
                         ss_seq = str(ss_rec.seq)
-                        his_inds = histag.find_histag(str(seq_rec.seq))
-
-                        nseq = histag.slice_seq(his_inds, seq)
-                        nmseq = histag.slice_seq(his_inds, mseq)
-                        nss_seq = histag.slice_seq(his_inds, ss_seq)
-                        assert len(nseq) == len(nmseq) == len(nss_seq)
-                        fo.write('{}\t{}\t{}\t{}\n'.format(pid, nseq, nmseq,
-                                                           nss_seq))
+                        assert len(seq) == len(mseq) == len(ss_seq)
+                        fo.write('{}\t{}\t{}\t{}\n'.format(pid, seq, mseq,
+                                                           ss_seq))
 
     def get_pids(self, fasta):
         pids, seqs = tools_fasta.fasta_to_id_seq(fasta)
