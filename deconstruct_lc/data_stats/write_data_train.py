@@ -1,4 +1,3 @@
-from Bio import SeqIO
 import configparser
 import os
 import pandas as pd
@@ -17,18 +16,28 @@ class WriteDataTrain(object):
                                                     'data_dp'], 'bc_prep')
         self.pdb_fpi = os.path.join(self.pdb_dp, 'pdb_train_cd90.fasta')
         self.bc_fpi = os.path.join(self.bc_dp, 'bc_train_cd90.fasta')
+        self.train_fpo = os.path.join(config['filepaths']['data_dp'],
+                                      'train.tsv')
 
     def train_df(self):
-        pids, seqs = tools_fasta.fasta_to_id_seq(self.train_fpi)
-        lens = tools_fasta.get_lengths(seqs)
-        df_dict = {'Protein ID': pids, 'Sequence': seqs, 'Length': lens}
-        cols = ['Protein ID', 'Sequence', 'Length']
+        pdb_pids, pdb_seqs = tools_fasta.fasta_to_id_seq(self.bc_fpi)
+        pdb_lens = tools_fasta.get_lengths(pdb_seqs)
+        bc_pids, bc_seqs = tools_fasta.fasta_to_id_seq(self.bc_fpi)
+        bc_lens = tools_fasta.get_lengths(bc_seqs)
+        lens = bc_lens + pdb_lens
+        pids = bc_pids + pdb_pids
+        seqs = bc_seqs + pdb_seqs
+        y = [0]*len(bc_pids) + [1]*len(pdb_pids)
+        df_dict = {'Protein ID': pids, 'Sequence': seqs, 'Length': lens,
+                   'y': y}
+        cols = ['Protein ID', 'y', 'Sequence', 'Length']
         df = pd.DataFrame(df_dict, columns=cols)
         df.to_csv(self.train_fpo, sep='\t')
 
 
 def main():
-    pass
+    wt = WriteDataTrain()
+    wt.train_df()
 
 
 if __name__ == '__main__':
