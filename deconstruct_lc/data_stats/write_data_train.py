@@ -11,16 +11,15 @@ config.read_file(open(cfg_fp, 'r'))
 
 class WriteDataTrain(object):
     def __init__(self):
-        self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
-        self.bc_dp = self.pdb_dp = os.path.join(config['filepaths'][
-                                                    'data_dp'], 'bc_prep')
+        self.data_dp = config['filepaths']['data_dp']
+        self.pdb_dp = os.path.join(self.data_dp, 'pdb_prep')
+        self.bc_dp = os.path.join(self.data_dp, 'bc_prep')
         self.pdb_fpi = os.path.join(self.pdb_dp, 'pdb_train_cd90.fasta')
         self.bc_fpi = os.path.join(self.bc_dp, 'bc_train_cd90.fasta')
-        self.train_fpo = os.path.join(config['filepaths']['data_dp'],
-                                      'train.tsv')
+        self.train_fpo = os.path.join(self.data_dp, 'train.tsv')
 
     def train_df(self):
-        pdb_pids, pdb_seqs = tools_fasta.fasta_to_id_seq(self.bc_fpi)
+        pdb_pids, pdb_seqs = tools_fasta.fasta_to_id_seq(self.pdb_fpi)
         pdb_lens = tools_fasta.get_lengths(pdb_seqs)
         bc_pids, bc_seqs = tools_fasta.fasta_to_id_seq(self.bc_fpi)
         bc_lens = tools_fasta.get_lengths(bc_seqs)

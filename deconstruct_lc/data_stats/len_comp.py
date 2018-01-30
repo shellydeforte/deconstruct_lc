@@ -17,7 +17,7 @@ class LenComp(object):
     def __init__(self):
         self.aas = 'SGEQAPDTNKRLHVYFIMCW'
         self.lca = 'SGEQAPDTNKR'
-        self.fd = os.path.join(config['filepaths']['data_fp'])
+        self.fd = os.path.join(config['filepaths']['data_dp'])
         self.cb90 = os.path.join(self.fd, 'bc_train_cd90.fasta')
         self.pdb90 = os.path.join(self.fd, 'pdb_train_cd90.fasta')
         self.pdb_ids, self.pdb_seqs = tools_fasta.fasta_to_id_seq(

@@ -12,7 +12,7 @@ config.read_file(open(cfg_fp, 'r'))
 
 class DataStats(object):
     def __init__(self):
-        self.fd = os.path.join(config['filepaths']['data_fp'])
+        self.fd = os.path.join(config['filepaths']['data_dp'])
         self.cb90 = os.path.join(self.fd, 'bc_train_cd90.fasta')
         self.pdb90 = os.path.join(self.fd, 'pdb_train_cd90.fasta')
         self.pdb_chain = os.path.join(self.fd, 'pdb_prep', 'pdb_chain_uniprot.tsv')
