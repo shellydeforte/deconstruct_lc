@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
-from deconstruct_lc import tools_fasta
 from deconstruct_lc.svm import svms
 
 config = configparser.ConfigParser()
@@ -104,6 +103,15 @@ class LenComp(object):
         print("The accuracy score for the fraction of all amino acids used "
               "to classify is {}".format(score))
 
+    def svm_len(self):
+        df_train = pd.read_csv(self.train_fp, sep='\t', index_col=0)
+        y = np.array(df_train['y']).T
+        X = np.array(df_train[['Length']])
+        print(X)
+        lin_clf = svms.linear_svc(X, y)
+        print(lin_clf)
+        print(lin_clf.score(X, y))
+
     def write_aa_comp(self):
         cols = ['Protein ID', 'y'] + [aa for aa in self.aas]
         df_train = pd.read_csv(self.train_fp, sep='\t', index_col=0)
@@ -132,7 +140,8 @@ def main():
     lc = LenComp()
     #lc.plot_lencomp()
     #lc.write_aa_comp()
-    lc.svm_comp()
+    #lc.svm_comp()
+    lc.svm_len()
 
 
 
