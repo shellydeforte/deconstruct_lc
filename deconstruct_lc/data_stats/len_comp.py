@@ -17,15 +17,72 @@ class LenComp(object):
     def __init__(self):
         self.aas = 'SGEQAPDTNKRLHVYFIMCW'
         self.lca = 'SGEQAPDTNKR'
-        self.fd = os.path.join(config['filepaths']['data_dp'])
-        self.cb90 = os.path.join(self.fd, 'bc_train_cd90.fasta')
-        self.pdb90 = os.path.join(self.fd, 'pdb_train_cd90.fasta')
-        self.pdb_ids, self.pdb_seqs = tools_fasta.fasta_to_id_seq(
-            self.pdb90, minlen=100, maxlen=2000)
-        self.bc_ids, self.bc_seqs = tools_fasta.fasta_to_id_seq(self.cb90,
-                                                                minlen=100,
-                                                                maxlen=2000)
+        self.fd = config['filepaths']['data_dp']
+        self.train_fp = config['filepaths']['train_fp']
         self.comp_len_fp = os.path.join(self.fd, 'len_comp', 'len_comp.tsv')
+
+    def plot_lencomp(self):
+        plt.subplot(2, 1, 1)
+        self.plot_len()
+        plt.subplot(2, 1, 2)
+        self.plot_comp()
+        plt.subplots_adjust(hspace=0.5)
+        plt.show()
+
+    def plot_len(self):
+        df_train = pd.read_csv(self.train_fp, sep='\t', index_col=0)
+        bc_lens = list(df_train[df_train['y'] == 0]['Length'])
+        pdb_lens = list(df_train[df_train['y'] == 1]['Length'])
+        cb_heights, cb_bins = np.histogram(bc_lens, bins=20, range=(0,2000))
+        cbn_heights = cb_heights / sum(cb_heights)
+
+        pdb_heights, pdb_bins = np.histogram(pdb_lens, bins=20, range=(0,
+                                                                       2000))
+        pdbn_heights = pdb_heights / sum(pdb_heights)
+        plt.bar(pdb_bins[:-1], pdbn_heights, width=(max(pdb_bins) - min(
+            pdb_bins)) / len(pdb_bins), color="darkblue", alpha=0.7,
+                label='PDB')
+
+        plt.bar(cb_bins[:-1], cbn_heights, width=(max(cb_bins) - min(
+            cb_bins)) / len(cb_bins), color="orangered", alpha=0.7,
+                label='BC')
+
+        plt.xlabel('Protein Length', size=12)
+        plt.ylabel('Relative Fraction', size=12)
+        plt.legend()
+        #plt.show()
+
+    def plot_comp(self):
+        df_train = pd.read_csv(self.train_fp, sep='\t', index_col=0)
+        bc_seqs = list(df_train[df_train['y'] == 0]['Sequence'])
+        pdb_seqs = list(df_train[df_train['y'] == 1]['Sequence'])
+        aas_list = [aa for aa in self.aas]
+        ind = range(len(self.aas))
+        pdb_seq = ''
+        for seq in pdb_seqs:
+            pdb_seq += seq
+        cb_seq = ''
+        for seq in bc_seqs:
+            cb_seq += seq
+        an_pdb_seq = ProteinAnalysis(pdb_seq)
+        pdb_dict = an_pdb_seq.get_amino_acids_percent()
+        an_cb_seq = ProteinAnalysis(cb_seq)
+        cb_dict = an_cb_seq.get_amino_acids_percent()
+        pdb_bins = []
+        cb_bins = []
+        for aa in aas_list:
+            pdb_bins.append(pdb_dict[aa])
+            cb_bins.append(cb_dict[aa])
+        plt.bar(ind, pdb_bins, color='darkblue', alpha=0.7, label='PDB',
+                align='center')
+        plt.bar(ind, cb_bins, color='orangered', alpha=0.7,
+                label='BC', align='center')
+        plt.xticks(ind, aas_list)
+        plt.xlim([-1, len(self.aas)])
+        plt.legend()
+        plt.xlabel('Amino Acids', size=12)
+        plt.ylabel('Relative Fraction', size=12)
+        #plt.show()
 
     def individual_aas(self):
         df = pd.read_csv(self.comp_len_fp, sep='\t', index_col=0)
@@ -105,9 +162,7 @@ class LenComp(object):
 
 def main():
     lc = LenComp()
-    lc.individual_aas()
-    lc.lca_comp()
-    lc.lca_comp_plot()
+    lc.plot_lencomp()
 
 
 
