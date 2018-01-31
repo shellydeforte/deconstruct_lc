@@ -84,7 +84,7 @@ class LenComp(object):
         plt.ylabel('Relative Fraction', size=12)
         #plt.show()
 
-    def svm_ind_aas(self):
+    def svm_comp(self):
         df_train = pd.read_csv(self.comp_fp, sep='\t', index_col=0)
         y = np.array(df_train['y']).T
         scores = []
@@ -132,7 +132,7 @@ def main():
     lc = LenComp()
     #lc.plot_lencomp()
     #lc.write_aa_comp()
-    lc.svm_ind_aas()
+    lc.svm_comp()
 
 
 
