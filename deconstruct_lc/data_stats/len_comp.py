@@ -19,7 +19,7 @@ class LenComp(object):
         self.lca = 'SGEQAPDTNKR'
         self.fd = config['filepaths']['data_dp']
         self.train_fp = config['filepaths']['train_fp']
-        self.comp_len_fp = os.path.join(self.fd, 'len_comp', 'len_comp.tsv')
+        self.comp_fp = os.path.join(self.fd, 'len_comp', 'train_comp.tsv')
 
     def plot_lencomp(self):
         plt.subplot(2, 1, 1)
@@ -84,13 +84,13 @@ class LenComp(object):
         plt.ylabel('Relative Fraction', size=12)
         #plt.show()
 
-    def individual_aas(self):
-        df = pd.read_csv(self.comp_len_fp, sep='\t', index_col=0)
-        y = np.array(df['y']).T
+    def svm_ind_aas(self):
+        df_train = pd.read_csv(self.comp_fp, sep='\t', index_col=0)
+        y = np.array(df_train['y']).T
         scores = []
         for aa in self.aas:
             cols = [aa]
-            X = np.array(df[cols])
+            X = np.array(df_train[cols])
             lin_clf = svms.linear_svc(X, y)
             score = lin_clf.score(X, y)
             scores.append(score)
@@ -98,8 +98,8 @@ class LenComp(object):
               "fraction of each amino acid used separately to "
               "classify.".format(np.mean(scores), np.std(scores)))
         all_cols = [aa for aa in self.aas]
-        X = np.array(df[all_cols])
-        rbf_clf = svms.normal_rbf(X, y)
+        X = np.array(df_train[all_cols])
+        rbf_clf = svms.smooth_rbf(X, y)
         score = rbf_clf.score(X, y)
         print("The accuracy score for the fraction of all amino acids used "
               "to classify is {}".format(score))
@@ -130,39 +130,34 @@ class LenComp(object):
         plt.show()
 
     def write_aa_comp(self):
-        cols = ['Protein ID', 'Length', 'y'] + [aa for aa in self.aas]
-        df_dict = self.init_df(cols)
-        for bc_seq in self.bc_seqs:
+        cols = ['Protein ID', 'y'] + [aa for aa in self.aas]
+        df_train = pd.read_csv(self.train_fp, sep='\t', index_col=0)
+        bc_seqs = list(df_train[df_train['y'] == 0]['Sequence'])
+        pdb_seqs = list(df_train[df_train['y'] == 1]['Sequence'])
+        df_dict = dict()
+        for aa in self.aas:
+            df_dict[aa] = []
+        df_dict['y'] = list(df_train['y'])
+        df_dict['Protein ID'] = list(df_train['Protein ID'])
+        for bc_seq in bc_seqs:
             a_bc_seq = ProteinAnalysis(bc_seq)
             bc_aas = a_bc_seq.get_amino_acids_percent()
             for aa in self.aas:
                 df_dict[aa].append(bc_aas[aa])
-        for pdb_seq in self.pdb_seqs:
+        for pdb_seq in pdb_seqs:
             a_pdb_seq = ProteinAnalysis(pdb_seq)
             pdb_aas = a_pdb_seq.get_amino_acids_percent()
             for aa in self.aas:
                 df_dict[aa].append(pdb_aas[aa])
         df = pd.DataFrame(df_dict, columns=cols)
-        df.to_csv(self.comp_len_fp, sep='\t')
-
-    def init_df(self, cols):
-        df_dict = {}
-        for col in cols:
-            df_dict[col] = []
-        pdb_lens = tools_fasta.get_lengths(self.pdb_seqs)
-        bc_lens = tools_fasta.get_lengths(self.bc_seqs)
-        pids = self.bc_ids + self.pdb_ids
-        lens = bc_lens + pdb_lens
-        y = [0]*len(self.bc_ids) + [1]*len(self.pdb_ids)
-        df_dict['Protein ID'] = pids
-        df_dict['Length'] = lens
-        df_dict['y'] = y
-        return df_dict
+        df.to_csv(self.comp_fp, sep='\t')
 
 
 def main():
     lc = LenComp()
-    lc.plot_lencomp()
+    #lc.plot_lencomp()
+    #lc.write_aa_comp()
+    lc.svm_ind_aas()
 
 
 
