@@ -104,31 +104,6 @@ class LenComp(object):
         print("The accuracy score for the fraction of all amino acids used "
               "to classify is {}".format(score))
 
-    def lca_comp(self):
-        df = pd.read_csv(self.comp_len_fp, sep='\t', index_col=0)
-        y = np.array(df['y']).T
-        lca_col = [aa for aa in self.lca]
-        X = np.array(df[lca_col].sum(axis=1)).reshape(len(y), 1)
-        lin_clf = svms.linear_svc(X, y)
-        score = lin_clf.score(X, y)
-        print("The accuracy using the LCA composition is {}".format(score))
-
-    def lca_comp_plot(self):
-        df = pd.read_csv(self.comp_len_fp, sep='\t', index_col=0)
-        lca_col = [aa for aa in self.lca]
-        dfz = df[df['y']==0]
-        bc_lca_sum = list(dfz[lca_col].sum(axis=1))
-        dfo = df[df['y']==1]
-        pdb_lca_sum = list(dfo[lca_col].sum(axis=1))
-        print("The BC mean and std are {} and {}".format(np.mean(
-            bc_lca_sum), np.std(bc_lca_sum)))
-        print("The PDB mean and std are {} and {}".format(np.mean(
-            pdb_lca_sum), np.std(pdb_lca_sum)))
-        labels = ['BC', 'PDB']
-        plt.boxplot([bc_lca_sum, pdb_lca_sum], labels=labels)
-        plt.ylabel("Fraction of LCA residues")
-        plt.show()
-
     def write_aa_comp(self):
         cols = ['Protein ID', 'y'] + [aa for aa in self.aas]
         df_train = pd.read_csv(self.train_fp, sep='\t', index_col=0)
