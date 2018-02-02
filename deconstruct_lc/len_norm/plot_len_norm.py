@@ -25,6 +25,7 @@ class PlotLenNorm(object):
         self.lc_m = 0.066213297264721263
         self.lc_b = 1.7520712972708843
         self.lc_b_up = 16.5
+        self.grey_b = 36.5
 
     def demonstrate_mb(self):
         """
@@ -35,6 +36,27 @@ class PlotLenNorm(object):
         lr = ln.mb_lc(self.k, self.lca, self.lce)
         print(lr)
 
+    def plot_all(self):
+        plt.subplot(2, 2, 1)
+        self.plot_scatter()
+        plt.subplot(2, 2, 2)
+        self.plot_nomiss()
+        plt.subplot(2, 2, 3)
+        self.plot_train()
+        plt.subplots_adjust(hspace=0.5)
+        plt.show()
+
+    def plot_a_line(self):
+        x = np.arange(0, 1500, 0.01)
+        y1 = self.plot_line(self.lc_m, self.lc_b, x)
+        y2 = self.plot_line(self.lc_m, self.lc_b_up, x)
+        y3 = self.plot_line(self.lc_m, self.grey_b, x)
+        plt.plot(x, y1, color='black', lw=2)
+        plt.plot(x, y2, color='black', lw=2, linestyle='--')
+        plt.plot(x, y3, color='grey', lw=2)
+        plt.xlim([0, 1500])
+        plt.ylim([0, 150])
+
     def plot_scatter(self):
         df = pd.read_csv(self.norm_fpi, sep='\t', index_col=0)
         seqs = df['Sequence']
@@ -44,13 +66,15 @@ class PlotLenNorm(object):
         x = np.arange(0, 1500, 0.01)
         y1 = self.plot_line(self.lc_m, self.lc_b, x)
         y2 = self.plot_line(self.lc_m, self.lc_b_up, x)
+        y3 = self.plot_line(self.lc_m, self.grey_b, x)
         plt.plot(x, y1, color='black', lw=2)
         plt.plot(x, y2, color='black', lw=2, linestyle='--')
+        plt.plot(x, y3, color='grey', lw=2)
         plt.xlim([0, 1500])
         plt.ylim([0, 150])
-        plt.xlabel('Protein sequence length')
-        plt.ylabel('Raw LC score')
-        plt.show()
+        plt.xlabel('Protein sequence length', size=12)
+        plt.ylabel('Raw LC score', size=12)
+        #plt.show()
 
     def plot_nomiss(self):
         """Show that the PDB norm dataset moves below the trendline when you
@@ -65,23 +89,44 @@ class PlotLenNorm(object):
         x = np.arange(0, 1500, 0.01)
         y1 = self.plot_line(self.lc_m, self.lc_b, x)
         y2 = self.plot_line(self.lc_m, self.lc_b_up, x)
+        y3 = self.plot_line(self.lc_m, self.grey_b, x)
         plt.plot(x, y1, color='black', lw=2)
         plt.plot(x, y2, color='black', lw=2, linestyle='--')
+        plt.plot(x, y3, color='grey', lw=2)
         plt.xlim([0, 1500])
         plt.ylim([0, 150])
-        plt.xlabel('Protein sequence length')
-        plt.ylabel('Raw LC score')
-        plt.show()
-
+        plt.xlabel('Protein sequence length', size=12)
+        plt.ylabel('Raw LC score', size=12)
+        #plt.show()
 
     def plot_line(self, m, b, x):
         y = m*x + b
         return y
 
+    def plot_train(self):
+        df = pd.read_csv(self.train_fpi, sep='\t', index_col=0)
+        df = df[df['y'] == 1]
+        seqs = df['Sequence']
+        lens = [len(seq) for seq in seqs]
+        raw_scores = tools_lc.calc_lc_motifs(seqs, self.k, self.lca, self.lce)
+        plt.scatter(lens, raw_scores, alpha=0.1, color='darkblue')
+        x = np.arange(0, 1500, 0.01)
+        y1 = self.plot_line(self.lc_m, self.lc_b, x)
+        y2 = self.plot_line(self.lc_m, self.lc_b_up, x)
+        y3 = self.plot_line(self.lc_m, self.grey_b, x)
+        plt.plot(x, y1, color='black', lw=2)
+        plt.plot(x, y2, color='black', lw=2, linestyle='--')
+        plt.plot(x, y3, color='grey', lw=2)
+        plt.xlim([0, 1500])
+        plt.ylim([0, 150])
+        plt.xlabel('Protein sequence length', size=12)
+        plt.ylabel('Raw LC score', size=12)
+        #plt.show()
+
 
 def main():
     pln = PlotLenNorm()
-    pln.plot_nomiss()
+    pln.plot_all()
 
 
 if __name__ == '__main__':
