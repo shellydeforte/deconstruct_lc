@@ -2,7 +2,6 @@ import configparser
 import os
 import numpy as np
 import pandas as pd
-from deconstruct_lc.params import lc_labels
 from deconstruct_lc.svm import svms
 
 config = configparser.ConfigParser()
