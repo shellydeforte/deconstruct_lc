@@ -14,7 +14,7 @@ class PipeRaw(object):
         self.train_fp = config['filepaths']['train_fp']
         self.param_dp = os.path.join(config['filepaths']['data_dp'], 'params')
         self.all_ids, self.all_seqs, self.all_lens, self.y = self.get_seqs()
-        self.kr = (10, 21)
+        self.kr = (2, 21)
         self.alph = 'SGEQAPDTNKRL'
         #self.kr = (2, 3)
         #self.alph = 'SGE'
@@ -33,9 +33,10 @@ class PipeRaw(object):
             print(k)
             fno = 'raw_{}_lca.tsv'.format(k)
             fpo = os.path.join(self.param_dp, fno)
-            wr = WriteRaw(k, self.all_seqs, df_dict)
-            df = wr.write_lca(self.alph)
-            df.to_csv(fpo, sep='\t')
+            if not os.path.exists(fpo):
+                wr = WriteRaw(k, self.all_seqs, df_dict)
+                df = wr.write_lca(self.alph)
+                df.to_csv(fpo, sep='\t')
 
     def all_lce(self):
         df_dict = self.init_df_dict()
@@ -43,9 +44,10 @@ class PipeRaw(object):
             print(k)
             fno = 'raw_{}_lce.tsv'.format(k)
             fpo = os.path.join(self.param_dp, fno)
-            wr = WriteRaw(k, self.all_seqs, df_dict)
-            df = wr.write_lce()
-            df.to_csv(fpo, sep='\t')
+            if not os.path.exists(fpo):
+                wr = WriteRaw(k, self.all_seqs, df_dict)
+                df = wr.write_lce()
+                df.to_csv(fpo, sep='\t')
 
     def init_df_dict(self):
         df_dict = {'Protein ID': self.all_ids, 'Length': self.all_lens,
