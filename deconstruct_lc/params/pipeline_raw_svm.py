@@ -19,30 +19,30 @@ class RawSvm(object):
 
     def svm_lca_lce(self):
         for k in range(self.kr[0], self.kr[1]):
-            lca_fpi = os.path.join(self.param_dp, 'raw_{}_lca.tsv'.format(k))
-            lca_fpo = os.path.join(self.param_dp, 'svm_{}_lca.tsv'.format(k))
-            self.raw_svm(lca_fpi, lca_fpo)
+            print(k)
             lce_fpi = os.path.join(self.param_dp, 'raw_{}_lce.tsv'.format(k))
             lce_fpo = os.path.join(self.param_dp, 'svm_{}_lce.tsv'.format(k))
             self.raw_svm(lce_fpi, lce_fpo)
+            lca_fpi = os.path.join(self.param_dp, 'raw_{}_lca.tsv'.format(k))
+            lca_fpo = os.path.join(self.param_dp, 'svm_{}_lca.tsv'.format(k))
+            self.raw_svm(lca_fpi, lca_fpo)
 
     def raw_svm(self, fpi, fpo):
-        for k in range(self.kr[0], self.kr[1]):
-            df_dict = {'SVM score': [], 'Label': []}
-            cols = ['Label', 'SVM score']
-            rem_cols = ['Protein ID', 'Length', 'y']
-            df_in = pd.read_csv(fpi, sep='\t', index_col=0)
-            k_lcs = [lab for lab in df_in.columns.values.tolist() if lab not
+        df_dict = {'SVM score': [], 'Label': []}
+        cols = ['Label', 'SVM score']
+        rem_cols = ['Protein ID', 'Length', 'y']
+        df_in = pd.read_csv(fpi, sep='\t', index_col=0)
+        k_lcs = [lab for lab in df_in.columns.values.tolist() if lab not
                     in rem_cols]
-            for k_lc in k_lcs:
-                scores = df_in[k_lc]
-                X = np.array([scores]).T
-                y = np.array(df_in['y']).T
-                clf = svms.linear_svc(X, y)
-                df_dict['SVM score'].append(clf.score(X, y))
-                df_dict['Label'].append(k_lc)
-            df = pd.DataFrame(df_dict, columns=cols)
-            df.to_csv(fpo, sep='\t')
+        for k_lc in k_lcs:
+            scores = df_in[k_lc]
+            X = np.array([scores]).T
+            y = np.array(df_in['y']).T
+            clf = svms.linear_svc(X, y)
+            df_dict['SVM score'].append(clf.score(X, y))
+            df_dict['Label'].append(k_lc)
+        df = pd.DataFrame(df_dict, columns=cols)
+        df.to_csv(fpo, sep='\t')
 
 
 def main():
