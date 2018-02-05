@@ -19,10 +19,11 @@ class RawSvm(object):
 
     def svm_lca_lce(self):
         for k in range(self.kr[0], self.kr[1]):
-            print(k)
+            print("{} LCE".format(k))
             lce_fpi = os.path.join(self.param_dp, 'raw_{}_lce.tsv'.format(k))
             lce_fpo = os.path.join(self.param_dp, 'svm_{}_lce.tsv'.format(k))
             self.raw_svm(lce_fpi, lce_fpo)
+            print("{} LCA".format(k))
             lca_fpi = os.path.join(self.param_dp, 'raw_{}_lca.tsv'.format(k))
             lca_fpo = os.path.join(self.param_dp, 'svm_{}_lca.tsv'.format(k))
             self.raw_svm(lca_fpi, lca_fpo)
