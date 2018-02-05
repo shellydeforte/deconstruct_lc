@@ -17,12 +17,13 @@ def main():
             "EVDMAMCGEQVKLRIKGVEEEDISPGFVLTSPKNPIKSVTKFVAQIAIVELKSIIAAGFS" \
             "CVMHVHTAIEEVHIVKLLHKLEKGTNRKSKKPPAFAKKGMKVIAVLETEAPVCVETYQDY" \
             "PQLGRFTLRDQGTTIAIGKIVKIAE"
+    print(sup35[:260])
     ns = tools_lc.display_lc(sup35[:260], k, lca, lce)
-    #print(ns)
+    print(ns)
     motifs = tools_lc.count_lc_motifs(sup35[:260], k, lca, lce)
-    #print(motifs)
+    print(motifs)
     norm = NormScore([sup35[:260]])
-    #print(norm.lc_norm_score())
+    print(norm.lc_norm_score())
 
     pab1 = 'MADITDKTAEQLENLNIQDDQKQAATGSESQSVENSSASLYVGDLEPSVSEAHLYDIFSP' \
            'IGSVSSIRVCRDAITKTSLGYAYVNFNDHEAGRKAIEQLNYTPIKGRLCRIMWSQRDPSL' \
@@ -83,30 +84,30 @@ def main():
               'VGGVLWQRRLRRLAEGISEKTEAGSEEDRVRNEYEESQWTGERDTQSSTVSTTEAEPYYR' \
               'SLRDFSPQLPPTQEEVSYSRGFTGEDEDMAFPGHLYDEVERTYPPSGAWGPLYDEVQMGP' \
               'WDLHWPEDTYQDPRGIYDQVAGDLDTLEPDSLPFELRGHLV'
-    nicd = nephrin[1077:1242]
-    norm = NormScore([nicd])
-    print(norm.lc_norm_score())
-    print(nicd)
-    ns = tools_lc.display_lc(nicd, k, lca, lce)
-    print(ns)
-    motifs = tools_lc.count_lc_motifs(nicd, k, lca, lce)
-    print(motifs)
-    gfp = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTL' \
-          'VTTFSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLV' \
-          'NRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLAD' \
-          'HYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK'
-    #ns = tools_lc.display_lc(nicd+gfp, k, lca, lce)
-    #norm = NormScore([nicd+gfp])
-    #print(norm.lc_norm_score())
-    #print(ns)
-    fus = 'MASNDYTQQATQSYGAYPTQPGQGYSQQSSQPYGQQSYSGYSQSTDTSGYGQSSYSSYGQ' \
-          'SQNTGYGTQSTPQGYGSTGGYGSSQSSQSSYGQQSSYPGYGQQPAPSSTSGSYGSSSQSS' \
-          'SYGQPQSGSYSQQPSYGGQQQSYGQQQSYNPPQGYGQQNQY'
-    ns = tools_lc.display_lc(fus, k, lca, lce)
-    print(ns)
-    print(fus)
-    norm = NormScore([fus])
-    print(norm.lc_norm_score())
+    # nicd = nephrin[1077:1242]
+    # norm = NormScore([nicd])
+    # print(norm.lc_norm_score())
+    # print(nicd)
+    # ns = tools_lc.display_lc(nicd, k, lca, lce)
+    # print(ns)
+    # motifs = tools_lc.count_lc_motifs(nicd, k, lca, lce)
+    # print(motifs)
+    # gfp = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTL' \
+    #       'VTTFSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLV' \
+    #       'NRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLAD' \
+    #       'HYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK'
+    # #ns = tools_lc.display_lc(nicd+gfp, k, lca, lce)
+    # #norm = NormScore([nicd+gfp])
+    # #print(norm.lc_norm_score())
+    # #print(ns)
+    # fus = 'MASNDYTQQATQSYGAYPTQPGQGYSQQSSQPYGQQSYSGYSQSTDTSGYGQSSYSSYGQ' \
+    #       'SQNTGYGTQSTPQGYGSTGGYGSSQSSQSSYGQQSSYPGYGQQPAPSSTSGSYGSSSQSS' \
+    #       'SYGQPQSGSYSQQPSYGGQQQSYGQQQSYNPPQGYGQQNQY'
+    # ns = tools_lc.display_lc(fus, k, lca, lce)
+    # print(ns)
+    # print(fus)
+    # norm = NormScore([fus])
+    # print(norm.lc_norm_score())
 
 
 
