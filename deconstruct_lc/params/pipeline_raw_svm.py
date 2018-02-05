@@ -32,15 +32,15 @@ class RawSvm(object):
             cols = ['Label', 'SVM score']
             rem_cols = ['Protein ID', 'Length', 'y']
             df_in = pd.read_csv(fpi, sep='\t', index_col=0)
-            k_lces = [lab for lab in df_in.columns.values.tolist() if lab not
+            k_lcs = [lab for lab in df_in.columns.values.tolist() if lab not
                     in rem_cols]
-            for k_lce in k_lces:
-                scores = df_in[k_lce]
+            for k_lc in k_lcs:
+                scores = df_in[k_lc]
                 X = np.array([scores]).T
                 y = np.array(df_in['y']).T
                 clf = svms.linear_svc(X, y)
                 df_dict['SVM score'].append(clf.score(X, y))
-                df_dict['Label'].append(k_lce)
+                df_dict['Label'].append(k_lc)
             df = pd.DataFrame(df_dict, columns=cols)
             df.to_csv(fpo, sep='\t')
 
