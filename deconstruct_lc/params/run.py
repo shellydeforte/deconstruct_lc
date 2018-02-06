@@ -4,7 +4,7 @@ from deconstruct_lc.params import raw_scores
 
 class RunRaw(object):
     def __init__(self):
-        self.config = read_config.read_test_config()
+        self.config = read_config.read_config()
 
     def run(self):
         pr = raw_scores.PipeRaw(self.config)
