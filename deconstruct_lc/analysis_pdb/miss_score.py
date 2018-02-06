@@ -23,10 +23,44 @@ class MissScore(object):
         subplot(nrows, ncolumns, index)
         """
         plt.subplot(2, 1, 1)
-        self.plot_lc_miss()
-        #plt.subplot(2, 1, 2)
-        #self.plot_mean()
+        self.plot_frac_w_miss()
+        plt.subplot(2, 1, 2)
+        self.plot_avg_miss()
+        plt.tight_layout()
         plt.show()
+
+    def plot_frac_w_miss(self):
+        df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
+        frac_w_miss = list(df['Fraction Missing'])
+        labels = list(df['Labels'])
+        x = list(range(len(frac_w_miss)))
+        plt.plot(x, frac_w_miss, marker='o', color='black', lw=2, markersize=8)
+        plt.xlim([-1, len(x) + 1])
+        plt.tick_params(
+            axis='x',  # changes apply to the x-axis
+            which='both',  # both major and minor ticks are affected
+            bottom='on',  # ticks along the bottom edge are off
+            top='on',  # ticks along the top edge are off
+            labelbottom='off')
+        plt.ylabel('Fraction with a Missing Residue')
+        #plt.xticks(x, labels, rotation=45)
+        #plt.show()
+
+    def plot_avg_miss(self):
+        df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
+        labels = list(df['Labels'])
+        num_miss = list(df['Average Missing Residues'])
+        std_num_miss = list(df['STD Missing Residues'])
+        x = list(range(len(num_miss)))
+        plt.errorbar(x, num_miss, std_num_miss, linestyle='None', marker='o',
+                     capsize=10, capthick=3, label='Average missing residues',
+                     color='black', lw=3, markersize=8)
+        plt.xticks(x, labels, rotation=45)
+        plt.xlabel('LC Motifs')
+        plt.ylabel('Average Missing Residues')
+        plt.xlim([-1, len(x) + 1])
+        plt.ylim([0, 200])
+        #plt.show()
 
     def plot_lc_miss(self):
         df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
@@ -63,15 +97,19 @@ class MissScore(object):
         labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
                   '30-35', '35-40', '40-45', '45-50', '50+']
         plt.errorbar(x, mean_mm, std_mm, linestyle='None', marker='o',
-                     capsize=3, label='Fraction missing residues in LC motif')
+                     capsize=4, lw=2, label='Fraction missing residues in LC '
+                                      'motif', color='black', markersize=8)
         plt.errorbar(x, mean_mp, std_mp, linestyle='None', marker='o',
-                     capsize=3, label='Fraction residues in LC motif')
+                     capsize=5, lw=3, label='Fraction residues in LC motif',
+                     color='grey', markersize=8)
         plt.xticks(x, labels, rotation=45)
         plt.xlim([-1, len(x)+1])
-        #plt.ylim([0, 0.8])
-        plt.xlabel('LC motifs')
+        plt.ylim([0, 0.8])
+        plt.xlabel('LC motifs', size=12)
         plt.legend(loc=4)
-        #plt.show()
+        #plt.legend(bbox_to_anchor=(1.017, 1.14))
+        plt.tight_layout()
+        plt.show()
 
     def write_lc_vs_miss(self):
         df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
@@ -177,7 +215,7 @@ class MissScore(object):
 
 def main():
     ms = MissScore()
-    ms.plot_all()
+    ms.plot_mean()
 
 
 if __name__ == '__main__':
