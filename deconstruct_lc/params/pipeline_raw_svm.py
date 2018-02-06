@@ -36,8 +36,8 @@ class RawSvm(object):
         k_lcs = [lab for lab in df_in.columns.values.tolist() if lab not
                     in rem_cols]
         for k_lc in k_lcs:
-            scores = df_in[k_lc]
-            X = np.array([scores]).T
+            raw_scores = df_in[k_lc]
+            X = np.array([raw_scores]).T
             y = np.array(df_in['y']).T
             clf = svms.linear_svc(X, y)
             df_dict['SVM score'].append(clf.score(X, y))
