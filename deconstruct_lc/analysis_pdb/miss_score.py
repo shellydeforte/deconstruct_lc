@@ -1,25 +1,32 @@
-import configparser
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
 
+from deconstruct_lc import read_config
 from deconstruct_lc import motif_seq
 from deconstruct_lc import tools_fasta
 from deconstruct_lc.scores.norm_score import NormScore
 
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
 
 class MissScore(object):
     def __init__(self):
-        self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
-        self.pdb_an_dp = os.path.join(config['filepaths']['data_dp'],
-                                      'pdb_analysis')
+        self.config = read_config.read_config()
+        self.data_dp = self.config['fps']['data_dp']
+        self.pdb_dp = os.path.join(self.data_dp, 'pdb_prep')
+        self.pdb_an_dp = os.path.join(self.data_dp, 'pdb_analysis')
         self.an_fpi = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
         self.lc_vs_miss_fp = os.path.join(self.pdb_an_dp, 'lc_vs_miss.tsv')
+
+    def plot_all(self):
+        """
+        subplot(nrows, ncolumns, index)
+        """
+        plt.subplot(2, 1, 1)
+        self.plot_lc_miss()
+        #plt.subplot(2, 1, 2)
+        #self.plot_mean()
+        plt.show()
 
     def plot_lc_miss(self):
         df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
@@ -47,8 +54,8 @@ class MissScore(object):
         ax2.set_ylim([0, 200])
         ax2.set_xlim([-1, len(x)+1])
 
-        fig.tight_layout()
-        plt.show()
+        #fig.tight_layout()
+        #plt.show()
 
     def plot_mean(self):
         mean_mm, std_mm, mean_mp, std_mp = self.mean_data()
@@ -64,7 +71,7 @@ class MissScore(object):
         #plt.ylim([0, 0.8])
         plt.xlabel('LC motifs')
         plt.legend(loc=4)
-        plt.show()
+        #plt.show()
 
     def write_lc_vs_miss(self):
         df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
@@ -170,7 +177,7 @@ class MissScore(object):
 
 def main():
     ms = MissScore()
-    ms.plot_lc_miss()
+    ms.plot_all()
 
 
 if __name__ == '__main__':
