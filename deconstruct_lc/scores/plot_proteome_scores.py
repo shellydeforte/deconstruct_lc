@@ -16,17 +16,6 @@ class PlotScores(object):
         self.data_dp = self.config['fps']['data_dp']
         self.fpi = os.path.join(self.data_dp, 'scores', 'proteomes.tsv')
 
-    def sns_box_plots(self):
-        """Note, fliersize=0.1, width=0.1"""
-        df = pd.read_csv(self.fpi, sep='\t', index_col=0)
-        df = df[(df['Proteome'] == 'BC') | (df['Proteome'] == 'PDB')]
-        #ax = sns.swarmplot(data=df, x="LC Score", y="Proteome", orient="h")
-        fig, ax = plt.subplots(figsize=(7.5, 1))
-        ax = sns.boxplot(ax=ax, data=df, x='LC Score', y='Proteome',
-                         orient='h')
-        ax.xlim([-50, 150])
-        plt.show()
-
     def matplot_box_plots(self):
         df = pd.read_csv(self.fpi, sep='\t', index_col=0)
         #df = df[(df['Proteome'] == 'BC') | (df['Proteome'] == 'PDB')]
