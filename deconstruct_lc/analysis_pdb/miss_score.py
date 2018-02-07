@@ -14,7 +14,8 @@ class MissScore(object):
         self.config = read_config.read_config()
         self.data_dp = self.config['fps']['data_dp']
         self.pdb_dp = os.path.join(self.data_dp, 'pdb_prep')
-        self.pdb_an_dp = os.path.join(self.data_dp, 'pdb_analysis')
+        self.pdb_an_dp = os.path.join(self.data_dp,
+                                      'pdb_analysis')
         self.an_fpi = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
         self.lc_vs_miss_fp = os.path.join(self.pdb_an_dp, 'lc_vs_miss.tsv')
 
@@ -22,19 +23,126 @@ class MissScore(object):
         """
         subplot(nrows, ncolumns, index)
         """
-        plt.subplot(2, 1, 1)
-        self.plot_frac_w_miss()
-        plt.subplot(2, 1, 2)
-        self.plot_avg_miss()
-        plt.tight_layout()
+        fig = plt.figure()
+        ax1 = fig.add_subplot(211)
+
+        #fig, ax1 = plt.subplot(2, 1, 1, sharex=True)
+        #fig, ax1 = plt.subplots(sharex=True)
+        ax2 = ax1.twinx()
+        #self.same_plot_black_green(ax1, ax2)
+        self.frac_miss_box(ax1, ax2)
+        ax3 = fig.add_subplot(212, sharex=ax1)
+        ax1.set_xlim([0, 12])
+        ax2.set_xlim([0, 12])
+        ax3.set_xlim([0, 12])
+        #plt.subplot(2, 1, 2)
+        self.plot_mean(ax3)
+        #plt.tight_layout()
         plt.show()
+
+    def frac_miss_box(self, ax1, ax2):
+        # note labels in boxplots
+        df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
+        bins = range(0, 50, 5)
+        miss_counts = []
+        frac_miss = []
+        bp = {'color': 'black'}
+        wp = {'color': 'black', 'linestyle':'-'}
+        for i in bins:
+            print(i)
+            ndf = df[(df['LC Raw'] >= i) & (df['LC Raw'] < i + 5)]
+            nm_ndf = ndf[ndf['Miss Count'] > 0]
+            miss_counts.append(list(nm_ndf['Miss Count']))
+            frac_miss.append(len(nm_ndf)/len(ndf))
+        ndf = df[(df['LC Raw'] >= 50)]
+        nm_ndf = ndf[ndf['Miss Count'] > 0]
+        miss_counts.append(list(nm_ndf['Miss Count']))
+        frac_miss.append(len(nm_ndf) / len(ndf))
+        x = list(range(1, len(frac_miss)+1))
+        ax1.plot(x, frac_miss, color='black')
+        ax1.scatter(x, frac_miss, marker='o', color='green', s=70)
+        ax1.set_ylabel('Fraction w/ missing', color='darkgreen', size=12)
+        ax1.tick_params('y', colors='black')
+        ax1.set_ylim([0.75, 1.0])
+        ax1.tick_params(axis='x', which='both', labelbottom='off')
+        ax2.tick_params(axis='x', which='both', labelbottom='off')
+        ax2.boxplot(miss_counts, vert=True, whis=[5, 95], widths=0.5,
+                   boxprops=bp, whiskerprops=wp, showfliers=False)
+        ax2.set_ylim([0, 260])
+
+        ax2.set_ylabel('Missing residues', color='black')
+
+
+    def plot_mean(self, ax3):
+        mean_mm, std_mm, mean_mp, std_mp = self.mean_data()
+        x = list(range(1, len(mean_mm)+1))
+        labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
+                  '30-35', '35-40', '40-45', '45-50', '50+']
+        ax3.errorbar(x, mean_mm, std_mm, linestyle='None', marker='o',
+                     capsize=4, lw=2, label='Fraction missing residues in LC '
+                                      'motif', color='black', markersize=8)
+        ax3.errorbar(x, mean_mp, std_mp, linestyle='None', marker='o',
+                     capsize=5, lw=3, label='Fraction residues in LC motif',
+                     color='grey', markersize=8)
+        #ax3.set_xticks(x, labels, rotation=45)
+        #ax3.set_xlim([-1, len(x)+1])
+        ax3.set_ylim([0, 0.8])
+        ax3.set_xlabel('LC motifs', size=12)
+        #plt.legend(loc=4)
+        #plt.legend(bbox_to_anchor=(1.017, 1.14))
+        #plt.tight_layout()
+        #plt.show()
+
+    def same_plot_black_green(self, ax1, ax2):
+        df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
+        frac_w_miss = list(df['Fraction Missing'])
+        num_miss = list(df['Average Missing Residues'])
+        std_num_miss = list(df['STD Missing Residues'])
+        labels = list(df['Labels'])
+        labels = labels
+        x = list(range(len(frac_w_miss)))
+        #fig, ax1 = plt.subplots(sharex=True, figsize=(6, 2.5))
+        #fig, ax1 = plt.subplots(sharex=True)
+        ax1.plot(x, frac_w_miss, color='black')
+        ax1.scatter(x, frac_w_miss, marker='o', color='green', s=70)
+        # Make the y-axis label, ticks and tick labels match the line color.
+
+        ax1.set_ylabel('Fraction w/ missing', color='darkgreen',
+                       size=12)
+        #ax1.tick_params('y', colors='black')
+        ax1.tick_params(axis='x', which='both', labelbottom='off')
+        ax2.tick_params(axis='x', which='both', labelbottom='off')
+        #plt.tick_params(
+        #    axis='x',  # changes apply to the x-axis
+        #    which='both',  # both major and minor ticks are affected
+        #    bottom='on',  # ticks along the bottom edge are off
+        #    top='on',  # ticks along the top edge are off
+        #    labelbottom='off')
+        #plt.xticks(x, labels, rotation=45)
+        ax1.set_ylim([0.75, 1.0])
+        ax1.set_xlim([-1, len(x)+1])
+        #ax1.set_xlabel('LC Motifs')
+        #ax2 = ax1.twinx()
+        ax2.errorbar(x, num_miss, std_num_miss, linestyle='None', marker='o',
+                     capsize=8, label='Average missing',
+                     color='black', lw=2, markersize=8, capthick=3)
+        ax2.set_ylabel('Average missing', color='black')
+        #ax2.tick_params('y', colors='black')
+        ax2.set_ylim([0, 200])
+        ax2.set_xlim([-1, len(x)+1])
+
+        #fig.tight_layout()
+        #plt.show()
+
+
 
     def plot_frac_w_miss(self):
         df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
         frac_w_miss = list(df['Fraction Missing'])
         labels = list(df['Labels'])
         x = list(range(len(frac_w_miss)))
-        plt.plot(x, frac_w_miss, marker='o', color='black', lw=2, markersize=8)
+        plt.plot(x, frac_w_miss, marker='o', color='black', lw=2,
+                 markersize=8, capsize=10, capthick=3)
         plt.xlim([-1, len(x) + 1])
         plt.tick_params(
             axis='x',  # changes apply to the x-axis
@@ -90,26 +198,6 @@ class MissScore(object):
 
         #fig.tight_layout()
         #plt.show()
-
-    def plot_mean(self):
-        mean_mm, std_mm, mean_mp, std_mp = self.mean_data()
-        x = list(range(len(mean_mm)))
-        labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
-                  '30-35', '35-40', '40-45', '45-50', '50+']
-        plt.errorbar(x, mean_mm, std_mm, linestyle='None', marker='o',
-                     capsize=4, lw=2, label='Fraction missing residues in LC '
-                                      'motif', color='black', markersize=8)
-        plt.errorbar(x, mean_mp, std_mp, linestyle='None', marker='o',
-                     capsize=5, lw=3, label='Fraction residues in LC motif',
-                     color='grey', markersize=8)
-        plt.xticks(x, labels, rotation=45)
-        plt.xlim([-1, len(x)+1])
-        plt.ylim([0, 0.8])
-        plt.xlabel('LC motifs', size=12)
-        plt.legend(loc=4)
-        #plt.legend(bbox_to_anchor=(1.017, 1.14))
-        plt.tight_layout()
-        plt.show()
 
     def write_lc_vs_miss(self):
         df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
@@ -215,7 +303,7 @@ class MissScore(object):
 
 def main():
     ms = MissScore()
-    ms.plot_mean()
+    ms.plot_all()
 
 
 if __name__ == '__main__':
