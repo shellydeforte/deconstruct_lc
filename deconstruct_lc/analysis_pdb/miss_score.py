@@ -5,9 +5,6 @@ import pandas as pd
 
 from deconstruct_lc import read_config
 from deconstruct_lc import motif_seq
-from deconstruct_lc import tools_fasta
-from deconstruct_lc.scores.norm_score import NormScore
-
 
 class MissScore(object):
     def __init__(self):
@@ -17,7 +14,10 @@ class MissScore(object):
         self.pdb_an_dp = os.path.join(self.data_dp,
                                       'pdb_analysis')
         self.an_fpi = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
-        self.lc_vs_miss_fp = os.path.join(self.pdb_an_dp, 'lc_vs_miss.tsv')
+        self.miss_fp = os.path.join(self.pdb_an_dp, 'miss_in_out.tsv')
+        self.k = 6
+        self.lce = 1.6
+        self.lca = 'SGEQAPDTNKR'
 
     def plot_all(self):
         """
@@ -27,11 +27,12 @@ class MissScore(object):
         ax1 = fig.add_subplot(211)
         ax2 = ax1.twinx()
         self.frac_miss_box(ax1, ax2)
-        ax3 = fig.add_subplot(212, sharex=ax1)
+        #ax3 = fig.add_subplot(212, sharex=ax1)
+        ax3 = fig.add_subplot(212)
         ax1.set_xlim([0, 12])
         ax2.set_xlim([0, 12])
         ax3.set_xlim([0, 12])
-        self.plot_mean(ax3)
+        self.plot_inout_box(ax3)
         #plt.tight_layout()
         plt.show()
 
@@ -43,6 +44,9 @@ class MissScore(object):
         frac_miss = []
         bp = {'color': 'black'}
         wp = {'color': 'black', 'linestyle':'-'}
+        medianprops = dict(linestyle='-', color='black')
+        meanpointprops = dict(marker='D', markeredgecolor='black',
+                              markerfacecolor='black', markersize=2)
         for i in bins:
             ndf = df[(df['LC Raw'] >= i) & (df['LC Raw'] < i + 5)]
             nm_ndf = ndf[ndf['Miss Count'] > 0]
@@ -53,6 +57,9 @@ class MissScore(object):
         miss_counts.append(list(nm_ndf['Miss Count']))
         frac_miss.append(len(nm_ndf) / len(ndf))
         x = list(range(1, len(frac_miss)+1))
+        #x = list(range(0, 22, 2))
+        print(len(x))
+        print(len(frac_miss))
         ax1.plot(x, frac_miss, color='black')
         ax1.scatter(x, frac_miss, marker='o', color='green', s=70)
         ax1.set_ylabel('Fraction w/ missing', color='darkgreen', size=12)
@@ -61,7 +68,9 @@ class MissScore(object):
         ax1.tick_params(axis='x', which='both', labelbottom='off')
         ax2.tick_params(axis='x', which='both', labelbottom='off')
         ax2.boxplot(miss_counts, vert=True, whis=[5, 95], widths=0.5,
-                   boxprops=bp, whiskerprops=wp, showfliers=False)
+                   boxprops=bp, whiskerprops=wp, showfliers=False,
+                    showmeans=True, medianprops=medianprops,
+                    meanprops=meanpointprops)
         ax2.set_ylim([0, 260])
         ax2.set_ylabel('Missing residues', color='black')
 
@@ -85,40 +94,55 @@ class MissScore(object):
         #plt.tight_layout()
         #plt.show()
 
+    def plot_inout_box(self, ax3):
+        labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
+                  '30-35', '35-40', '40-45', '45-50', '50+']
+        df = pd.read_csv(self.miss_fp, sep='\t', index_col=0)
+        bins = range(0, 50, 5)
+        miss_in = []
+        motif_perc = []
+        all_box = []
+        for i in bins:
+            ndf = df[(df['LC Raw'] >= i) & (df['LC Raw'] < i + 5)]
+            all_box.append(list(ndf['Motif perc']))
+            all_box.append(list(ndf['Miss in motif']))
+
+            miss_in.append(list(ndf['Miss in motif']))
+            motif_perc.append(list(ndf['Motif perc']))
+        ndf = df[(df['LC Raw'] >= 50)]
+        miss_in.append(list(ndf['Miss in motif']))
+        motif_perc.append(list(ndf['Motif perc']))
+        bp1 = {'color': 'grey', 'facecolor': 'white'}
+        wp1 = {'color': 'black', 'linestyle':'-'}
+        bp2 = {'color': 'black'}
+        wp2 = {'color': 'black', 'linestyle':'-'}
+        medianprops = dict(linestyle='-', color='black')
+        bp = ax3.boxplot(all_box, vert=True, whis=[5, 95],
+                         widths=0.5, boxprops=bp1, whiskerprops=wp1,
+                         showfliers=False, patch_artist=True,
+                         medianprops=medianprops)
+        #plt.setp(bp['boxes'], color='grey')
+        #ax3.boxplot(miss_in, vert=True, whis=[5, 95], widths=0.5,
+        #            boxprops=bp2, whiskerprops=wp2, showfliers=False)
+        ax3.set_ylim([-0.5, 1.5])
+        x = list(range(2, 22, 2))
+        plt.xticks(x, labels, rotation=45)
+        plt.show()
+
     def write_in_motif(self):
         df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
-        bins = range(0, 50, 5)
-        mean_mm = []
-        std_mm = []
-        mean_mp = []
-        std_mp = []
-        for i in bins:
-            print(i)
-            ndf = df[(df['LCA+LCE'] >= i) & (df['LCA+LCE'] < i+5)]
-            print(len(ndf))
-            miss_in_motifs, motif_percs = self.lc_blobs(ndf)
-            mean_mm.append(np.mean(miss_in_motifs))
-            std_mm.append(np.std(miss_in_motifs))
-            mean_mp.append(np.mean(motif_percs))
-            std_mp.append(np.std(motif_percs))
-        ndf = df[(df['LCA+LCE'] >= 50)]
-        miss_in_motifs, motif_percs = self.lc_blobs(ndf)
-        mean_mm.append(np.mean(miss_in_motifs))
-        std_mm.append(np.std(miss_in_motifs))
-        mean_mp.append(np.mean(motif_percs))
-        std_mp.append(np.std(motif_percs))
-        print(mean_mm)
-        print(std_mm)
-        print(mean_mp)
-        print(std_mp)
-        plt.errorbar(bins, mean_mm, std_mm, linestyle='None', marker='o')
-        plt.errorbar(bins, mean_mp, std_mp, linestyle='None', marker='o')
-        plt.show()
+        miss_in_motifs, motif_percs, lc_raw = self.lc_blobs(df)
+        df_dict = {'Miss in motif': miss_in_motifs, 'Motif perc':
+            motif_percs, 'LC Raw': lc_raw}
+        df_out = pd.DataFrame(df_dict)
+        df_out.to_csv(self.miss_fp, sep='\t')
 
     def lc_blobs(self, df):
         miss_in_motifs = []
         motif_percs = []
+        lc_raw = []
         for i, row in df.iterrows():
+            print(i)
             miss = row['Missing']
             seq = row['Sequence']
             ind_miss = set([i for i, c in enumerate(miss) if c == 'X'])
@@ -126,11 +150,12 @@ class MissScore(object):
                 ind_in = self.get_inds(seq)
                 miss_in_motifs.append(len(ind_in & ind_miss) / len(ind_miss))
                 motif_percs.append(len(ind_in)/len(seq))
-        return miss_in_motifs, motif_percs
+                lc_raw.append(row['LC Raw'])
+        return miss_in_motifs, motif_percs, lc_raw
 
     def get_inds(self, seq):
-        lcas = motif_seq.LcSeq(seq, self.k_lca, self.alph_lca, 'lca')
-        lces = motif_seq.LcSeq(seq, self.k_lce, self.thresh_lce, 'lce')
+        lcas = motif_seq.LcSeq(seq, self.k, self.lca, 'lca')
+        lces = motif_seq.LcSeq(seq, self.k, self.lce, 'lce')
         lca_in, lca_out = lcas._get_motif_indexes()
         lce_in, lce_out = lces._get_motif_indexes()
         ind_in = lca_in.union(lce_in)
