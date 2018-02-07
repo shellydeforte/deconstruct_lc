@@ -25,17 +25,12 @@ class MissScore(object):
         """
         fig = plt.figure()
         ax1 = fig.add_subplot(211)
-
-        #fig, ax1 = plt.subplot(2, 1, 1, sharex=True)
-        #fig, ax1 = plt.subplots(sharex=True)
         ax2 = ax1.twinx()
-        #self.same_plot_black_green(ax1, ax2)
         self.frac_miss_box(ax1, ax2)
         ax3 = fig.add_subplot(212, sharex=ax1)
         ax1.set_xlim([0, 12])
         ax2.set_xlim([0, 12])
         ax3.set_xlim([0, 12])
-        #plt.subplot(2, 1, 2)
         self.plot_mean(ax3)
         #plt.tight_layout()
         plt.show()
@@ -49,7 +44,6 @@ class MissScore(object):
         bp = {'color': 'black'}
         wp = {'color': 'black', 'linestyle':'-'}
         for i in bins:
-            print(i)
             ndf = df[(df['LC Raw'] >= i) & (df['LC Raw'] < i + 5)]
             nm_ndf = ndf[ndf['Miss Count'] > 0]
             miss_counts.append(list(nm_ndf['Miss Count']))
@@ -69,9 +63,7 @@ class MissScore(object):
         ax2.boxplot(miss_counts, vert=True, whis=[5, 95], widths=0.5,
                    boxprops=bp, whiskerprops=wp, showfliers=False)
         ax2.set_ylim([0, 260])
-
         ax2.set_ylabel('Missing residues', color='black')
-
 
     def plot_mean(self, ax3):
         mean_mm, std_mm, mean_mp, std_mp = self.mean_data()
@@ -92,139 +84,6 @@ class MissScore(object):
         #plt.legend(bbox_to_anchor=(1.017, 1.14))
         #plt.tight_layout()
         #plt.show()
-
-    def same_plot_black_green(self, ax1, ax2):
-        df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
-        frac_w_miss = list(df['Fraction Missing'])
-        num_miss = list(df['Average Missing Residues'])
-        std_num_miss = list(df['STD Missing Residues'])
-        labels = list(df['Labels'])
-        labels = labels
-        x = list(range(len(frac_w_miss)))
-        #fig, ax1 = plt.subplots(sharex=True, figsize=(6, 2.5))
-        #fig, ax1 = plt.subplots(sharex=True)
-        ax1.plot(x, frac_w_miss, color='black')
-        ax1.scatter(x, frac_w_miss, marker='o', color='green', s=70)
-        # Make the y-axis label, ticks and tick labels match the line color.
-
-        ax1.set_ylabel('Fraction w/ missing', color='darkgreen',
-                       size=12)
-        #ax1.tick_params('y', colors='black')
-        ax1.tick_params(axis='x', which='both', labelbottom='off')
-        ax2.tick_params(axis='x', which='both', labelbottom='off')
-        #plt.tick_params(
-        #    axis='x',  # changes apply to the x-axis
-        #    which='both',  # both major and minor ticks are affected
-        #    bottom='on',  # ticks along the bottom edge are off
-        #    top='on',  # ticks along the top edge are off
-        #    labelbottom='off')
-        #plt.xticks(x, labels, rotation=45)
-        ax1.set_ylim([0.75, 1.0])
-        ax1.set_xlim([-1, len(x)+1])
-        #ax1.set_xlabel('LC Motifs')
-        #ax2 = ax1.twinx()
-        ax2.errorbar(x, num_miss, std_num_miss, linestyle='None', marker='o',
-                     capsize=8, label='Average missing',
-                     color='black', lw=2, markersize=8, capthick=3)
-        ax2.set_ylabel('Average missing', color='black')
-        #ax2.tick_params('y', colors='black')
-        ax2.set_ylim([0, 200])
-        ax2.set_xlim([-1, len(x)+1])
-
-        #fig.tight_layout()
-        #plt.show()
-
-
-
-    def plot_frac_w_miss(self):
-        df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
-        frac_w_miss = list(df['Fraction Missing'])
-        labels = list(df['Labels'])
-        x = list(range(len(frac_w_miss)))
-        plt.plot(x, frac_w_miss, marker='o', color='black', lw=2,
-                 markersize=8, capsize=10, capthick=3)
-        plt.xlim([-1, len(x) + 1])
-        plt.tick_params(
-            axis='x',  # changes apply to the x-axis
-            which='both',  # both major and minor ticks are affected
-            bottom='on',  # ticks along the bottom edge are off
-            top='on',  # ticks along the top edge are off
-            labelbottom='off')
-        plt.ylabel('Fraction with a Missing Residue')
-        #plt.xticks(x, labels, rotation=45)
-        #plt.show()
-
-    def plot_avg_miss(self):
-        df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
-        labels = list(df['Labels'])
-        num_miss = list(df['Average Missing Residues'])
-        std_num_miss = list(df['STD Missing Residues'])
-        x = list(range(len(num_miss)))
-        plt.errorbar(x, num_miss, std_num_miss, linestyle='None', marker='o',
-                     capsize=10, capthick=3, label='Average missing residues',
-                     color='black', lw=3, markersize=8)
-        plt.xticks(x, labels, rotation=45)
-        plt.xlabel('LC Motifs')
-        plt.ylabel('Average Missing Residues')
-        plt.xlim([-1, len(x) + 1])
-        plt.ylim([0, 200])
-        #plt.show()
-
-    def plot_lc_miss(self):
-        df = pd.read_csv(self.lc_vs_miss_fp, sep='\t', index_col=0)
-        frac_w_miss = list(df['Fraction Missing'])
-        num_miss = list(df['Average Missing Residues'])
-        std_num_miss = list(df['STD Missing Residues'])
-        labels = list(df['Labels'])
-        labels = labels
-        x = list(range(len(frac_w_miss)))
-        fig, ax1 = plt.subplots(sharex=True)
-        ax1.plot(x, frac_w_miss, marker='o')
-        # Make the y-axis label, ticks and tick labels match the line color.
-        ax1.set_ylabel('Fraction of proteins with missing residues', color='b')
-        ax1.tick_params('y', colors='b')
-        plt.xticks(x, labels, rotation=45)
-        ax1.set_ylim([0.75, 1.0])
-        ax1.set_xlim([-1, len(x)+1])
-        ax1.set_xlabel('LC Motifs')
-
-        ax2 = ax1.twinx()
-        ax2.errorbar(x, num_miss, std_num_miss, linestyle='None', marker='o',
-                     capsize=3, label='Average missing residues', color='r')
-        ax2.set_ylabel('Average Missing Residues', color='r')
-        ax2.tick_params('y', colors='r')
-        ax2.set_ylim([0, 200])
-        ax2.set_xlim([-1, len(x)+1])
-
-        #fig.tight_layout()
-        #plt.show()
-
-    def write_lc_vs_miss(self):
-        df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
-        labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
-                  '30-35', '35-40', '40-45', '45-50', '50+']
-        bins = range(0, 50, 5)
-        frac_w_miss = []
-        num_miss = []
-        std_num_miss = []
-        for i in bins:
-            print(i)
-            ndf = df[(df['LC Raw'] >= i) & (df['LC Raw'] < i + 5)]
-            nm_ndf = ndf[ndf['Miss Count'] > 0]
-            frac_w_miss.append(len(nm_ndf)/len(ndf))
-            num_miss.append(np.mean(list(nm_ndf['Miss Count'])))
-            std_num_miss.append(np.std(list(nm_ndf['Miss Count'])))
-        ndf = df[(df['LC Raw'] >= 50)]
-        nm_ndf = ndf[ndf['Miss Count'] > 0]
-        frac_w_miss.append(len(nm_ndf) / len(ndf))
-        num_miss.append(np.mean(list(nm_ndf['Miss Count'])))
-        std_num_miss.append(np.std(list(nm_ndf['Miss Count'])))
-        df_dict = {'Fraction Missing': frac_w_miss,
-                   'Average Missing Residues': num_miss,
-                   'STD Missing Residues': std_num_miss,
-                   'Labels': labels}
-        df_out = pd.DataFrame(df_dict)
-        df_out.to_csv(self.lc_vs_miss_fp, sep='\t')
 
     def write_in_motif(self):
         df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
