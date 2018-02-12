@@ -24,24 +24,23 @@ class MissScore(object):
         subplot(nrows, ncolumns, index)
         """
         fig = plt.figure()
+        pos2 = list(range(1, 33, 3))
+        x = [i + 0.5 for i in pos2]
         ax1 = fig.add_subplot(211)
         ax2 = ax1.twinx()
-        self.frac_miss_box(ax1, ax2)
+        self.frac_miss_box(ax1, ax2, x)
         ax3 = fig.add_subplot(212)
         ax1.set_xlim([0, 33])
         ax2.set_xlim([0, 33])
         ax3.set_xlim([0, 33])
-        self.plot_inout_box(ax3)
-        #plt.tight_layout()
+        self.plot_inout_box(ax3, x)
+        plt.tight_layout()
+        ax3.set_ylabel('LC Motifs')
         plt.show()
 
-    def frac_miss_box(self, ax1, ax2):
+    def frac_miss_box(self, ax1, ax2, x):
         # note labels in boxplots
         frac_miss, miss_counts = self.frac_count_data()
-        pos2 = list(range(1, 33, 3))
-        x = [i + 0.5 for i in pos2]
-        #x = list(range(1, len(frac_miss) + 1))
-
         self.plot_frac(ax1, x, frac_miss)
         self.plot_count(ax2, x, miss_counts)
         ax1.tick_params('y', colors='black')
@@ -49,8 +48,6 @@ class MissScore(object):
         ax1.tick_params(axis='x', which='both', labelbottom='off')
         ax2.tick_params(axis='x', which='both', labelbottom='off')
         ax2.set_ylim([0, 260])
-        #ax1.set_xticks(x)
-        #ax2.set_xticks(x)
 
     def plot_frac(self, ax, x, frac_miss):
         ax.plot(x, frac_miss,
@@ -104,27 +101,9 @@ class MissScore(object):
         frac_miss.append(len(nm_ndf) / len(ndf))
         return frac_miss, miss_counts
 
-    def plot_mean(self, ax3):
-        mean_mm, std_mm, mean_mp, std_mp = self.mean_data()
-        x = list(range(1, len(mean_mm)+1))
-        labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
-                  '30-35', '35-40', '40-45', '45-50', '50+']
-        ax3.errorbar(x, mean_mm, std_mm, linestyle='None', marker='o',
-                     capsize=4, lw=2, label='Fraction missing residues in LC '
-                                      'motif', color='black', markersize=8)
-        ax3.errorbar(x, mean_mp, std_mp, linestyle='None', marker='o',
-                     capsize=5, lw=3, label='Fraction residues in LC motif',
-                     color='grey', markersize=8)
-        #ax3.set_xticks(x, labels, rotation=45)
-        #ax3.set_xlim([-1, len(x)+1])
-        ax3.set_ylim([0, 0.8])
-        ax3.set_xlabel('LC motifs', size=12)
-        #plt.legend(loc=4)
-        #plt.legend(bbox_to_anchor=(1.017, 1.14))
-        #plt.tight_layout()
-        #plt.show()
 
-    def plot_inout_box(self, ax3):
+
+    def plot_inout_box(self, ax3, x):
         labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
                   '30-35', '35-40', '40-45', '45-50', '50+']
         motif_perc, miss_in, all_box = self.inout_data()
@@ -187,8 +166,8 @@ class MissScore(object):
         ax2 = ax3.twinx()
         ax2.set_ylabel('LC Fraction', color='brown', size=12)
         #x = list(range(0, 24, 2))
-        x_labs = [x+0.5 for x in pos2]
-        ax3.set_xticks(x_labs)
+        #x_labs = [x+0.5 for x in pos2]
+        ax3.set_xticks(x)
         ax3.set_xticklabels(labels, rotation=45)
         plt.show()
 
