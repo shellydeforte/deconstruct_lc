@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import os
+import numpy as np
 import pandas as pd
 
 from deconstruct_lc import read_config
@@ -27,52 +27,82 @@ class MissScore(object):
         ax1 = fig.add_subplot(211)
         ax2 = ax1.twinx()
         self.frac_miss_box(ax1, ax2)
-        #ax3 = fig.add_subplot(212, sharex=ax1)
         ax3 = fig.add_subplot(212)
-        ax1.set_xlim([0, 12])
-        ax2.set_xlim([0, 12])
-        ax3.set_xlim([0, 12])
+        ax1.set_xlim([0, 33])
+        ax2.set_xlim([0, 33])
+        ax3.set_xlim([0, 33])
         self.plot_inout_box(ax3)
         #plt.tight_layout()
         plt.show()
 
     def frac_miss_box(self, ax1, ax2):
         # note labels in boxplots
-        df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
-        bins = range(0, 50, 5)
-        miss_counts = []
-        frac_miss = []
-        bp = {'color': 'black'}
-        wp = {'color': 'black', 'linestyle':'-'}
-        medianprops = dict(linestyle='-', color='black')
-        meanpointprops = dict(marker='D', markeredgecolor='black',
-                              markerfacecolor='black', markersize=2)
-        for i in bins:
-            ndf = df[(df['LC Raw'] >= i) & (df['LC Raw'] < i + 5)]
-            nm_ndf = ndf[ndf['Miss Count'] > 0]
-            miss_counts.append(list(nm_ndf['Miss Count']))
-            frac_miss.append(len(nm_ndf)/len(ndf))
-        ndf = df[(df['LC Raw'] >= 50)]
-        nm_ndf = ndf[ndf['Miss Count'] > 0]
-        miss_counts.append(list(nm_ndf['Miss Count']))
-        frac_miss.append(len(nm_ndf) / len(ndf))
-        x = list(range(1, len(frac_miss)+1))
-        #x = list(range(0, 22, 2))
-        print(len(x))
-        print(len(frac_miss))
-        ax1.plot(x, frac_miss, color='black')
-        ax1.scatter(x, frac_miss, marker='o', color='green', s=70)
-        ax1.set_ylabel('Fraction w/ missing', color='darkgreen', size=12)
+        frac_miss, miss_counts = self.frac_count_data()
+        pos2 = list(range(1, 33, 3))
+        x = [i + 0.5 for i in pos2]
+        #x = list(range(1, len(frac_miss) + 1))
+
+        self.plot_frac(ax1, x, frac_miss)
+        self.plot_count(ax2, x, miss_counts)
         ax1.tick_params('y', colors='black')
         ax1.set_ylim([0.75, 1.0])
         ax1.tick_params(axis='x', which='both', labelbottom='off')
         ax2.tick_params(axis='x', which='both', labelbottom='off')
-        ax2.boxplot(miss_counts, vert=True, whis=[5, 95], widths=0.5,
-                   boxprops=bp, whiskerprops=wp, showfliers=False,
-                    showmeans=True, medianprops=medianprops,
-                    meanprops=meanpointprops)
         ax2.set_ylim([0, 260])
-        ax2.set_ylabel('Missing residues', color='black')
+        #ax1.set_xticks(x)
+        #ax2.set_xticks(x)
+
+    def plot_frac(self, ax, x, frac_miss):
+        ax.plot(x, frac_miss,
+                color='grey')
+        ax.scatter(x, frac_miss,
+                   marker='o',
+                   color='darkgreen',
+                   s=20)
+        ax.set_ylabel('Fraction w/ Missing',
+                      color='darkgreen',
+                      size=12)
+
+    def plot_count(self, ax, x, miss_counts):
+        bp = {'color': 'grey'}
+        wp = {'color': 'grey',
+              'linestyle':'-'}
+        medianprops = dict(linestyle='-',
+                           color='black')
+        meanpointprops = dict(marker='D',
+                              markeredgecolor='brown',
+                              markerfacecolor='brown',
+                              markersize=3)
+        ax.boxplot(miss_counts,
+                   vert=True,
+                   positions=x,
+                   whis=[5, 95],
+                   widths=1,
+                   showfliers=False,
+                   showmeans=True,
+                   boxprops=bp,
+                   whiskerprops=wp,
+                   medianprops=medianprops,
+                   meanprops=meanpointprops)
+        ax.set_ylabel('Mean Missing',
+                      color='brown',
+                      size=12)
+
+    def frac_count_data(self):
+        df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
+        bins = range(0, 50, 5)
+        miss_counts = []
+        frac_miss = []
+        for i in bins:
+            ndf = df[(df['LC Raw'] >= i) & (df['LC Raw'] < i + 5)]
+            nm_ndf = ndf[ndf['Miss Count'] > 0]
+            miss_counts.append(list(nm_ndf['Miss Count']))
+            frac_miss.append(len(nm_ndf) / len(ndf))
+        ndf = df[(df['LC Raw'] >= 50)]
+        nm_ndf = ndf[ndf['Miss Count'] > 0]
+        miss_counts.append(list(nm_ndf['Miss Count']))
+        frac_miss.append(len(nm_ndf) / len(ndf))
+        return frac_miss, miss_counts
 
     def plot_mean(self, ax3):
         mean_mm, std_mm, mean_mp, std_mp = self.mean_data()
@@ -97,6 +127,72 @@ class MissScore(object):
     def plot_inout_box(self, ax3):
         labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
                   '30-35', '35-40', '40-45', '45-50', '50+']
+        motif_perc, miss_in, all_box = self.inout_data()
+        pos1 = list(range(2, 34, 3))
+        pos2 = list(range(1, 33, 3))
+        miss_in_means = []
+        for item in miss_in:
+            miss_in_means.append(np.mean(item))
+        motif_perc_means = []
+        for item in motif_perc:
+            motif_perc_means.append(np.mean(item))
+        bp1 = {'color': 'grey', 'facecolor': 'white'}
+        wp1 = {'color': 'grey', 'linestyle':'-', 'alpha': 0.5}
+        bp2 = {'color': 'grey', 'alpha': 0.8, 'facecolor': 'grey'}
+        wp2 = {'color': 'grey', 'linestyle':'-', 'alpha': 0.5}
+        medianprops = dict(linestyle='-', color='black')
+        meanpointprops1 = dict(marker='o',
+                              markeredgecolor='green',
+                              markerfacecolor='green',
+                              markersize=5)
+        meanpointprops2 = dict(marker='o',
+                              markeredgecolor='brown',
+                              markerfacecolor='brown',
+                              markersize=3)
+
+        ax3.plot(pos1, miss_in_means, color='green', alpha=0.5)
+        ax3.plot(pos2, motif_perc_means, color='brown', alpha=0.5)
+        bp = ax3.boxplot(miss_in,
+                         vert=True,
+                         positions=pos1,
+                         whis=[5, 95],
+                         widths=0.75,
+                         showfliers=False,
+                         showmeans=True,
+                         patch_artist=True,
+                         boxprops=bp1,
+                         whiskerprops=wp1,
+                         medianprops=medianprops,
+                         meanprops=meanpointprops1)
+
+
+        bp2 = ax3.boxplot(motif_perc,
+                          vert=True,
+                          positions=pos2,
+                          whis=[5, 95],
+                          widths=1,
+                          showfliers=False,
+                          showmeans=True,
+                          patch_artist=True,
+                          boxprops=bp2,
+                          whiskerprops=wp2,
+                          medianprops=medianprops,
+                          meanprops=meanpointprops2)
+
+        #ax3.scatter(pos2, np.mean(motif_perc), color='grey')
+        #plt.setp(bp['boxes'], color='grey')
+        ax3.set_ylim([-0.1, 1.1])
+        ax3.set_xlim([0, 33])
+        ax3.set_ylabel('Missing in LC', color='darkgreen', size=12)
+        ax2 = ax3.twinx()
+        ax2.set_ylabel('LC Fraction', color='brown', size=12)
+        #x = list(range(0, 24, 2))
+        x_labs = [x+0.5 for x in pos2]
+        ax3.set_xticks(x_labs)
+        ax3.set_xticklabels(labels, rotation=45)
+        plt.show()
+
+    def inout_data(self):
         df = pd.read_csv(self.miss_fp, sep='\t', index_col=0)
         bins = range(0, 50, 5)
         miss_in = []
@@ -112,22 +208,7 @@ class MissScore(object):
         ndf = df[(df['LC Raw'] >= 50)]
         miss_in.append(list(ndf['Miss in motif']))
         motif_perc.append(list(ndf['Motif perc']))
-        bp1 = {'color': 'grey', 'facecolor': 'white'}
-        wp1 = {'color': 'black', 'linestyle':'-'}
-        bp2 = {'color': 'black'}
-        wp2 = {'color': 'black', 'linestyle':'-'}
-        medianprops = dict(linestyle='-', color='black')
-        bp = ax3.boxplot(all_box, vert=True, whis=[5, 95],
-                         widths=0.5, boxprops=bp1, whiskerprops=wp1,
-                         showfliers=False, patch_artist=True,
-                         medianprops=medianprops)
-        #plt.setp(bp['boxes'], color='grey')
-        #ax3.boxplot(miss_in, vert=True, whis=[5, 95], widths=0.5,
-        #            boxprops=bp2, whiskerprops=wp2, showfliers=False)
-        ax3.set_ylim([-0.5, 1.5])
-        x = list(range(2, 22, 2))
-        plt.xticks(x, labels, rotation=45)
-        plt.show()
+        return motif_perc, miss_in, all_box
 
     def write_in_motif(self):
         df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
