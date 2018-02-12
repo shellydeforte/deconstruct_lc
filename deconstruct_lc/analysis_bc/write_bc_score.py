@@ -63,6 +63,7 @@ class BcScore(object):
         df = pd.DataFrame(df_dict, columns=cols)
         df.to_csv(self.bc_score_fp, sep='\t')
 
+
 def main():
     bc = BcScore()
     bc.compile_bcs()
