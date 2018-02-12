@@ -1,9 +1,3 @@
-"""
-1. Just do a straight ID, org, score from tsv or fasta file.
-1. open excel spreadsheet
-2. Create a dict that is BC: pids
-3. Create separate files for BCs
-"""
 import os
 import pandas as pd
 from Bio import SeqIO
