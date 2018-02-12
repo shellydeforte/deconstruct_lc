@@ -101,8 +101,6 @@ class MissScore(object):
         frac_miss.append(len(nm_ndf) / len(ndf))
         return frac_miss, miss_counts
 
-
-
     def plot_inout_box(self, ax3, x):
         labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
                   '30-35', '35-40', '40-45', '45-50', '50+']
@@ -144,7 +142,6 @@ class MissScore(object):
                          medianprops=medianprops,
                          meanprops=meanpointprops1)
 
-
         bp2 = ax3.boxplot(motif_perc,
                           vert=True,
                           positions=pos2,
@@ -158,15 +155,11 @@ class MissScore(object):
                           medianprops=medianprops,
                           meanprops=meanpointprops2)
 
-        #ax3.scatter(pos2, np.mean(motif_perc), color='grey')
-        #plt.setp(bp['boxes'], color='grey')
         ax3.set_ylim([-0.1, 1.1])
         ax3.set_xlim([0, 33])
         ax3.set_ylabel('Missing in LC', color='darkgreen', size=12)
         ax2 = ax3.twinx()
         ax2.set_ylabel('LC Fraction', color='brown', size=12)
-        #x = list(range(0, 24, 2))
-        #x_labs = [x+0.5 for x in pos2]
         ax3.set_xticks(x)
         ax3.set_xticklabels(labels, rotation=45)
         plt.show()
