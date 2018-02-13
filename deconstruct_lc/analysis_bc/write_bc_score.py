@@ -7,6 +7,7 @@ from deconstruct_lc import tools_fasta
 
 
 class BcScore(object):
+    """Write individual BC files with pid, org, seq, lc score, length"""
     def __init__(self):
         self.config = read_config.read_config()
         self.data_dp = self.config['fps']['data_dp']
