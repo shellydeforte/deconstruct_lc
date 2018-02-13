@@ -23,10 +23,15 @@ class WriteNorm(object):
         pdb_pids, pdb_proteome, pdb_org, pdb_scores = self.get_pdb()
         bc_pids, bc_proteome, bc_org, bc_scores = self.get_bcs()
         ypids, yproteome, yorg, yscores = self.get_yeast()
-        df_dict = {'Protein ID': pdb_pids + bc_pids + ypids,
-                   'Proteome': pdb_proteome + bc_proteome + yproteome,
-                   'Organism': pdb_org + bc_org + yorg,
-                   'LC Score': pdb_scores + bc_scores + yscores}
+        hpids, hproteome, horg, hscores = self.get_human()
+        pids = pdb_pids + bc_pids + ypids + hpids
+        proteome = pdb_proteome + bc_proteome + yproteome + hproteome
+        org = pdb_org + bc_org + yorg + horg
+        scores = pdb_scores + bc_scores + yscores + hscores
+        df_dict = {'Protein ID': pids,
+                   'Proteome': proteome,
+                   'Organism': org,
+                   'LC Score': scores}
         cols = ['Protein ID', 'Proteome', 'Organism', 'LC Score']
         df_out = pd.DataFrame(df_dict, columns=cols)
         df_out.to_csv(self.fpo, sep='\t')
@@ -66,6 +71,13 @@ class WriteNorm(object):
         org = ['Yeast']*len(pids)
         return pids, proteome, org, scores
 
+    def get_human(self):
+        pids, seqs = tools_fasta.fasta_to_id_seq(self.human_fp)
+        ns = NormScore()
+        scores = ns.lc_norm_score(seqs)
+        proteome = ['Human']*len(pids)
+        org = ['Human']*len(pids)
+        return pids, proteome, org, scores
 
 
 def main():
