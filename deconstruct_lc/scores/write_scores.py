@@ -3,6 +3,7 @@ import pandas as pd
 from deconstruct_lc.scores.norm_score import NormScore
 from deconstruct_lc.analysis_bc.write_bc_score import BcScore
 from deconstruct_lc import read_config
+from deconstruct_lc import tools_fasta
 
 
 class WriteNorm(object):
@@ -21,10 +22,11 @@ class WriteNorm(object):
         """Write tsv that is pid, proteome, org, lc score"""
         pdb_pids, pdb_proteome, pdb_org, pdb_scores = self.get_pdb()
         bc_pids, bc_proteome, bc_org, bc_scores = self.get_bcs()
-        df_dict = {'Protein ID': pdb_pids + bc_pids,
-                   'Proteome': pdb_proteome + bc_proteome,
-                   'Organism': pdb_org + bc_org,
-                   'LC Score': pdb_scores + bc_scores}
+        ypids, yproteome, yorg, yscores = self.get_yeast()
+        df_dict = {'Protein ID': pdb_pids + bc_pids + ypids,
+                   'Proteome': pdb_proteome + bc_proteome + yproteome,
+                   'Organism': pdb_org + bc_org + yorg,
+                   'LC Score': pdb_scores + bc_scores + yscores}
         cols = ['Protein ID', 'Proteome', 'Organism', 'LC Score']
         df_out = pd.DataFrame(df_dict, columns=cols)
         df_out.to_csv(self.fpo, sep='\t')
@@ -55,6 +57,15 @@ class WriteNorm(object):
             org += list(df['Organism'])
             scores += list(df['LC Score'])
         return pids, proteome, org, scores
+
+    def get_yeast(self):
+        pids, seqs = tools_fasta.fasta_to_id_seq(self.yeast_fp)
+        ns = NormScore()
+        scores = ns.lc_norm_score(seqs)
+        proteome = ['Yeast']*len(pids)
+        org = ['Yeast']*len(pids)
+        return pids, proteome, org, scores
+
 
 
 def main():
