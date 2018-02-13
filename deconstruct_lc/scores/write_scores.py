@@ -80,9 +80,55 @@ class WriteNorm(object):
         return pids, proteome, org, scores
 
 
+class CreateTable(object):
+    def __init__(self):
+        config = read_config.read_config()
+        data = config['fps']['data_dp']
+        self.fpi = os.path.join(data, 'scores', 'pdb_bc_scores.tsv')
+        self.yeast_fpo = os.path.join(data, 'scores', 'yeast_bc.tsv')
+        self.human_fpo = os.path.join(data, 'scores', 'human_bc.tsv')
+
+    def write_table(self):
+        self.create_table('YEAST', self.yeast_fpo)
+        self.create_table('HUMAN', self.human_fpo)
+
+    def create_table(self, org, fpo):
+        names = []
+        lts = []
+        ms = []
+        gts = []
+        numseq = []
+        df = pd.read_csv(self.fpi, sep='\t', index_col=0)
+        bcs = BcScore()
+        bc_names = bcs.get_sheets()
+        for bc_name in bc_names:
+            ndf = df[df['Proteome'] == bc_name]
+            yndf = ndf[ndf['Organism'] == org]
+            if len(yndf) > 0:
+                lt, m, gt = self.get_bins(yndf)
+                lts.append(lt)
+                ms.append(m)
+                gts.append(gt)
+                names.append(bc_name)
+                numseq.append(len(yndf))
+        df_dict = {'BC Name': names, '< 0': lts, '0-20': ms, '> 20': gts, 'Sequences': numseq}
+        cols = ['BC Name', '< 0', '0-20', '> 20', 'Sequences']
+        df = pd.DataFrame(df_dict, columns=cols)
+        df.to_csv(fpo, sep='\t')
+
+    def get_bins(self, df):
+        ndf = df[df['LC Score'] < 0]
+        lt = len(ndf)/len(df)
+        ndf = df[(df['LC Score'] >= 0) & (df['LC Score'] <= 20)]
+        m = len(ndf)/len(df)
+        ndf = df[df['LC Score'] > 20]
+        gt = len(ndf)/len(df)
+        return lt, m, gt
+
+
 def main():
-    wn = WriteNorm()
-    wn.write_scores()
+    ct = CreateTable()
+    ct.write_table()
 
 
 if __name__ == '__main__':
