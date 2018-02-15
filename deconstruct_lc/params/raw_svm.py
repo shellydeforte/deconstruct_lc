@@ -9,8 +9,8 @@ class RawSvm(object):
     def __init__(self):
         self.config = read_config.read_config()
         self.param_dp = os.path.join(self.config['fps']['data_dp'], 'params')
-        #self.kr = (2, 21)
-        self.kr = (2, 3)
+        self.kr = (2, 21)
+        #self.kr = (2, 3)
 
     def svm_lca_lce(self):
         for k in range(self.kr[0], self.kr[1]):
