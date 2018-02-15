@@ -1,5 +1,6 @@
 """Results: Neither the table nor the plots by bin are particularly compelling.
-X goes up, but most other things are pretty similar without a lot of movement"""
+X goes up, but most other things are pretty similar without a lot of movement
+Structure is about a 15 point difference"""
 
 import matplotlib.pyplot as plt
 from scipy.interpolate import spline
@@ -91,6 +92,37 @@ class PlotSs(object):
         self.lce = 1.6
         self.lca = 'SGEQAPDTNKR'
 
+    def plot_bar(self):
+        data = [[0.2, 0.4, 0.4], [0.1, 0.5, 0.6]]
+        data1 = [0.2, 0.1]
+        data2 = [0.4, 0.5]
+        data3 = [0.4, 0.6]
+        plt.bar([0, 1], data1, color='darkblue')
+        plt.bar([0, 1], data2, bottom=data1, color='darkorange')
+        plt.show()
+
+    def bar_plot(self):
+        df = pd.read_csv(self.ss_in_fp, sep='\t', index_col=0)
+        missing = []
+        noss = []
+        turns = []
+        struct = []
+        for i, row in df.iterrows():
+            # each row is a bin
+            missing.append(row['X'])
+            noss.append(row['P'])
+            turns.append((row['S'] + row['T']))
+            struct.append((row['E'] + row['H'] + row['B'] + row['G'] + row['I']))
+        x = list(range(0, 10))
+        x2 = [i+0.5 for i in x]
+        plt.bar(x, struct, color='darkblue', width=0.5)
+        plt.bar(x, turns, color='darkorange', bottom=struct, width=0.5)
+        plt.bar(x, noss, color='grey', bottom=np.array(turns)+np.array(struct), width=0.5)
+        plt.bar(x, missing, color='darkgrey', bottom=np.array(turns)+np.array(struct)+np.array(noss), width=0.5)
+        plt.ylim([0, 1])
+        plt.show()
+
+
     def read_plot(self):
         df = pd.read_csv(self.ss_out_fp, sep='\t', index_col=0)
         all_ss = ['P', 'X', 'T', 'S', 'H', 'E', 'B', 'G', 'I']
@@ -106,8 +138,6 @@ class PlotSs(object):
         plt.ylim([0, 0.35])
         plt.legend()
         plt.show()
-
-
 
     def get_bins(self):
         df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
@@ -174,7 +204,7 @@ class PlotSs(object):
 
 def main():
     st = PlotSs()
-    st.read_plot()
+    st.bar_plot()
 
 
 if __name__ == '__main__':
