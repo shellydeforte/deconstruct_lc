@@ -102,7 +102,15 @@ class PlotSs(object):
         plt.show()
 
     def bar_plot(self):
-        df = pd.read_csv(self.ss_in_fp, sep='\t', index_col=0)
+        df_out = pd.read_csv(self.ss_out_fp, sep='\t', index_col=0)
+        df_in = pd.read_csv(self.ss_in_fp, sep='\t', index_col=0)
+        x = list(range(0, 10))
+        x2 = [i+0.25 for i in x]
+        self.abar(df_in, x2, 1)
+        self.abar(df_out, x, 1)
+        plt.show()
+
+    def abar(self, df, x, a):
         missing = []
         noss = []
         turns = []
@@ -113,14 +121,11 @@ class PlotSs(object):
             noss.append(row['P'])
             turns.append((row['S'] + row['T']))
             struct.append((row['E'] + row['H'] + row['B'] + row['G'] + row['I']))
-        x = list(range(0, 10))
-        x2 = [i+0.5 for i in x]
-        plt.bar(x, struct, color='darkblue', width=0.5)
-        plt.bar(x, turns, color='darkorange', bottom=struct, width=0.5)
-        plt.bar(x, noss, color='grey', bottom=np.array(turns)+np.array(struct), width=0.5)
-        plt.bar(x, missing, color='darkgrey', bottom=np.array(turns)+np.array(struct)+np.array(noss), width=0.5)
-        plt.ylim([0, 1])
-        plt.show()
+        plt.bar(x, struct, color='black', width=0.2, alpha=a)
+        plt.bar(x, turns, color='grey', bottom=struct, width=0.2, alpha=a)
+        plt.bar(x, noss, color='darkgrey', bottom=np.array(turns)+np.array(struct), width=0.2, alpha=a)
+        plt.bar(x, missing, color='darkred', bottom=np.array(turns)+np.array(struct)+np.array(noss), width=0.2, alpha=a)
+        plt.ylim([0, 1.1])
 
 
     def read_plot(self):
