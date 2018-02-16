@@ -54,17 +54,6 @@ class LcProteome(object):
         analyzed_sequence = ProteinAnalysis(all_aa)
         return analyzed_sequence.get_amino_acids_percent()
 
-    def write_n(self):
-        all_perc = []
-        for fasta_in in self.fns:
-            aa_dict = self._one_organism(fasta_in)
-            all_perc.append(aa_dict['N'])
-        df_dict = {'Filename': self.fns, 'Fraction of Asparagine': all_perc}
-        df = pd.DataFrame(df_dict, columns=['Filename', 'Fraction of '
-                                                        'Asparagine'])
-        fpo = os.path.join(self.fpo, 'asparagine.tsv')
-        df.to_csv(fpo, sep='\t')
-
 
 def main():
     lcp = LcProteome()
