@@ -88,26 +88,73 @@ class PlotSs(object):
         self.an_fpi = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
         self.ss_out_fp = os.path.join(self.pdb_an_dp, 'ss_out.tsv')
         self.ss_in_fp = os.path.join(self.pdb_an_dp, 'ss_in.tsv')
+        self.ss_one_in_fp = os.path.join(self.pdb_an_dp, 'ss_one_in.tsv')
+        self.ss_one_out_fp = os.path.join(self.pdb_an_dp, 'ss_one_out.tsv')
         self.k = 6
         self.lce = 1.6
         self.lca = 'SGEQAPDTNKR'
 
-    def plot_bar(self):
-        data = [[0.2, 0.4, 0.4], [0.1, 0.5, 0.6]]
-        data1 = [0.2, 0.1]
-        data2 = [0.4, 0.5]
-        data3 = [0.4, 0.6]
-        plt.bar([0, 1], data1, color='darkblue')
-        plt.bar([0, 1], data2, bottom=data1, color='darkorange')
+    def one_bar_plot(self):
+        """Plot the average of all, but also mention that the bars go down by bins"""
+        df_out = pd.read_csv(self.ss_one_out_fp, sep='\t', index_col=0)
+        df_in = pd.read_csv(self.ss_one_in_fp, sep='\t', index_col=0)
+
+        x1 = [0]
+        x2 = [0.2]
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        self.data_one_bar(df_out, x1, 1, 0.1)
+        plt.legend()
+        self.data_one_bar(df_in, x2, 1, 0.1)
+        labels = ['Outside Motifs', 'Inside Motifs']
+        ax.set_xticks([0.05, 0.25])
+        ax.set_xticklabels(labels, size=12)
+        plt.ylim([0, 1.1])
+        plt.xlim([-0.1, 0.9])
         plt.show()
+
+    def data_one_bar(self, df, x, a, w):
+        missing = []
+        noss = []
+        turns = []
+        struct = []
+        for i, row in df.iterrows():
+            # each row is a bin
+            missing.append(row['X'])
+            noss.append(row['P'])
+            turns.append((row['S'] + row['T']))
+            struct.append((row['E'] + row['H'] + row['B'] + row['G'] + row['I']))
+        plt.bar(x, missing, color='white',
+                    bottom=np.array(turns) + np.array(struct) + np.array(noss),
+                    width=w, alpha=a, label='Missing')
+        plt.bar(x, noss, color='darkgrey',
+                    bottom=np.array(turns) + np.array(struct), width=w,
+                    alpha=a, label='Coils')
+        plt.bar(x, turns, color='grey', bottom=struct, width=w, alpha=a,
+                    label='Turns and Bends')
+        plt.bar(x, struct, color='black', width=w, alpha=a, label='Alpha Helix and Beta Sheet')
+
 
     def bar_plot(self):
         df_out = pd.read_csv(self.ss_out_fp, sep='\t', index_col=0)
         df_in = pd.read_csv(self.ss_in_fp, sep='\t', index_col=0)
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
         x = list(range(0, 10))
-        x2 = [i+0.25 for i in x]
+        x2 = [i+0.45 for i in x]
         self.abar(df_in, x2, 1)
+        ax.legend()
+        #ax.legend(bbox_to_anchor=(1, 1.2))
         self.abar(df_out, x, 1)
+        labels = ['0-5', '5-10', '10-15', '15-20', '20-25', '25-30',
+                  '30-35', '35-40', '40-45', '45-50', '50+']
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, rotation=45, size=12)
+        #plt.tight_layout()
+
+        plt.ylim([0, 1.5])
+        plt.xlim([-1, len(x)+1])
         plt.show()
 
     def abar(self, df, x, a):
@@ -121,12 +168,11 @@ class PlotSs(object):
             noss.append(row['P'])
             turns.append((row['S'] + row['T']))
             struct.append((row['E'] + row['H'] + row['B'] + row['G'] + row['I']))
-        plt.bar(x, struct, color='black', width=0.2, alpha=a)
-        plt.bar(x, turns, color='grey', bottom=struct, width=0.2, alpha=a)
-        plt.bar(x, noss, color='darkgrey', bottom=np.array(turns)+np.array(struct), width=0.2, alpha=a)
-        plt.bar(x, missing, color='darkred', bottom=np.array(turns)+np.array(struct)+np.array(noss), width=0.2, alpha=a)
+        plt.bar(x, struct, color='black', width=0.4, alpha=a, label='Alpha Helix and Beta Sheet')
+        plt.bar(x, turns, color='grey', bottom=struct, width=0.4, alpha=a, label='Turns and Bends')
+        plt.bar(x, noss, color='darkgrey', bottom=np.array(turns)+np.array(struct), width=0.4, alpha=a, label='Coils')
+        plt.bar(x, missing, color='darkred', bottom=np.array(turns)+np.array(struct)+np.array(noss), width=0.4, alpha=a, label='Missing')
         plt.ylim([0, 1.1])
-
 
     def read_plot(self):
         df = pd.read_csv(self.ss_out_fp, sep='\t', index_col=0)
@@ -143,6 +189,20 @@ class PlotSs(object):
         plt.ylim([0, 0.35])
         plt.legend()
         plt.show()
+
+    def one_bin(self):
+        df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
+        ss_in_dict = {'P': [], 'X': [], 'T': [], 'S': [], 'H': [], 'E': [],
+                      'B': [], 'G': [], 'I': []}
+        ss_out_dict = {'P': [], 'X': [], 'T': [], 'S': [], 'H': [], 'E': [],
+                      'B': [], 'G': [], 'I': []}
+        self.read_ss(df, ss_in_dict, ss_out_dict)
+        print(ss_in_dict)
+        print(ss_out_dict)
+        df_ssin = pd.DataFrame(ss_in_dict)
+        df_ssout = pd.DataFrame(ss_out_dict)
+        df_ssin.to_csv(self.ss_one_in_fp, sep='\t')
+        df_ssout.to_csv(self.ss_one_out_fp, sep='\t')
 
     def get_bins(self):
         df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
@@ -209,7 +269,7 @@ class PlotSs(object):
 
 def main():
     st = PlotSs()
-    st.bar_plot()
+    st.one_bar_plot()
 
 
 if __name__ == '__main__':
