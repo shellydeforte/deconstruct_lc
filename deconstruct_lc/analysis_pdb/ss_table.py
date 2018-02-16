@@ -7,9 +7,11 @@ from scipy.interpolate import spline
 import os
 import numpy as np
 import pandas as pd
+from collections import OrderedDict
 
 from deconstruct_lc import read_config
 from deconstruct_lc import motif_seq
+from deconstruct_lc import tools_lc
 
 
 class SsTable(object):
@@ -134,7 +136,6 @@ class PlotSs(object):
         plt.bar(x, turns, color='grey', bottom=struct, width=w, alpha=a,
                     label='Turns and Bends')
         plt.bar(x, struct, color='black', width=w, alpha=a, label='Alpha Helix and Beta Sheet')
-
 
     def bar_plot(self):
         df_out = pd.read_csv(self.ss_out_fp, sep='\t', index_col=0)
@@ -267,9 +268,60 @@ class PlotSs(object):
         return ind_in, ind_out
 
 
+class SsComp(object):
+    """If it is both in motif and S/T/P/X - what do the motifs look like?"""
+    def __init__(self):
+        self.config = read_config.read_config()
+        self.data_dp = self.config['fps']['data_dp']
+        self.pdb_dp = os.path.join(self.data_dp, 'pdb_prep')
+        self.pdb_an_dp = os.path.join(self.data_dp,
+                                      'pdb_analysis')
+        self.an_fpi = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
+        self.ss_out_fp = os.path.join(self.pdb_an_dp, 'ss_out.tsv')
+        self.ss_in_fp = os.path.join(self.pdb_an_dp, 'ss_in.tsv')
+        self.ss_one_in_fp = os.path.join(self.pdb_an_dp, 'ss_one_in.tsv')
+        self.ss_one_out_fp = os.path.join(self.pdb_an_dp, 'ss_one_out.tsv')
+        self.k = 6
+        self.lce = 1.6
+        self.lca = 'SGEQAPDTNKR'
+
+    def comp(self):
+        df = pd.read_csv(self.an_fpi, sep='\t', index_col=0)
+        all_kmers = {}
+        for i, row in df.iterrows():
+            print(i)
+            seq = row['Sequence']
+            ss = row['Secondary Structure']
+            miss = row['Missing']
+            xss = self.add_x(ss, miss)
+
+            seq_kmers = tools_lc.seq_to_kmers(seq, self.k)
+            ss_kmers = tools_lc.seq_to_kmers(xss, self.k)
+            for seq_kmer, ss_kmer in zip(seq_kmers, ss_kmers):
+                if tools_lc.lca_motif(seq_kmer, self.lca) or tools_lc.lce_motif(seq_kmer, self.lce):
+                    if set(ss_kmer) <= {'S', 'T', 'P', 'X'}:
+                        if seq_kmer in all_kmers:
+                            all_kmers[seq_kmer] += 1
+                        else:
+                            all_kmers[seq_kmer] = 1
+        for item in all_kmers:
+            if all_kmers[item] > 200:
+                print(item)
+                print(all_kmers[item])
+
+
+    def add_x(self, ss, miss):
+        nss = ''
+        for s, m in zip(ss, miss):
+            if m == 'X':
+                nss += m
+            else:
+                nss += s
+        return nss
+
 def main():
-    st = PlotSs()
-    st.one_bar_plot()
+    st = SsComp()
+    st.comp()
 
 
 if __name__ == '__main__':
