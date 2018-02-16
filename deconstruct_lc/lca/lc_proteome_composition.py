@@ -5,6 +5,8 @@ import numpy as np
 import os
 import pandas as pd
 
+from deconstruct_lc import read_config
+
 
 class LcProteome(object):
     """
@@ -12,18 +14,13 @@ class LcProteome(object):
     composition and standard deviation. The composition is calculated for
     the entire organism and the mean and standard deviation are taken from
     the list of these values.
-
-    In order to run this, set the correct directory paths to the proteome
-    SEG files.
     """
-
     def __init__(self):
-        self.base_dir = os.path.join(os.path.dirname(__file__), '..',
-                                     'data', 'lc_composition')
-        self.seg_dpi = os.path.join(self.base_dir, 'euk_seg')
+        config = read_config.read_config()
+        data_dp = config['fps']['data_dp']
+        self.seg_dpi = os.path.join(data_dp, 'proteomes', 'euk_seg')
         self.fns = os.listdir(self.seg_dpi)
-        self.fdo = os.path.join(self.base_dir, 'data_out')
-        self.fno = os.path.join(self.fdo, 'lc_composition.tsv')
+        self.fpo = os.path.join(data_dp, 'proteomes_analysis', 'lc_composition.tsv')
 
     def write_all_comps(self):
         aa_order = 'SGEQAPDTNKRLHVYFIMCW'
@@ -43,7 +40,7 @@ class LcProteome(object):
             stds}
         df = pd.DataFrame(df_dict, columns=['Amino Acid',
                                             'Mean', 'Standard Deviation'])
-        df.to_csv(self.fno, sep='\t')
+        df.to_csv(self.fpo, sep='\t')
 
     def _one_organism(self, fasta_in):
         all_aa = ''
@@ -65,13 +62,13 @@ class LcProteome(object):
         df_dict = {'Filename': self.fns, 'Fraction of Asparagine': all_perc}
         df = pd.DataFrame(df_dict, columns=['Filename', 'Fraction of '
                                                         'Asparagine'])
-        fpo = os.path.join(self.fdo, 'asparagine.tsv')
+        fpo = os.path.join(self.fpo, 'asparagine.tsv')
         df.to_csv(fpo, sep='\t')
 
 
 def main():
     lcp = LcProteome()
-    lcp.write_n()
+    lcp.write_all_comps()
 
 
 if __name__ == '__main__':
