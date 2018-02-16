@@ -1,7 +1,6 @@
 from Bio import SeqIO
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 from collections import defaultdict
-import numpy as np
 import os
 import pandas as pd
 
@@ -29,17 +28,8 @@ class LcProteome(object):
             aa_dict = self._one_organism(fasta_in)
             for aa in aa_order:
                 all_perc[aa].append(aa_dict[aa])
-        means = []
-        stds = []
-        aas = []
-        for aa in aa_order:
-            means.append(np.mean(all_perc[aa]))
-            stds.append(np.std(all_perc[aa]))
-            aas.append(aa)
-        df_dict = {'Amino Acid': aas, 'Mean': means, 'Standard Deviation':
-            stds}
-        df = pd.DataFrame(df_dict, columns=['Amino Acid',
-                                            'Mean', 'Standard Deviation'])
+        cols = [aa for aa in aa_order]
+        df = pd.DataFrame(all_perc, columns=cols)
         df.to_csv(self.fpo, sep='\t')
 
     def _one_organism(self, fasta_in):
