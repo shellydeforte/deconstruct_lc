@@ -5,6 +5,7 @@ import os
 import pandas as pd
 
 from deconstruct_lc import tools_lc
+from deconstruct_lc import read_config
 from deconstruct_lc.len_norm.len_norm import LenNorm
 
 config = configparser.ConfigParser()
@@ -15,10 +16,10 @@ config.read_file(open(cfg_fp, 'r'))
 
 class PlotLenNorm(object):
     def __init__(self):
-        self.data_dp = os.path.join(config['filepaths']['data_dp'])
+        config = read_config.read_config()
+        self.data_dp = os.path.join(config['fps']['data_dp'])
         self.pdb_dp = os.path.join(self.data_dp, 'pdb_prep')
         self.norm_fpi = os.path.join(self.pdb_dp, 'pdb_norm_cd100.tsv')
-        self.train_fpi = config['filepaths']['train_fp']
         self.k = 6
         self.lca = 'SGEQAPDTNKR'
         self.lce = 1.6
@@ -37,12 +38,10 @@ class PlotLenNorm(object):
         print(lr)
 
     def plot_all(self):
-        plt.subplot(2, 2, 1)
+        plt.subplot(1, 2, 1)
         self.plot_scatter()
-        plt.subplot(2, 2, 2)
+        plt.subplot(1, 2, 2)
         self.plot_nomiss()
-        plt.subplot(2, 2, 3)
-        self.plot_train()
         plt.subplots_adjust(hspace=0.5)
         plt.show()
 
@@ -102,26 +101,6 @@ class PlotLenNorm(object):
     def plot_line(self, m, b, x):
         y = m*x + b
         return y
-
-    def plot_train(self):
-        df = pd.read_csv(self.train_fpi, sep='\t', index_col=0)
-        df = df[df['y'] == 1]
-        seqs = df['Sequence']
-        lens = [len(seq) for seq in seqs]
-        raw_scores = tools_lc.calc_lc_motifs(seqs, self.k, self.lca, self.lce)
-        plt.scatter(lens, raw_scores, alpha=0.1, color='darkblue')
-        x = np.arange(0, 1500, 0.01)
-        y1 = self.plot_line(self.lc_m, self.lc_b, x)
-        y2 = self.plot_line(self.lc_m, self.lc_b_up, x)
-        y3 = self.plot_line(self.lc_m, self.grey_b, x)
-        plt.plot(x, y1, color='black', lw=2)
-        plt.plot(x, y2, color='black', lw=2, linestyle='--')
-        plt.plot(x, y3, color='grey', lw=2)
-        plt.xlim([0, 1500])
-        plt.ylim([0, 150])
-        plt.xlabel('Protein sequence length', size=12)
-        plt.ylabel('Raw LC score', size=12)
-        #plt.show()
 
 
 def main():
