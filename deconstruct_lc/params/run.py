@@ -1,6 +1,7 @@
 from deconstruct_lc import read_config
 from deconstruct_lc.params import raw_scores
 from deconstruct_lc.params import raw_svm
+from deconstruct_lc.params import raw_mb
 
 
 class RunRaw(object):
@@ -16,9 +17,14 @@ class RunRaw(object):
         rs = raw_svm.RawSvm(self.config)
         rs.svm_lca_lce()
 
+    def run_rawmb(self):
+        rm = raw_mb.RawMb(self.config)
+        rm.write_top()
+
 
 def main():
     rr = RunRaw()
+    rr.run_rawmb()
 
 
 if __name__ == '__main__':
