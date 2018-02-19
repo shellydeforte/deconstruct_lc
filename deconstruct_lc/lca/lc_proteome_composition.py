@@ -9,10 +9,8 @@ from deconstruct_lc import read_config
 
 class LcProteome(object):
     """
-    Read all seg proteome files and output a tsv file with the mean
-    composition and standard deviation. The composition is calculated for
-    the entire organism and the mean and standard deviation are taken from
-    the list of these values.
+    For each proteome, record the amino acid composition for that proteome as
+    a continuous sequence string.
     """
     def __init__(self):
         config = read_config.read_config()
@@ -28,7 +26,8 @@ class LcProteome(object):
             aa_dict = self._one_organism(fasta_in)
             for aa in aa_order:
                 all_perc[aa].append(aa_dict[aa])
-        cols = [aa for aa in aa_order]
+        cols = ['Filename'] + [aa for aa in aa_order]
+        all_perc['Filename'] = self.fns
         df = pd.DataFrame(all_perc, columns=cols)
         df.to_csv(self.fpo, sep='\t')
 
