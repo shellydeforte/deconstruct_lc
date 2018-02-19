@@ -54,6 +54,7 @@ class RawMb(object):
         ms = []
         bs = []
         for lab in labels:
+            print(lab)
             lab_sp = lab.split('_')
             k = int(lab_sp[0])
             lca = lab_sp[1]
@@ -67,6 +68,7 @@ class RawMb(object):
         ms = []
         bs = []
         for lab in labels:
+            print(lab)
             lab_sp = lab.split('_')
             k = int(lab_sp[0])
             lce = float(lab_sp[1])
