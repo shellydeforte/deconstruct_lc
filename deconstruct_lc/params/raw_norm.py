@@ -25,7 +25,7 @@ class RawNorm(object):
         lce_df = pd.read_csv(lce_fpi, sep='\t', index_col=0)
         lce_dict = self.calc_norm_score(lce_df, 'lce')
         lce_df_out = pd.DataFrame(lce_dict)
-        lce_df_out.to_csvf(lce_fpo, sep='t')
+        lce_df_out.to_csv(lce_fpo, sep='\t')
 
     def calc_norm_score(self, df_in, type):
         df_dict = {}
@@ -33,6 +33,7 @@ class RawNorm(object):
             m = float(row['m'])
             b = float(row['b'])
             label = str(row['Label'])
+            print(label)
             raw_scores, lengths = self.get_raw_score(label, type)
             norm_scores = self.norm_function(m, b, raw_scores, lengths)
             df_dict[label] = norm_scores

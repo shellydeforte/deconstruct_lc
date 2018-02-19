@@ -2,6 +2,7 @@ from deconstruct_lc import read_config
 from deconstruct_lc.params import raw_scores
 from deconstruct_lc.params import raw_svm
 from deconstruct_lc.params import raw_mb
+from deconstruct_lc.params import raw_norm
 
 
 class RunRaw(object):
@@ -21,10 +22,14 @@ class RunRaw(object):
         rm = raw_mb.RawMb(self.config)
         rm.write_top()
 
+    def run_rawnorm(self):
+        rn = raw_norm.RawNorm(self.config)
+        rn.read_files()
+
 
 def main():
     rr = RunRaw()
-    rr.run_rawmb()
+    rr.run_rawnorm()
 
 
 if __name__ == '__main__':
