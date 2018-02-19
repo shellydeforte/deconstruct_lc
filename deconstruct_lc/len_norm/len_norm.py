@@ -1,6 +1,7 @@
 import os
-from scipy.stats import linregress
 import pandas as pd
+from scipy.stats import linregress
+
 from deconstruct_lc import tools_fasta
 from deconstruct_lc import tools_lc
 
