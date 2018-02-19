@@ -4,11 +4,11 @@ from deconstruct_lc.params import lc_labels
 from deconstruct_lc import tools_lc
 
 
-class PipeRaw(object):
+class RawScores(object):
     def __init__(self, config):
-        self.data_dp = config['fps']['data_dp']
-        self.train_fp = os.path.join(self.data_dp, 'train.tsv')
-        self.param_dp = os.path.join(self.data_dp, 'params')
+        data_dp = config['fps']['data_dp']
+        self.train_fp = os.path.join(data_dp, 'train.tsv')
+        self.param_dp = os.path.join(data_dp, 'params')
         self.k1 = config.getint('params', 'k1')
         self.k2 = config.getint('params', 'k2')
         self.alph = config['params']['alph']

@@ -6,14 +6,14 @@ from deconstruct_lc.svm import svms
 
 
 class RawSvm(object):
-    def __init__(self):
-        self.config = read_config.read_config()
-        self.param_dp = os.path.join(self.config['fps']['data_dp'], 'params')
-        self.kr = (2, 21)
-        #self.kr = (2, 3)
+    def __init__(self, config):
+        data_dp = config['fps']['data_dp']
+        self.param_dp = os.path.join(data_dp, 'params')
+        self.k1 = config.getint('params', 'k1')
+        self.k2 = config.getint('params', 'k2')
 
     def svm_lca_lce(self):
-        for k in range(self.kr[0], self.kr[1]):
+        for k in range(self.k1, self.k2):
             print("{} LCE".format(k))
             lce_fpi = os.path.join(self.param_dp, 'raw_{}_lce.tsv'.format(k))
             lce_fpo = os.path.join(self.param_dp, 'svm_{}_lce.tsv'.format(k))
@@ -44,8 +44,7 @@ class RawSvm(object):
 
 
 def main():
-    pipe = RawSvm()
-    pipe.svm_lca_lce()
+    pass
 
 
 if __name__ == '__main__':
