@@ -1,19 +1,13 @@
-import configparser
 import os
 from scipy.stats import linregress
 import pandas as pd
 from deconstruct_lc import tools_fasta
 from deconstruct_lc import tools_lc
 
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
-
 
 class LenNorm(object):
-    def __init__(self):
-        self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
+    def __init__(self, config):
+        self.pdb_dp = os.path.join(config['fps']['data_dp'], 'pdb_prep')
         self.pdb_fp = os.path.join(self.pdb_dp, 'pdb_norm_cd100.tsv')
         self.seqs = self.read_seqs()
         self.lens = tools_fasta.get_lengths(self.seqs)
@@ -46,13 +40,7 @@ class LenNorm(object):
 
 
 def main():
-    ln = LenNorm()
-    k = 6
-    lca = 'SGEQAPDTNKR'
-    lce = 1.6
-    m, b = ln.mb_lc(k, lca, lce)
-    print(m)
-    print(b)
+    pass
 
 
 if __name__ == '__main__':
