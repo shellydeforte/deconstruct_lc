@@ -102,18 +102,23 @@ class PlotSs(object):
         df_in = pd.read_csv(self.ss_one_in_fp, sep='\t', index_col=0)
 
         x1 = [0]
-        x2 = [0.2]
+        x2 = [0.3]
+        h = [0.2]
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
+        ax.set_yticks([0.1, 0.4])
 
-        self.data_one_bar(df_out, x1, 1, 0.1)
-        plt.legend()
-        self.data_one_bar(df_in, x2, 1, 0.1)
+        self.data_one_bar(df_out, x1, 1, h)
+        plt.legend(fontsize=12)
+        self.data_one_bar(df_in, x2, 1, h)
         labels = ['Outside Motifs', 'Inside Motifs']
-        ax.set_xticks([0.05, 0.25])
-        ax.set_xticklabels(labels, size=12)
-        plt.ylim([0, 1.1])
-        plt.xlim([-0.1, 0.9])
+
+        ax.set_yticklabels(labels, size=12)
+        plt.ylim([0, 1])
+        plt.xlim([0, 1.0])
+        plt.xlabel('Fraction Secondary Structure')
+        plt.tight_layout()
         plt.show()
 
     def data_one_bar(self, df, x, a, w):
@@ -127,15 +132,12 @@ class PlotSs(object):
             noss.append(row['P'])
             turns.append((row['S'] + row['T']))
             struct.append((row['E'] + row['H'] + row['B'] + row['G'] + row['I']))
-        plt.bar(x, missing, color='white',
-                    bottom=np.array(turns) + np.array(struct) + np.array(noss),
-                    width=w, alpha=a, label='Missing')
-        plt.bar(x, noss, color='darkgrey',
-                    bottom=np.array(turns) + np.array(struct), width=w,
-                    alpha=a, label='Coils')
-        plt.bar(x, turns, color='grey', bottom=struct, width=w, alpha=a,
-                    label='Turns and Bends')
-        plt.bar(x, struct, color='black', width=w, alpha=a, label='Alpha Helix and Beta Sheet')
+        bot1 = (np.array(turns) + np.array(struct) + np.array(noss))[0]
+        bot2 = (np.array(turns) + np.array(struct))[0]
+        plt.barh(x, missing, color='white', left=bot1, height=w, alpha=a, label='Missing')
+        plt.barh(x, noss, color='darkgrey', left=bot2, height=w, alpha=a, label='Coils')
+        plt.barh(x, turns, color='grey', left=struct, height=w, alpha=a, label='Turns and Bends')
+        plt.barh(x, struct, color='black', height=w, alpha=a, label='Alpha Helix and Beta Sheet')
 
     def bar_plot(self):
         df_out = pd.read_csv(self.ss_out_fp, sep='\t', index_col=0)
@@ -320,8 +322,8 @@ class SsComp(object):
         return nss
 
 def main():
-    st = SsComp()
-    st.comp()
+    pss = PlotSs()
+    pss.one_bar_plot()
 
 
 if __name__ == '__main__':
