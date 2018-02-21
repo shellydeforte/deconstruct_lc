@@ -18,36 +18,42 @@ class PlotLenNorm(object):
         self.grey_b = 36.5
 
     def plot_all(self):
-        plt.subplot(1, 2, 1)
-        self.plot_scatter()
-        plt.subplot(1, 2, 2)
-        self.plot_nomiss()
-        plt.subplots_adjust(hspace=0.5)
+        fig = plt.figure(figsize=(10, 3))
+        ax1 = fig.add_subplot(121)
+        self.plot_scatter(ax1)
+        ax2 = fig.add_subplot(122)
+        self.plot_nomiss(ax2)
+        ax2.yaxis.set_label_position("right")
+        fig.subplots_adjust(hspace=0, wspace=0)
+        fig.tight_layout()
         plt.show()
 
-    def plot_scatter(self):
+    def plot_scatter(self, ax):
         df = pd.read_csv(self.fpi, sep='\t', index_col=0)
         lens = list(df['Length'])
         raw_scores = list(df['score'])
-        plt.scatter(lens, raw_scores, alpha=0.1, color='darkblue')
+        ax.scatter(lens, raw_scores, alpha=0.1, color='darkblue')
         self.plot_lines()
-        plt.xlim([0, 1500])
-        plt.ylim([0, 150])
-        plt.xlabel('Protein sequence length', size=12)
-        plt.ylabel('LC Motifs', size=12)
+        ax.set_xlim([0, 1500])
+        ax.set_ylim([0, 150])
+        ax.set_xlabel('Protein sequence length', size=12)
+        ax.set_ylabel('LC Motifs', size=12)
 
-    def plot_nomiss(self):
+    def plot_nomiss(self, ax):
         """Show that the PDB norm dataset moves below the trendline when you
         don't count missing residues"""
         df = pd.read_csv(self.fpi, sep='\t', index_col=0)
         lens = list(df['Length'])
         raw_scores = list(df['nomiss_score'])
-        plt.scatter(lens, raw_scores, alpha=0.1, color='darkblue')
+        ax.scatter(lens, raw_scores, alpha=0.1, color='darkblue')
         self.plot_lines()
-        plt.xlim([0, 1500])
-        plt.ylim([0, 150])
-        plt.xlabel('Protein sequence length', size=12)
-        plt.ylabel('LC Motifs - No Missing Residues', size=12)
+        ax.set_xlim([0, 1500])
+        ax.set_ylim([0, 150])
+        ax.set_xlabel('Protein sequence length', size=12)
+        ax.set_ylabel('LC Motifs - No Missing Residues', size=12)
+        plt.tick_params(axis='both', left='on', top='on', right='on',
+                        bottom='on', labelleft='off', labeltop='off',
+                        labelright='on', labelbottom='on')
 
     def plot_lines(self):
         x = np.arange(0, 1500, 0.01)
