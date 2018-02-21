@@ -13,9 +13,9 @@ class DataLenNorm(object):
         pdb_an_dp = os.path.join(data_dp, 'pdb_analysis')
         self.norm_fpi = os.path.join(pdb_dp, 'pdb_norm_cd100.tsv')
         self.fpo = os.path.join(pdb_an_dp, 'pdb_len_norm.tsv')
-        self.k = config['score']['k']
-        self.lca = config['score']['lca']
-        self.lce = config['score']['lce']
+        self.k = int(config['score']['k'])
+        self.lca = str(config['score']['lca'])
+        self.lce = float(config['score']['lce'])
 
     def write_tsv(self):
         """Write a tsv file that is score, nomiss_score, length"""
