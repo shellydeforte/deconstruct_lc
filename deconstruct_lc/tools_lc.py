@@ -2,6 +2,7 @@
 Created by Shelly DeForte, Michnick Lab, University of Montreal 2018
 """
 import math
+
 from deconstruct_lc import tools
 
 
@@ -138,6 +139,7 @@ def lca_to_indexes(sequence, k, lca):
                 indexes.add(j)
     return indexes
 
+
 def lce_to_indexes(sequence, k, lce):
     kmers = seq_to_kmers(sequence, k)
     indexes = set()
@@ -265,5 +267,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
