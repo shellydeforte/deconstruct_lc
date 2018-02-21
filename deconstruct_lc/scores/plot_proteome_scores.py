@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import os
 import pandas as pd
 from deconstruct_lc import read_config
@@ -11,6 +12,16 @@ class PlotScores(object):
         self.data_dp = self.config['fps']['data_dp']
         self.fpi = os.path.join(self.data_dp, 'scores', 'pdb_bc_scores.tsv')
 
+    def plot_bg(self):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.add_patch(patches.Rectangle((-30, 0), 30, 5, facecolor='grey'))
+        ax.add_patch(patches.Rectangle((0, 0), 20, 5, facecolor='darkgrey'))
+        ax.add_patch(patches.Rectangle((20, 0), 100, 5, facecolor='white'))
+        ax.set_xlim([-30 ,120])
+        ax.set_ylim([0, 4])
+        plt.show()
+
     def matplot_box_plots(self):
         """
         For doing background:
@@ -21,10 +32,15 @@ class PlotScores(object):
         bc_scores = list(df[df['Proteome'] == 'BC']['LC Score'])
         pdb_scores = list(df[df['Proteome'] == 'PDB']['LC Score'])
         #data = np.concatenate((bc_scores, pdb_scores), 0)
-        fig, ax = plt.subplots(figsize=(7.5, 3))
-        #fig, ax = plt.subplots()
-        fig.set_facecolor('white')
-        ax.grid(False)
+        fig = plt.figure(figsize=(7.5, 3))
+        ax = fig.add_subplot(111)
+        #fig.set_facecolor('white')
+        #ax.grid(False)
+        ax.add_patch(patches.Rectangle((-30, 0), 30, 6, facecolor='grey'))
+        ax.add_patch(patches.Rectangle((0, 0), 20, 6, facecolor='darkgrey'))
+        ax.add_patch(patches.Rectangle((20, 0), 100, 6, facecolor='white'))
+        ax.set_xlim([-30 ,110])
+        ax.set_ylim([0, 4])
         labs = ['PDB', 'Yeast', 'Yeast Nucleolus', 'Yeast Stress Granule', 'Yeast P Body']
         bp = {'color': 'black'}
         wp = {'color': 'black', 'linestyle':'-'}
@@ -40,13 +56,17 @@ class PlotScores(object):
                    labels=labs,
                    widths=0.5,
                    showmeans=True,
+                   showfliers=False,
                    boxprops=bp,
                    whiskerprops=wp,
                    meanprops=meanprops,
                    medianprops=medianprops)
-        plt.xlim([-30, 120])
-        plt.xticks(np.arange(-30, 121, 10))
+        #plt.xlim([-30, 120])
+        plt.xticks(np.arange(-30, 111, 10))
         plt.xlabel('LC score')
+        plt.tick_params(axis='both', left='on', top='on', right='on',
+                        bottom='on', labelleft='off', labeltop='off',
+                        labelright='on', labelbottom='on')
         plt.tight_layout()
         plt.show()
 
