@@ -10,10 +10,9 @@ class WriteNorm(object):
     def __init__(self):
         config = read_config.read_config()
         data = config['fps']['data_dp']
+        self.train_fpi = os.path.join(data, 'train.tsv')
         prot_dp = os.path.join(data, 'proteomes')
         self.bc_dp = os.path.join(data, 'bc_analysis')
-
-        self.train_fpi = os.path.join(data, 'train.tsv')
         self.yeast_fp = os.path.join(prot_dp, 'UP000002311_559292_Yeast.fasta')
         self.human_fp = os.path.join(prot_dp, 'UP000005640_9606_Human.fasta')
         self.fpo = os.path.join(data, 'scores', 'pdb_bc_scores.tsv')
