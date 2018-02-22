@@ -1,32 +1,27 @@
-import configparser
 import os
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
-from deconstruct_lc import tools_fasta
-from deconstruct_lc import tools_lc
-from deconstruct_lc.motif_seq import LcSeq
-from Bio.SeqUtils.ProtParam import ProteinAnalysis
 
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
+from deconstruct_lc import read_config
+from deconstruct_lc import tools_lc
+
 
 class CompStats(object):
     def __init__(self):
-        self.train_fpi = os.path.join(config['filepaths']['train_fp'])
-        self.k = 6
-        self.lca = 'SGEQAPDTNKR'
-        self.lce = 1.6
+        config = read_config.read_config()
+        data_dp = os.path.join(config['fps']['data_dp'])
+        self.train_fpi = os.path.join(data_dp, 'train.tsv')
+        self.k = int(config['score']['k'])
+        self.lca = str(config['score']['lca'])
+        self.lce = float(config['score']['lce'])
 
     def comp_lc(self):
         """What is the composition inside LCE motifs?
         Put all LCE motifs into a single string, and do fractions"""
         bc_seqs = self.get_seqs(0)
         pdb_seqs = self.get_seqs(1)
-        all_lca_seqs, all_lce_seqs, all_lc_seqs = self.all_lc_seqs(bc_seqs)
+        all_lca_seqs, all_lce_seqs, all_lc_seqs = self.all_lc_seqs(pdb_seqs)
         aas = 'SGEQAPDTNKRLHVYFIMCW'
         aas_list = [aa for aa in aas]
         ind = range(len(aas))
@@ -81,8 +76,6 @@ class CompStats(object):
             if i in lc:
                 lc_seq += aa
         return lca_seq, lce_seq, lc_seq
-
-
 
     def get_lc_inds(self, seq):
         lce_inds = tools_lc.lce_to_indexes(seq, self.k, self.lce)
