@@ -19,6 +19,7 @@ def smooth_rbf(X, y):
     clf.fit(X, y)
     return clf
 
+
 def normal_rbf(X, y):
     clf = SVC(kernel='rbf',
               C=1,
