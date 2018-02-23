@@ -3,10 +3,13 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import localcider
+from localcider.sequenceParameters import SequenceParameters
 
 from deconstruct_lc import read_config
 from deconstruct_lc import tools_lc
 from deconstruct_lc.svm import svms
+from deconstruct_lc import motif_seq
 
 class LcaSvmComp(object):
     """
@@ -29,6 +32,19 @@ class LcaSvmComp(object):
         self.k = int(config['score']['k'])
         self.lca = str(config['score']['lca'])
         self.lce = float(config['score']['lce'])
+
+    def in_out_kappa(self):
+        df = pd.read_csv(self.train_fpi, sep='\t', index_col=0)
+        df = df[df['y'] == 0]
+        seqs = list(df['Sequence'])
+        for seq in seqs:
+            ms = motif_seq.LcSeq(seq, self.k, self.lca, 'lca')
+            in_seq, out_seq = ms.seq_in_motif()
+            SeqOb = SequenceParameters(in_seq)
+            print(SeqOb.get_kappa())
+            seqOb = SequenceParameters(out_seq)
+            print(seqOb.get_kappa())
+            print('')
 
     def check_one_charge(self):
         """
@@ -55,8 +71,9 @@ class LcaSvmComp(object):
             kmers = tools_lc.seq_to_kmers(seq, self.k)
             for kmer in kmers:
                 if tools_lc.lca_motif(kmer, self.lca):
-                    if ('K' in kmer) or ('R' in kmer) or ('E' in kmer) or ('D' in kmer):
-                        lca_motifs += 1
+                    if not tools_lc.lce_motif(kmer, self.lce):
+                        if ('K' in kmer) and ('R' in kmer) and ('E' in kmer):
+                            lca_motifs += 1
             lca_counts.append(lca_motifs)
         return lca_counts
 
@@ -75,7 +92,8 @@ class LcaSvmComp(object):
         df_dict = {'seq_kmer': seq_kmers, 'lca_count': lca_counts, 'y': y}
         df = pd.DataFrame(df_dict)
         print(len(df))
-        ndf = df[(df['lca_count'] > 20) & (df['lca_count'] < 30)]
+        ndf = df
+        #ndf = df[(df['lca_count'] > 20) & (df['lca_count'] < 30)]
         print(len(ndf[ndf['y'] == 0]))
         print(len(ndf[ndf['y'] == 1]))
         y = np.array(ndf['y']).T
@@ -90,7 +108,7 @@ class LcaSvmComp(object):
         print(clf.score(X, y))
 
     def one_feat_vec(self, seq_kmer):
-        aas = 'KRESQP'
+        aas = 'KRESQPANDGT'
         feat_vec = []
         for aa in aas:
             if seq_kmer.count(aa) > 0:
@@ -117,7 +135,7 @@ class LcaSvmComp(object):
 
 def main():
     ls = LcaSvmComp()
-    ls.check_one_charge()
+    ls.in_out_kappa()
 
 
 if __name__ == '__main__':
