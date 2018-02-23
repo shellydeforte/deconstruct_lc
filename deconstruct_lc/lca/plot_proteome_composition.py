@@ -30,15 +30,17 @@ class PlotLcProteome():
                     whiskerprops=whiskerprops,
                     medianprops=medprops,
                     meanprops=meanprops)
+        plt.xlabel('Amino Acids', size=12)
+        plt.ylabel('Total Fraction in Long LCRs', size=12)
         plt.show()
 
     def params(self):
         medprops = dict(linestyle='-',
                         color='grey')
         meanprops = dict(marker='o',
-                         markeredgecolor='darkred',
+                         markeredgecolor='black',
                          markerfacecolor='darkred',
-                         markersize=4)
+                         markersize=5)
         whiskerprops = dict(color='grey',
                             linestyle='-')
         boxprops = dict(color='grey')
