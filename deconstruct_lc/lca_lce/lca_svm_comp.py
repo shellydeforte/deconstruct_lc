@@ -30,6 +30,36 @@ class LcaSvmComp(object):
         self.lca = str(config['score']['lca'])
         self.lce = float(config['score']['lce'])
 
+    def check_one_charge(self):
+        """
+        Result. If you remove K, R, E, your classification accuracy goes to 0.71
+        Hypothesis: it is the LCAs with K/R/E that matter the most for
+        classification. So what if we only count LCAs with a charged residue?
+        """
+        df = pd.read_csv(self.train_fpi, sep='\t', index_col=0)
+        #df = df[df['y'] == 0]
+        seqs = list(df['Sequence'])
+        lca_counts = self.count_lca_charge(seqs)
+        #plt.hist(lca_counts, bins=20, range=(0, 70))
+        #plt.ylim([0, 900])
+        #plt.show()
+        X = np.array([lca_counts]).T
+        y = np.array(df['y']).T
+        clf = svms.linear_svc(X, y)
+        print(clf.score(X, y))
+
+    def count_lca_charge(self, seqs):
+        lca_counts = []
+        for seq in seqs:
+            lca_motifs = 0
+            kmers = tools_lc.seq_to_kmers(seq, self.k)
+            for kmer in kmers:
+                if tools_lc.lca_motif(kmer, self.lca):
+                    if ('K' in kmer) or ('R' in kmer) or ('E' in kmer) or ('D' in kmer):
+                        lca_motifs += 1
+            lca_counts.append(lca_motifs)
+        return lca_counts
+
     def create_feature_vecs(self):
         df = pd.read_csv(self.train_fpi, sep='\t', index_col=0)
         seqs = list(df['Sequence'])
@@ -87,7 +117,7 @@ class LcaSvmComp(object):
 
 def main():
     ls = LcaSvmComp()
-    ls.create_feature_vecs()
+    ls.check_one_charge()
 
 
 if __name__ == '__main__':

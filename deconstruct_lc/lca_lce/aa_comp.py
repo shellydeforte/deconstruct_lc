@@ -21,6 +21,51 @@ class AaComp(object):
         self.lca = str(config['score']['lca'])
         self.lce = float(config['score']['lce'])
 
+    def plot_charge(self):
+        """
+        Result: This is nto working, too much variety
+        Plot, in the BC dataset, the KRE fraction in in motif vs. out motif.
+        No, wait. No matter how I fucking do this, the fraction will be higher
+        because of the reduced alphabet.
+        """
+        bc_seqs = self.get_seqs(1)
+        lca_counts, seq_kmers = self.seq_lca(bc_seqs)
+        lca_fracs = self.charge_frac(seq_kmers)
+        seq_fracs = self.charge_frac(bc_seqs)
+        diff_fracs = []
+        for lca_frac, seq_frac in zip(lca_fracs, seq_fracs):
+            diff_fracs.append(lca_frac - seq_frac)
+        plt.scatter(seq_fracs, lca_fracs, alpha=0.5)
+        plt.xlim([0, 1])
+        plt.ylim([0, 1])
+        plt.show()
+
+    def charge_frac(self, seqs):
+        cfracs = []
+        for seq in seqs:
+            if len(seq) == 0:
+                cfracs.append(0)
+            else:
+                ccount = seq.count('K') + seq.count('E') + seq.count('R')
+                cfrac = ccount/len(seq)
+                cfracs.append(cfrac)
+        return cfracs
+
+    def seq_lca(self, seqs):
+        seq_kmers = []
+        lca_counts = []
+        for seq in seqs:
+            lca_motifs = 0
+            kmer_str = ''
+            kmers = tools_lc.seq_to_kmers(seq, self.k)
+            for kmer in kmers:
+                if tools_lc.lca_motif(kmer, self.lca):
+                    kmer_str += kmer
+                    lca_motifs += 1
+            lca_counts.append(lca_motifs)
+            seq_kmers.append(kmer_str)
+        return lca_counts, seq_kmers
+
     def comp_lc(self):
         """What is the composition inside LCE motifs?
         Put all LCE motifs into a single string, and do fractions"""
@@ -126,7 +171,7 @@ class AaComp(object):
                     all_kmers += kmer
         return all_kmers
 
-    def seq_lca(self, seqs):
+    def seq_lca2(self, seqs):
         all_kmers = ''
         for seq in seqs:
             kmers = tools_lc.seq_to_kmers(seq, self.k)
@@ -147,7 +192,7 @@ class AaComp(object):
 
 def main():
     ac = AaComp()
-    ac.comp_lc()
+    ac.plot_charge()
 
 
 if __name__ == '__main__':
