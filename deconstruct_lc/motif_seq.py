@@ -8,6 +8,26 @@ class LcSeq(object):
         self.lc = lc
         self.lctype = lctype
 
+    def overlapping_kmer_in_motif(self):
+        """Counts overlapping composition"""
+        inside_seq = []
+        outside_seq = []
+        kmers = tools_lc.seq_to_kmers(self.sequence, self.k)
+        for kmer in kmers:
+            if self.lctype == 'lca':
+                if tools_lc.lca_motif(kmer, self.lc):
+                    inside_seq.append(kmer)
+                else:
+                    outside_seq.append(kmer)
+            elif self.lctype == 'lce':
+                if tools_lc.lce_motif(kmer, self.lc):
+                    inside_seq.append(kmer)
+                else:
+                    outside_seq.append(kmer)
+            else:
+                raise Exception("lctype must be lca or lce")
+        return inside_seq, outside_seq
+
     def overlapping_seq_in_motif(self):
         """Counts overlapping composition"""
         inside_seq = ''
