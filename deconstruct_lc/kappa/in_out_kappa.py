@@ -9,6 +9,7 @@ from deconstruct_lc import read_config
 from deconstruct_lc import tools_lc
 from deconstruct_lc.svm import svms
 from deconstruct_lc import motif_seq
+from deconstruct_lc.scores import norm_score
 
 class InOutKappa(object):
     """
@@ -63,10 +64,36 @@ class InOutKappa(object):
         plt.title('Outside LC Motifs')
         plt.show()
 
+    def normal_charge_properties(self):
+        df = pd.read_csv(self.train_fpi, sep='\t', index_col=0)
+        df = df[df['y'] == 0]
+        seqs = list(df['Sequence'])
+        all_deltas = []
+        net_charges = []
+        frac_charges = []
+        all_seq_in = ''
+        for seq in seqs:
+            ms = motif_seq.LcSeq(seq, self.k, self.lca, 'lca')
+            in_seq, out_seq = ms.seq_in_motif()
+            in_kmer, out_kmer = ms.overlapping_kmer_in_motif()
+            if len(in_kmer) > 20:
+                ka = kappa.KappaKmers(out_kmer, out_seq)
+                delta = ka.deltaForm()
+                if ka.NCPR() > -0.1 and ka.NCPR() < 0.1 :
+                    if delta < 0.1:
+                        ns = norm_score.NormScore()
+                        score = ns.lc_norm_score([seq])[0]
+                        if score > 20:
+                            if ka.FCR() < 0.2:
+                                all_seq_in += in_seq
+        analysed_seq = ProteinAnalysis(all_seq_in)
+        aa_perc = analysed_seq.get_amino_acids_percent()
+        print(aa_perc)
+
 
 def main():
     ls = InOutKappa()
-    ls.in_out_kappa()
+    ls.normal_charge_properties()
 
 
 if __name__ == '__main__':
