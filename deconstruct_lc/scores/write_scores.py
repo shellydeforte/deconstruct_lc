@@ -84,12 +84,34 @@ class CreateTable(object):
         config = read_config.read_config()
         data = config['fps']['data_dp']
         self.fpi = os.path.join(data, 'scores', 'pdb_bc_scores.tsv')
+        self.prot_fpi = os.path.join(data, 'scores', 'proteomes.tsv')
         self.yeast_fpo = os.path.join(data, 'scores', 'yeast_bc.tsv')
         self.human_fpo = os.path.join(data, 'scores', 'human_bc.tsv')
+        self.prot_fpo = os.path.join(data, 'scores', 'prot.tsv')
 
     def write_table(self):
         self.create_table('YEAST', self.yeast_fpo)
         self.create_table('HUMAN', self.human_fpo)
+
+    def create_prot(self):
+        df = pd.read_csv(self.prot_fpi, sep='\t', index_col=0)
+        names = ['Human', 'Yeast', 'PDB']
+        lts = []
+        ms = []
+        gts = []
+        numseq = []
+        for name in names:
+            yndf = df[df['Proteome'] == name]
+            lt, m, gt = self.get_bins(yndf)
+            lts.append(lt)
+            ms.append(m)
+            gts.append(gt)
+            numseq.append(len(yndf))
+        df_dict = {'Proteome': names, '< 0': lts, '0-20': ms, '> 20': gts,
+                   'Sequences': numseq}
+        cols = ['Proteome', '< 0', '0-20', '> 20', 'Sequences']
+        df = pd.DataFrame(df_dict, columns=cols)
+        df.to_csv(self.prot_fpo, sep='\t')
 
     def create_table(self, org, fpo):
         names = []
@@ -127,7 +149,7 @@ class CreateTable(object):
 
 def main():
     ct = CreateTable()
-    ct.write_table()
+    ct.create_prot()
 
 
 if __name__ == '__main__':
