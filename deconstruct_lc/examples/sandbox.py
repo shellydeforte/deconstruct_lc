@@ -17,13 +17,13 @@ def main():
             "EVDMAMCGEQVKLRIKGVEEEDISPGFVLTSPKNPIKSVTKFVAQIAIVELKSIIAAGFS" \
             "CVMHVHTAIEEVHIVKLLHKLEKGTNRKSKKPPAFAKKGMKVIAVLETEAPVCVETYQDY" \
             "PQLGRFTLRDQGTTIAIGKIVKIAE"
-    print(sup35[:260])
+    #print(sup35[:260])
     ns = tools_lc.display_lc(sup35[:260], k, lca, lce)
-    print(ns)
+    #print(ns)
     motifs = tools_lc.count_lc_motifs(sup35[:260], k, lca, lce)
-    print(motifs)
-    norm = NormScore([sup35[:260]])
-    print(norm.lc_norm_score())
+    #print(motifs)
+    #norm = NormScore([sup35[:260]])
+    #print(norm.lc_norm_score())
 
     pab1 = 'MADITDKTAEQLENLNIQDDQKQAATGSESQSVENSSASLYVGDLEPSVSEAHLYDIFSP' \
            'IGSVSSIRVCRDAITKTSLGYAYVNFNDHEAGRKAIEQLNYTPIKGRLCRIMWSQRDPSL' \
@@ -36,13 +36,14 @@ def main():
            'VYGVPPQGGFPRNANDNNQFYQQKQRQALGEQLYKKVSAKTSNEEAAGKITGMILDLPPQ' \
            'EVFPLLESDELFEQHYKEASAAYESFKKEQEQQTEQA'
     wop = pab1[0:420] + pab1[505:]
+    print(wop)
     #print(wop)
     motifs = tools_lc.count_lc_motifs(wop, k, lca, lce)
     #print(motifs)
-    norm = NormScore([wop])
-    #print(norm.lc_norm_score())
-    #ns = tools_lc.display_lc(wop, k, lca, lce)
-    #print(ns)
+    norm = NormScore()
+    print(norm.lc_norm_score([wop]))
+    ns = tools_lc.display_lc(wop, k, lca, lce)
+    print(ns)
     nck = 'MAEEVVVVAKFDYVAQQEQELDIKKNERLWLLDDSKSWWRVRNSMNKTGFVPSNYVERKN' \
           'SARKASIVKNLKDTLGIGKVKRKPSVPDSASPADDSFVDPGERLYDLNMPAYVKFNYMAE' \
           'REDELSLIKGTKVIVMEKCSDGWWRGSYNGQVGWFPSNYVTEEGDSPLGDHVGSLSEKLA' \
@@ -50,7 +51,7 @@ def main():
           'LVPKNYVTVMQNNPLTSGLEPSPPQCDYIRPSLTGKFAGNPWYYGKVTRHQAEMALNERG' \
           'HEGDFLIRDSESSPNDFSVSLKAQGKNKHFKVQLKETVYCIGQRKFSTMEELVEHYKKAP' \
           'IFTSEQGEKLYLVKHLS'
-    norm = NormScore([nck])
+    #norm = NormScore([nck])
     #print(norm.lc_norm_score())
     nwasp = 'MSSVQQQPPPPRRVTNVGSLLLTPQENESLFTFLGKKCVTMSSAVVQLYAADRNCMWSKK' \
             'CSGVACLVKDNPQRSYFLRIFDIKDGKLLWEQELYNNFVYNSPRGYFHTFAGDTCQVALN' \
@@ -61,7 +62,7 @@ def main():
             'PPPSVLGVGPVAPPPPPPPPPPPGPPPPPGLPSDGDHQVPTTAGNKAALLDQIREGAQLK' \
             'KVEQNSRPVSCSGRDALLDQIRQGIQLKSVADGQESTPPTPAPTSGIVGALMEVMQKRSK' \
             'AIHSSDEDEDEDDEEDFEDDDEWED'
-    norm = NormScore([nwasp])
+    #norm = NormScore([nwasp])
     #print(norm.lc_norm_score())
     nephrin = 'MALGTTLRASLLLLGLLTEGLAQLAIPASVPRGFWALPENLTVVEGASVELRCGVSTPGS' \
               'AVQWAKDGLLLGPDPRIPGFPRYRLEGDPARGEFHLHIEACDLSDDAEYECQVGRSEMGP' \
