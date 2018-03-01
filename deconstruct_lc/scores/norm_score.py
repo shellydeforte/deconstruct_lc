@@ -6,7 +6,7 @@ class NormScore(object):
         self.k = 6
         self.lce = 1.6
         self.lca = 'SGEQAPDTNKR'
-        self.lc_m = 0.066213297264721263
+        self.lc_m = 0.06744064704548541
         self.lc_b = 16.5
 
     def lc_norm_score(self, seqs):
