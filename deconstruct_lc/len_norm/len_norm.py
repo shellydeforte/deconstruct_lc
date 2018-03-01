@@ -2,14 +2,15 @@ import os
 import pandas as pd
 from scipy.stats import linregress
 
+from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
 from deconstruct_lc import tools_lc
 
 
 class LenNorm(object):
     def __init__(self, config):
-        self.pdb_dp = os.path.join(config['fps']['data_dp'], 'pdb_prep')
-        self.pdb_fp = os.path.join(self.pdb_dp, 'pdb_norm_cd100.tsv')
+        pdb_dp = os.path.join(config['fps']['data_dp'], 'pdb_prep')
+        self.pdb_fp = os.path.join(pdb_dp, 'pdb_norm_cd100.tsv')
         self.seqs = self.read_seqs()
         self.lens = tools_fasta.get_lengths(self.seqs)
 
@@ -41,7 +42,13 @@ class LenNorm(object):
 
 
 def main():
-    pass
+    config = read_config.read_config()
+    k = int(config['score']['k'])
+    lca = str(config['score']['lca'])
+    lce = float(config['score']['lce'])
+    ln = LenNorm(config)
+    m, b = ln.mb_lc(k, lca, lce)
+    print("The slope is {} and the intercept is {}".format(m, b))
 
 
 if __name__ == '__main__':
