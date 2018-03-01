@@ -14,10 +14,9 @@ class PdbAnalysis(object):
         self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
         self.all_fpi = os.path.join(self.pdb_dp, 'pdb_all.tsv')
         self.an_fpo = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
-        self.k_lca = 6
-        self.k_lce = 6
-        self.alph_lca = 'SGEQAPDTNKR'
-        self.thresh_lce = 1.6
+        self.k = config['score']['k']
+        self.alph_lca = config['score']['lca']
+        self.thresh_lce = config['score']['lce']
 
     def write_analysis(self):
         df = pd.read_csv(self.all_fpi, sep='\t')
@@ -31,10 +30,9 @@ class PdbAnalysis(object):
     def add_scores(self, df):
         seqs = list(df['Sequence'])
         miss_seqs = list(df['Missing'])
-        ns = NormScore(seqs)
-        lc_raw = tools_lc.calc_lc_motifs(seqs, self.k_lca, self.alph_lca,
-                                         self.thresh_lce)
-        lc_norms = ns.lc_norm_score()
+        ns = NormScore()
+        lc_raw = tools_lc.calc_lc_motifs(seqs, self.k, self.alph_lca, self.thresh_lce)
+        lc_norms = ns.lc_norm_score(seqs)
         lengths = tools_fasta.get_lengths(seqs)
         miss_count = self.get_missing(miss_seqs)
         df['Length'] = lengths
