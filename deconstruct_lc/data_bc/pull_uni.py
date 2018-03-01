@@ -1,7 +1,8 @@
 import requests
 
+
 def fetch_uniprot(uniID):
-    """ Fetches Transmembrane UniProt information from UniProt
+    """
     status codes:
     200 -- The request was processed successfully
     400 -- Bad request. There was a problem with your input
