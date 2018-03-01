@@ -6,12 +6,12 @@ from deconstruct_lc import read_config
 
 class PullGo(object):
     def __init__(self, goid, fn):
-        self.config = read_config.read_config()
-        self.data_dp = self.config['fps']['data_dp']
+        config = read_config.read_config()
+        data_dp = config['fps']['data_dp']
         self.goid = goid
         self.fn = fn
         self.fno = '{}.tsv'.format(self.fn)
-        self.fpo = os.path.join(self.data_dp, 'data', 'quickgo', self.fno)
+        self.fpo = os.path.join(data_dp, 'data', 'quickgo', self.fno)
 
     def query_quickgo(self):
         requestURL = "https://www.ebi.ac.uk/QuickGO/services/annotation/downloadSearch?" \
