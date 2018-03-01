@@ -7,8 +7,8 @@ from Bio.SeqUtils.ProtParam import ProteinAnalysis
 from deconstruct_lc import read_config
 from deconstruct_lc.svm import svms
 
+
 class LenComp(object):
-    """Run an SVM on the length and composition together and separately"""
     def __init__(self):
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
@@ -46,7 +46,6 @@ class LenComp(object):
         plt.xlabel('Protein Length', size=12)
         plt.ylabel('Relative Fraction', size=12)
         plt.legend()
-        #plt.show()
 
     def plot_comp(self):
         df_train = pd.read_csv(self.train_fp, sep='\t', index_col=0)
@@ -78,7 +77,6 @@ class LenComp(object):
         plt.legend()
         plt.xlabel('Amino Acids', size=12)
         plt.ylabel('Relative Fraction', size=12)
-        #plt.show()
 
     def svm_comp(self):
         df_train = pd.read_csv(self.comp_fp, sep='\t', index_col=0)
@@ -104,10 +102,8 @@ class LenComp(object):
         df_train = pd.read_csv(self.train_fp, sep='\t', index_col=0)
         y = np.array(df_train['y']).T
         X = np.array(df_train[['Length']])
-        print(X)
         lin_clf = svms.linear_svc(X, y)
-        print(lin_clf)
-        print(lin_clf.score(X, y))
+        print("The accuracy score for the length is {}".format(lin_clf.score(X, y)))
 
     def write_aa_comp(self):
         cols = ['Protein ID', 'y'] + [aa for aa in self.aas]
@@ -136,10 +132,9 @@ class LenComp(object):
 def main():
     lc = LenComp()
     lc.plot_lencomp()
-    #lc.write_aa_comp()
-    #lc.svm_comp()
-    #lc.svm_len()
-
+    lc.write_aa_comp()
+    lc.svm_comp()
+    lc.svm_len()
 
 
 if __name__ == '__main__':
