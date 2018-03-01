@@ -1,6 +1,6 @@
 """
 Created by Shelly DeForte, Michnick Lab, University of Montreal 2017-2018
-https://github.com/shellydeforte/deconstruct_lc/blob/master/
+https://github.com/shellydeforte/deconstruct_lc/
 """
 from sklearn.svm import SVC
 
