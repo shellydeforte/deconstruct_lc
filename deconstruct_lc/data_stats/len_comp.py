@@ -1,24 +1,21 @@
-import configparser
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
-from deconstruct_lc.svm import svms
 
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
+from deconstruct_lc import read_config
+from deconstruct_lc.svm import svms
 
 class LenComp(object):
     """Run an SVM on the length and composition together and separately"""
     def __init__(self):
+        config = read_config.read_config()
+        data_dp = config['fps']['data_dp']
         self.aas = 'SGEQAPDTNKRLHVYFIMCW'
-        self.lca = 'SGEQAPDTNKR'
-        self.fd = config['filepaths']['data_dp']
-        self.train_fp = config['filepaths']['train_fp']
-        self.comp_fp = os.path.join(self.fd, 'len_comp', 'train_comp.tsv')
+        self.lca = str(config['score']['lca'])
+        self.train_fp = os.path.join(data_dp, 'train.tsv')
+        self.comp_fp = os.path.join(data_dp, 'len_comp', 'train_comp.tsv')
 
     def plot_lencomp(self):
         plt.subplot(2, 1, 1)
@@ -138,10 +135,10 @@ class LenComp(object):
 
 def main():
     lc = LenComp()
-    #lc.plot_lencomp()
+    lc.plot_lencomp()
     #lc.write_aa_comp()
     #lc.svm_comp()
-    lc.svm_len()
+    #lc.svm_len()
 
 
 
