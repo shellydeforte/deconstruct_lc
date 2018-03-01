@@ -14,9 +14,9 @@ class PdbAnalysis(object):
         self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
         self.all_fpi = os.path.join(self.pdb_dp, 'pdb_all.tsv')
         self.an_fpo = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
-        self.k = config['score']['k']
-        self.alph_lca = config['score']['lca']
-        self.thresh_lce = config['score']['lce']
+        self.k = int(config['score']['k'])
+        self.alph_lca = str(config['score']['lca'])
+        self.thresh_lce = float(config['score']['lce'])
 
     def write_analysis(self):
         df = pd.read_csv(self.all_fpi, sep='\t')
