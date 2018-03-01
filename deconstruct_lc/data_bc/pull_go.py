@@ -2,14 +2,16 @@ import os
 import requests
 import sys
 
+from deconstruct_lc import read_config
 
 class PullGo(object):
-
     def __init__(self, goid, fn):
+        self.config = read_config.read_config()
+        self.data_dp = self.config['fps']['data_dp']
         self.goid = goid
         self.fn = fn
         self.fno = '{}.tsv'.format(self.fn)
-        self.fpo = os.path.join(os.path.dirname(__file__), '..', 'data', 'quickgo', self.fno)
+        self.fpo = os.path.join(self.data_dp, 'data', 'quickgo', self.fno)
 
     def query_quickgo(self):
         requestURL = "https://www.ebi.ac.uk/QuickGO/services/annotation/downloadSearch?" \
@@ -41,10 +43,9 @@ def main():
                 'Cytoplasmic_Stress_Granule': 'GO:0010494',
                 'P_granule': 'GO:0043186'}
     for fn in go_terms:
-        fpo = os.path.join(os.path.dirname(__file__), '..', 'data', 'quickgo', '{}.tsv'.format(fn))
-        if not os.path.exists(fpo):
-            goid = go_terms[fn]
-            pg = PullGo(goid, fn)
+        goid = go_terms[fn]
+        pg = PullGo(goid, fn)
+        if not os.path.exists(pg.fpo):
             pg.query_quickgo()
 
 
