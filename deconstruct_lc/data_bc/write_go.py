@@ -1,20 +1,19 @@
-import configparser
 from datetime import datetime
 import os
 import pandas as pd
 from Bio import SeqIO
+
+from deconstruct_lc import read_config
 from deconstruct_lc.data_bc import pull_uni
 
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
 
 class WriteGO(object):
     def __init__(self):
         self.minlen = 100
         self.maxlen = 2000
-        self.fd = os.path.join(config['filepaths']['data_fp'], 'bc_prep')
+        config = read_config.read_config()
+        data_dp = config['fps']['data_dp']
+        self.fd = os.path.join(data_dp, 'bc_prep')
         self.now = datetime.now().strftime("%y%m%d")
         self.cb_fp = os.path.join(self.fd, '{}quickgo_bc.xlsx'.format(
             self.now))
