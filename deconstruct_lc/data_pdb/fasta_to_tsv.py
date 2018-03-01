@@ -6,9 +6,6 @@ from deconstruct_lc import tools_fasta
 
 
 class FastaTsv(object):
-    """
-    Fasta files are converted to tsv files with His-Tags removed
-    """
     def __init__(self):
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
