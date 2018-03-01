@@ -2,18 +2,17 @@ from Bio import SeqIO
 from Bio.Alphabet import IUPAC
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-import configparser
 import os
+
+from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
 
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
 
 class ReadSsDis(object):
     def __init__(self):
-        self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
+        config = read_config.read_config()
+        data_dp = config['fps']['data_dp']
+        self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
         self.ss_dis_fp = os.path.join(self.pdb_dp, 'ss_dis.txt')
         self.all_dis_fp = os.path.join(self.pdb_dp, 'all_dis.fasta')
         self.all_seq_fp = os.path.join(self.pdb_dp, 'all_seqs.fasta')

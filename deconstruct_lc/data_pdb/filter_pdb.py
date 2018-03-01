@@ -1,20 +1,17 @@
 from Bio import SeqIO
-import configparser
 import os
+
+from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
-
-
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
 
 
 class PdbFasta(object):
     def __init__(self):
         self.minlen = 100
         self.maxlen = 2000
-        self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
+        config = read_config.read_config()
+        data_dp = config['fps']['data_dp']
+        self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
         self.pdb_miss_fp = os.path.join(self.pdb_dp, 'pdb_all.fasta')
         self.pdb_nomiss_fp = os.path.join(self.pdb_dp, 'pdb_train.fasta')
         self.all_dis_fp = os.path.join(self.pdb_dp, 'all_dis.fasta')

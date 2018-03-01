@@ -1,20 +1,17 @@
-import configparser
 import os
 import pandas as pd
 
+from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
 from deconstruct_lc import tools_lc
 from deconstruct_lc.scores.norm_score import NormScore
 
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
-
 
 class PdbAnalysis(object):
     def __init__(self):
-        self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
+        config = read_config.read_config()
+        data_dp = config['fps']['data_dp']
+        self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
         self.all_fpi = os.path.join(self.pdb_dp, 'pdb_all.tsv')
         self.an_fpo = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
         self.k_lca = 6

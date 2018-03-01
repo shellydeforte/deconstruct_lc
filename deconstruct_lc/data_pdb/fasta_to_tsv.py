@@ -1,14 +1,8 @@
 from Bio import SeqIO
-import configparser
 import os
-import pandas as pd
+
+from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
-
-
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
 
 
 class FastaTsv(object):
@@ -16,7 +10,9 @@ class FastaTsv(object):
     Fasta files are converted to tsv files with His-Tags removed
     """
     def __init__(self):
-        self.pdb_dp = os.path.join(config['filepaths']['data_dp'], 'pdb_prep')
+        config = read_config.read_config()
+        data_dp = config['fps']['data_dp']
+        self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
         self.norm_fpi = os.path.join(self.pdb_dp, 'pdb_norm_cd100.fasta')
         self.all_fpi = os.path.join(self.pdb_dp, 'pdb_all.fasta')
         self.norm_fpo = os.path.join(self.pdb_dp, 'pdb_norm_cd100.tsv')
@@ -28,12 +24,6 @@ class FastaTsv(object):
     def write_tsv(self):
         self.write_full(self.all_fpi, self.all_fpo)
         self.write_full(self.norm_fpi, self.norm_fpo)
-
-    def df_stats(self):
-        norm_df = pd.read_csv(self.norm_fpo, sep='\t', index_col=0)
-        train_df = pd.read_csv(self.train_fpo, sep='\t', index_col=0)
-        print("There are {} entries in norm_df".format(len(norm_df)))
-        print("There are {} entries in train_df".format(len(train_df)))
 
     def write_full(self, fasta, fpo):
         """
