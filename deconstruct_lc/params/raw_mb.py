@@ -76,11 +76,3 @@ class RawMb(object):
             ms.append(m)
             bs.append(b)
         return ms, bs
-
-
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
