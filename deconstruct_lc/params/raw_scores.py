@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+
 from deconstruct_lc.params import lc_labels
 from deconstruct_lc import tools_lc
 
@@ -65,11 +66,3 @@ class RawScores(object):
         cols = ['Protein ID', 'Length', 'y']+k_lces
         df = pd.DataFrame(df_dict, columns=cols)
         return df
-
-
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
