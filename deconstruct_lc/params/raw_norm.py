@@ -56,11 +56,3 @@ class RawNorm(object):
             norm_score = raw_score - ((m * length) + b)
             norm_scores.append(norm_score)
         return norm_scores
-
-
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
