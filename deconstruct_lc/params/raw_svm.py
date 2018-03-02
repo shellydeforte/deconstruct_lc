@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
-from deconstruct_lc import read_config
+
 from deconstruct_lc.svm import svms
 
 
@@ -41,11 +41,3 @@ class RawSvm(object):
             df_dict['Label'].append(k_lc)
         df = pd.DataFrame(df_dict, columns=cols)
         df.to_csv(fpo, sep='\t')
-
-
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
