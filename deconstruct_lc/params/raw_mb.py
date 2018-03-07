@@ -18,13 +18,7 @@ class RawMb(object):
         lce_fpo = os.path.join(self.param_dp, 'top_svm_lce.tsv')
         lca_dict = self.get_top(lca_fps)
         lce_dict = self.get_top(lce_fps)
-        lca_m, lca_b = self.get_mb_lca(lca_dict['Label'])
-        lca_dict['m'] = lca_m
-        lca_dict['b'] = lca_b
-        lce_m, lce_b = self.get_mb_lce(lce_dict['Label'])
-        lce_dict['m'] = lce_m
-        lce_dict['b'] = lce_b
-        cols = ['Label', 'SVM score', 'm', 'b']
+        cols = ['Label', 'SVM score']
         lca_df = pd.DataFrame(lca_dict, columns=cols)
         lca_df.to_csv(lca_fpo, sep='\t')
         lce_df = pd.DataFrame(lce_dict, columns=cols)
@@ -49,30 +43,3 @@ class RawMb(object):
             lce_fps.append(lce_fpo)
         return lca_fps, lce_fps
 
-    def get_mb_lca(self, labels):
-        ln = len_norm.LenNorm(self.config)
-        ms = []
-        bs = []
-        for lab in labels:
-            print(lab)
-            lab_sp = lab.split('_')
-            k = int(lab_sp[0])
-            lca = lab_sp[1]
-            m, b = ln.mb_lca(k, lca)
-            ms.append(m)
-            bs.append(b)
-        return ms, bs
-
-    def get_mb_lce(self, labels):
-        ln = len_norm.LenNorm(self.config)
-        ms = []
-        bs = []
-        for lab in labels:
-            print(lab)
-            lab_sp = lab.split('_')
-            k = int(lab_sp[0])
-            lce = float(lab_sp[1])
-            m, b = ln.mb_lce(k, lce)
-            ms.append(m)
-            bs.append(b)
-        return ms, bs
