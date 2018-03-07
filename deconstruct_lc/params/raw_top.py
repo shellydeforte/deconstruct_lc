@@ -1,8 +1,6 @@
 import os
 import pandas as pd
 
-from deconstruct_lc.len_norm import len_norm
-
 
 class RawTop(object):
     def __init__(self, config):
