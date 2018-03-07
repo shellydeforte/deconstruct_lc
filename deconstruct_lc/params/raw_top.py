@@ -4,7 +4,7 @@ import pandas as pd
 from deconstruct_lc.len_norm import len_norm
 
 
-class RawMb(object):
+class RawTop(object):
     def __init__(self, config):
         self.config = config
         data_dp = self.config['fps']['data_dp']
