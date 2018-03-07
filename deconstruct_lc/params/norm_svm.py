@@ -51,63 +51,6 @@ class NormSvm(object):
             lce = float(lce_lab.split('_')[1])
             lca = str(lca_lab.split('_')[1])
 
-    def lca_lce_vec(self, k_lca, k_lce, lca, lce):
-        """for all check lca, lce, and [lca, lce]"""
-        lca_raw = tools_lc.calc_lca_motifs(self.seqs, k_lca, lca)
-
-    def norm_function(self, m, b, raw_scores, lengths):
-        norm_scores = []
-        for raw_score, length in zip(raw_scores, lengths):
-            norm_score = raw_score - ((m * length) + b)
-            norm_scores.append(norm_score)
-        return norm_scores
-
-    def count_lca_not_lce(self, seqs, k, lca, lce):
-        all_counts = []
-        for seq in seqs:
-            count = 0
-            kmers = tools_lc.seq_to_kmers(seq, k)
-            for kmer in kmers:
-                if tools_lc.lca_motif(kmer, lca):
-                    if not tools_lc.lce_motif(kmer, lce):
-                        count += 1
-            all_counts.append(count)
-        return all_counts
-
-    def count_not_lca_lce(self, seqs, k, lca, lce):
-        all_counts = []
-        for seq in seqs:
-            count = 0
-            kmers = tools_lc.seq_to_kmers(seq, k)
-            for kmer in kmers:
-                if tools_lc.lce_motif(kmer, lce):
-                    if not tools_lc.lca_motif(kmer, lca):
-                        count += 1
-            all_counts.append(count)
-        return all_counts
-
-    def count_lca_and_lce(self, seqs, k, lca, lce):
-        all_counts = []
-        for seq in seqs:
-            count = 0
-            kmers = tools_lc.seq_to_kmers(seq, k)
-            for kmer in kmers:
-                if tools_lc.lce_motif(kmer, lce):
-                    if tools_lc.lca_motif(kmer, lca):
-                        count += 1
-            all_counts.append(count)
-        return all_counts
-
-    def count_lca_or_lce(self, seqs, k, lca, lce):
-        lc_motifs = tools_lc.calc_lc_motifs(seqs, k, lca, lce)
-        return lc_motifs
-
-    def get_mb(self, ln_scores):
-        lr = linregress(self.pdb_lens, ln_scores)
-        m = lr[0]
-        b = lr[1]
-        return m, b
-
 
 def main():
     config = read_config.read_config()
