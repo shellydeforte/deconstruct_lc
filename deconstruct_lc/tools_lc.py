@@ -6,6 +6,89 @@ import math
 from deconstruct_lc import tools
 
 
+# Count motifs for one sequence ###############################################
+def count_lc_motifs(sequence, k, lca, lce):
+    """Count the number of LCA || LCE motifs of length k in a sequence"""
+    kmers = seq_to_kmers(sequence, k)
+    motif_count = 0
+    for kmer in kmers:
+        if lca_motif(kmer, lca):
+            motif_count += 1
+        elif lce_motif(kmer, lce):
+            motif_count += 1
+        else:
+            pass
+    return motif_count
+
+
+def count_lca_motifs(sequence, k, lca):
+    """Count the number of LCA motifs of length k in a sequence"""
+    kmers = seq_to_kmers(sequence, k)
+    motif_count = 0
+    for kmer in kmers:
+        if lca_motif(kmer, lca):
+            motif_count += 1
+    return motif_count
+
+
+def count_lce_motifs(sequence, k, threshold):
+    """Count the number of LCE motifs of length k in a sequence"""
+    kmers = seq_to_kmers(sequence, k)
+    motif_count = 0
+    for kmer in kmers:
+        if lce_motif(kmer, threshold):
+            motif_count += 1
+    return motif_count
+
+
+def count_lca_and_lce(sequence, k, lca, lce):
+    """Count the number of LCA & LCE motifs of length k in a sequence"""
+    kmers = seq_to_kmers(sequence, k)
+    motif_count = 0
+    for kmer in kmers:
+        if lca_motif(kmer, lca):
+            if lce_motif(kmer, lce):
+                motif_count += 1
+    return motif_count
+
+
+def count_lca_not_lce(sequence, k, lca, lce):
+    """Count the number of LCA & ~LCE motifs of length k in a sequence"""
+    kmers = seq_to_kmers(sequence, k)
+    motif_count = 0
+    for kmer in kmers:
+        if lca_motif(kmer, lca):
+            if not lce_motif(kmer, lce):
+                motif_count += 1
+    return motif_count
+
+
+def count_not_lca_lce(sequence, k, lca, lce):
+    """Count the number of ~LCA & LCE motifs of length k in a sequence"""
+    kmers = seq_to_kmers(sequence, k)
+    motif_count = 0
+    for kmer in kmers:
+        if not lca_motif(kmer, lca):
+            if lce_motif(kmer, lce):
+                motif_count += 1
+    return motif_count
+
+
+def count_lc_motifs_nomiss(seq, miss_seq, k, lca, lce):
+    """Count LC motifs only if there are no missing residues"""
+    kmers = seq_to_kmers_nomiss(seq, miss_seq, k)
+    motif_count = 0
+    for kmer in kmers:
+        if lca_motif(kmer, lca):
+            motif_count += 1
+        elif lce_motif(kmer, lce):
+            motif_count += 1
+        else:
+            pass
+    return motif_count
+###############################################################################
+
+
 def seq_to_kmers(sequence, k):
     """Given a sequence, return a list of all overlapping k-mers"""
     i = 0
@@ -44,32 +127,6 @@ def calc_lc_motifs_nomiss(seqs, miss_seqs, k, lca, lce):
         motif_count = count_lc_motifs_nomiss(seq, miss_seq, k, lca, lce)
         motif_counts.append(motif_count)
     return motif_counts
-
-
-def count_lc_motifs(sequence, k, lca, lce):
-    kmers = seq_to_kmers(sequence, k)
-    motif_count = 0
-    for kmer in kmers:
-        if lca_motif(kmer, lca):
-            motif_count += 1
-        elif lce_motif(kmer, lce):
-            motif_count += 1
-        else:
-            pass
-    return motif_count
-
-
-def count_lc_motifs_nomiss(seq, miss_seq, k, lca, lce):
-    kmers = seq_to_kmers_nomiss(seq, miss_seq, k)
-    motif_count = 0
-    for kmer in kmers:
-        if lca_motif(kmer, lca):
-            motif_count += 1
-        elif lce_motif(kmer, lce):
-            motif_count += 1
-        else:
-            pass
-    return motif_count
 
 
 def lc_to_indexes(sequence, k, lca, lce):
@@ -239,26 +296,6 @@ def calc_lca_motifs(sequences, k, lca):
         motif_count = count_lca_motifs(sequence, k, lca)
         motif_counts.append(motif_count)
     return motif_counts
-
-
-def count_lca_motifs(sequence, k, lca):
-    """Count the number of lca motifs of length k in a sequence"""
-    kmers = seq_to_kmers(sequence, k)
-    motif_count = 0
-    for kmer in kmers:
-        if lca_motif(kmer, lca):
-            motif_count += 1
-    return motif_count
-
-
-def count_lce_motifs(sequence, k, threshold):
-    """Count the number of lce motifs of length k in a sequence"""
-    kmers = seq_to_kmers(sequence, k)
-    motif_count = 0
-    for kmer in kmers:
-        if lce_motif(kmer, threshold):
-            motif_count += 1
-    return motif_count
 
 
 def main():

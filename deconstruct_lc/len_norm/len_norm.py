@@ -20,6 +20,7 @@ class LenNorm(object):
         return seqs
 
     def mb_lca(self, k, lca):
+        """LCA"""
         scores = tools_lc.calc_lca_motifs(self.seqs, k, lca)
         lr = linregress(self.lens, scores)
         m = lr[0]
@@ -27,6 +28,7 @@ class LenNorm(object):
         return m, b
 
     def mb_lce(self, k, lce):
+        """LCE"""
         scores = tools_lc.calc_lce_motifs(self.seqs, k, lce)
         lr = linregress(self.lens, scores)
         m = lr[0]
@@ -34,7 +36,38 @@ class LenNorm(object):
         return m, b
 
     def mb_lc(self, k, lca, lce):
+        """LCA || LCE"""
         scores = tools_lc.calc_lc_motifs(self.seqs, k, lca, lce)
+        lr = linregress(self.lens, scores)
+        m = lr[0]
+        b = lr[1]
+        return m, b
+
+    def mb_lca_and_lce(self, k, lca, lce):
+        """LCA & LCE"""
+        scores = []
+        for seq in self.seqs:
+            scores.append(tools_lc.count_lca_and_lce(seq, k, lca, lce))
+        lr = linregress(self.lens, scores)
+        m = lr[0]
+        b = lr[1]
+        return m, b
+
+    def mb_lca_not_lce(self, k, lca, lce):
+        """LCA & ~LCE"""
+        scores = []
+        for seq in self.seqs:
+            scores.append(tools_lc.count_lca_not_lce(seq, k, lca, lce))
+        lr = linregress(self.lens, scores)
+        m = lr[0]
+        b = lr[1]
+        return m, b
+
+    def mb_not_lca_lce(self, k, lca, lce):
+        """~LCA & LCE"""
+        scores = []
+        for seq in self.seqs:
+            scores.append(tools_lc.count_not_lca_lce(seq, k, lca, lce))
         lr = linregress(self.lens, scores)
         m = lr[0]
         b = lr[1]
