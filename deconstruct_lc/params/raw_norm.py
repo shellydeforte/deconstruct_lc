@@ -27,7 +27,7 @@ class RawNorm(object):
         df_in = pd.read_csv(self.mb_solo_fp, sep='\t', index_col=0)
         df_in = df_in[df_in['pearsons'] > 0.7]
         for i, row in df_in.iterrows():
-            fno = '{}.tsv'.format(str(row['lc label']))
+            fno = 'norm_{}.tsv'.format(str(row['lc label']))
             fpo = os.path.join(self.solo_dp, fno)
             m = float(row['m'])
             b = float(row['b'])
