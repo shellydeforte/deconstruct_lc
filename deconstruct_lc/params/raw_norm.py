@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from deconstruct_lc.len_norm import mb_len_norm
+from deconstruct_lc import tools_lc
 
 
 class RawNorm(object):
@@ -13,85 +13,85 @@ class RawNorm(object):
         self.config = config
         data_dp = self.config['fps']['data_dp']
         self.param_dp = os.path.join(data_dp, 'params')
-        self.lca_fpi = os.path.join(self.param_dp, 'rep_lca.txt')
-        self.lce_fpi = os.path.join(self.param_dp, 'top_svm_lce.tsv')
+        self.combos_dp = os.path.join(self.param_dp, 'combos')
+        self.solo_dp = os.path.join(self.param_dp, 'solo')
         self.mb_solo_fp = os.path.join(self.param_dp, 'mb_solo.tsv')
-        self.mb_combo_fp = os.path.join(self.param_dp, 'mb_combo.tsv')
-        self.k1 = self.config.getint('params', 'k1')
-        self.k2 = self.config.getint('params', 'k2')
+        train = os.path.join(data_dp, 'train.tsv')
+        train_df = pd.read_csv(train, sep='\t', index_col=0)
+        self.seqs = list(train_df['Sequence'])
+        self.pids = list(train_df['Protein ID'])
+        self.y = list(train_df['y'])
+        self.lengths = list(train_df['Length'])
 
-    def norm_alone(self):
-        """
-        Calculate LCA or LCE only
-        """
-        lca_labs, lce_labs = self.read_labels()
-        raw_scores, lengths, cy, cpids = self.get_raw_score(lca_labs[0], 'lca')
-        for lca_lab in lca_labs:
-            raw_scores, lengths, y, pids = self.get_raw_score(lca_lab, 'lca')
-            assert y == cy
-            assert pids == cpids
-        for lce_lab in lce_labs:
-            raw_scores, lengths, y, pids = self.get_raw_score(lce_lab, 'lce')
-            assert y == cy
-            assert pids == cpids
-
-    def get_raw_score(self, label, type):
-        """Given an lc label, get the corresponding raw scores"""
-        lab_sp = label.split('_')
-        k = lab_sp[0]
-        fpi = os.path.join(self.param_dp, 'raw_{}_{}.tsv'.format(k, type))
-        df_in = pd.read_csv(fpi, sep='\t', index_col=0)
-        raw_scores = list(df_in[label])
-        lengths = list(df_in['Length'])
-        y = list(df_in['y'])
-        pids = list(df_in['Protein ID'])
-        return raw_scores, lengths, y, pids
-
-    def read_labels(self):
-        lce_df = pd.read_csv(self.lce_fpi, sep='\t')
-        lce_labs = list(lce_df['Label'])
-        lca_labs = []
-        with open(self.lca_fpi, 'r') as fpi:
-            for line in fpi:
-                lca_labs.append(line.strip())
-        return lca_labs, lce_labs
-
-    def label_combos(self):
-        lca_labs, lce_labs = self.read_labels()
-        combos = []
-        for lce in lce_labs:
-            for lca in lca_labs:
-                combos.append((lce, lca))
-        return combos
-
-    def read_files(self):
-        lca_fpi = os.path.join(self.param_dp, 'top_svm_lca.tsv')
-        lce_fpi = os.path.join(self.param_dp, 'top_svm_lce.tsv')
-        lca_fpo = os.path.join(self.param_dp, 'top_norm_lca.tsv')
-        lce_fpo = os.path.join(self.param_dp, 'top_norm_lce.tsv')
-        lca_df = pd.read_csv(lca_fpi, sep='\t', index_col=0)
-        lca_dict = self.calc_norm_score(lca_df, 'lca')
-        lca_df_out = pd.DataFrame(lca_dict)
-        lca_df_out.to_csv(lca_fpo, sep='\t')
-        lce_df = pd.read_csv(lce_fpi, sep='\t', index_col=0)
-        lce_dict = self.calc_norm_score(lce_df, 'lce')
-        lce_df_out = pd.DataFrame(lce_dict)
-        lce_df_out.to_csv(lce_fpo, sep='\t')
-
-    def calc_norm_score(self, df_in, type):
-        df_dict = {}
+    def solo_norm(self):
+        df_in = pd.read_csv(self.mb_solo_fp, sep='\t', index_col=0)
+        df_in = df_in[df_in['pearsons'] > 0.7]
         for i, row in df_in.iterrows():
+            fno = '{}.tsv'.format(str(row['lc label']))
+            fpo = os.path.join(self.solo_dp, fno)
             m = float(row['m'])
             b = float(row['b'])
-            label = str(row['Label'])
-            print(label)
-            raw_scores, lengths = self.get_raw_score(label, type)
-            norm_scores = self.norm_function(m, b, raw_scores, lengths)
-            df_dict[label] = norm_scores
-        return df_dict
+            lc_label = str(row['lc label'])
+            print(lc_label)
+            params = lc_label.split('_')
+            k = int(params[0])
+            if isinstance(params[1], str):
+                lca = str(params[1])
+                raw_scores = tools_lc.calc_lca_motifs(self.seqs, k, lca)
+            else:
+                lce = float(params[1])
+                raw_scores = tools_lc.calc_lce_motifs(self.seqs, k, lce)
+            norm_scores = self.norm_function(m, b, raw_scores, self.lengths)
+            df_dict = {'Norm Scores': norm_scores, 'Protein ID': self.pids,
+                       'y': self.y}
+            df_out = pd.DataFrame(df_dict)
+            df_out.to_csv(fpo, sep='\t')
 
-    def get_mb(self):
-        pass
+    def combo_norm(self):
+        fns = os.listdir(self.combos_dp)
+        for fn in fns:
+            fpi = os.path.join(self.combos_dp, fn)
+            df_in = pd.read_csv(fpi, sep='\t', index_col=0)
+            df_in = df_in[df_in['pearsons'] > 0.7]
+            if len(df_in) > 0:
+                df_dict = {'Protein ID': self.pids, 'y': self.y}
+                fpo = os.path.join(self.combos_dp, 'norm_{}'.format(fn))
+                params = fn.split('_')
+                k = int(params[0])
+                lce = float(params[1])
+                lca = str(params[3])[:-4]
+                for i, row in df_in.iterrows():
+                    lc_label = str(row['LC Type'])
+                    m = float(row['m'])
+                    b = float(row['b'])
+                    norm_scores = self.get_norm_scores(m, b, lc_label, k, lca, lce)
+                    df_dict[lc_label] = norm_scores
+                df_out = pd.DataFrame(df_dict)
+                df_out.to_csv(fpo, sep='\t')
+
+    def get_norm_scores(self, m, b, lc_label, k, lca, lce):
+        raw_scores = self.get_raw_scores(lc_label, k, lca, lce)
+        norm_scores = self.norm_function(m, b, raw_scores, self.lengths)
+        return norm_scores
+
+    def get_raw_scores(self, lc_label, k, lca, lce):
+        if lc_label == 'LCA || LCE':
+            scores = tools_lc.calc_lc_motifs(self.seqs, k, lca, lce)
+        elif lc_label == 'LCA & LCE':
+            scores = []
+            for seq in self.seqs:
+                scores.append(tools_lc.count_lca_and_lce(seq, k, lca, lce))
+        elif lc_label == 'LCA & ~LCE':
+            scores = []
+            for seq in self.seqs:
+                scores.append(tools_lc.count_lca_not_lce(seq, k, lca, lce))
+        elif lc_label == '~LCA & LCE':
+            scores = []
+            for seq in self.seqs:
+                scores.append(tools_lc.count_not_lca_lce(seq, k, lca, lce))
+        else:
+            raise Exception('Unexpected logical expression')
+        return scores
 
     @staticmethod
     def norm_function(m, b, raw_scores, lengths):
