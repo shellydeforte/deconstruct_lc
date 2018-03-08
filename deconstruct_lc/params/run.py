@@ -25,16 +25,21 @@ class RunRaw(object):
 
     def run_writemb(self):
         mb = write_mb.WriteMb(self.config)
-        #mb.write_mb_solo()
+        mb.write_mb_solo()
         mb.write_mb_combos()
 
     def run_rawnorm(self):
         rn = raw_norm.RawNorm(self.config)
+        rn.solo_norm()
+        #rn.combo_norm()
+
+    def run_normsvm(self):
+        pass
 
 
 def main():
     rr = RunRaw()
-    rr.run_writemb()
+    rr.run_rawnorm()
 
 
 if __name__ == '__main__':
