@@ -4,6 +4,7 @@ from deconstruct_lc.params import raw_svm
 from deconstruct_lc.params import raw_top
 from deconstruct_lc.params import write_mb
 from deconstruct_lc.params import raw_norm
+from deconstruct_lc.params import norm_svm
 
 
 class RunRaw(object):
@@ -31,15 +32,17 @@ class RunRaw(object):
     def run_rawnorm(self):
         rn = raw_norm.RawNorm(self.config)
         rn.solo_norm()
-        #rn.combo_norm()
+        rn.combo_norm()
 
     def run_normsvm(self):
-        pass
+        ns = norm_svm.NormSvm(self.config)
+        #ns.oned_svm()
+        ns.ran_forest()
 
 
 def main():
     rr = RunRaw()
-    rr.run_rawnorm()
+    rr.run_normsvm()
 
 
 if __name__ == '__main__':
