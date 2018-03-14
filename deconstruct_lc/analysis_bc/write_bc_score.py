@@ -1,16 +1,17 @@
+from Bio import SeqIO
 import os
 import pandas as pd
-from Bio import SeqIO
-from deconstruct_lc import read_config
+
 from deconstruct_lc.scores.norm_score import NormScore
+from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
 
 
 class BcScore(object):
     """Write individual BC files with pid, org, seq, lc score, length"""
     def __init__(self):
-        self.config = read_config.read_config()
-        self.data_dp = self.config['fps']['data_dp']
+        config = read_config.read_config()
+        self.data_dp = config['fps']['data_dp']
         self.bc_dp = os.path.join(self.data_dp, 'bc_prep')
         self.bc_an_dp = os.path.join(self.data_dp, 'bc_analysis')
         # Use fasta file with all bc sequences
@@ -28,20 +29,7 @@ class BcScore(object):
             ndf = df_in[df_in['Protein ID'].isin(pids)]
             ndf.to_csv(fpo, sep='\t')
 
-    def create_bc_dict(self):
-        fns = self.get_sheets()
-        bc_pids = {}
-        for sheet in fns:
-            df_in = pd.read_excel(self.bc_ss, sheetname=sheet)
-            bc_pids[sheet] = list(df_in['Protein ID'])
-        return bc_pids
-
-    def get_sheets(self):
-        ex = pd.ExcelFile(self.bc_ss)
-        sheet_names = ex.sheet_names
-        return sorted(sheet_names)
-
-    def write_scores(self):
+    def write_all_scores(self):
         """Write ID, length, score from fasta file"""
         df_dict = {'Protein ID': [], 'Sequence': [], 'Organism': []}
         with open(self.fasta, 'r') as fi:
@@ -64,9 +52,23 @@ class BcScore(object):
         df = pd.DataFrame(df_dict, columns=cols)
         df.to_csv(self.bc_score_fp, sep='\t')
 
+    def create_bc_dict(self):
+        fns = self.get_sheets()
+        bc_pids = {}
+        for sheet in fns:
+            df_in = pd.read_excel(self.bc_ss, sheetname=sheet)
+            bc_pids[sheet] = list(df_in['Protein ID'])
+        return bc_pids
+
+    def get_sheets(self):
+        ex = pd.ExcelFile(self.bc_ss)
+        sheet_names = ex.sheet_names
+        return sorted(sheet_names)
+
 
 def main():
     bc = BcScore()
+    bc.write_all_scores()
     bc.compile_bcs()
 
 
