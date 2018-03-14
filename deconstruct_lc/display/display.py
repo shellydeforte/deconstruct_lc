@@ -19,8 +19,8 @@ class Display(object):
     def __init__(self):
         config = read_config.read_config()
         self.data_dp = config['fps']['data_dp']
-        self.bc_dp = os.path.join(self.data_dp, 'bc_analysis', 'Paraspeckle_score.tsv')
-        self.fpo = os.path.join(self.data_dp, 'display', 'test.html')
+        self.bc_dp = os.path.join(self.data_dp, 'bc_analysis', 'Cytoplasmic_Stress_Granule_score.tsv')
+        self.fp_out = os.path.join(self.data_dp, 'display', 'stressgranule_yeast.html')
         self.k = config['score'].getint('k')
         self.lca = config['score'].get('lca')
         self.lce = config['score'].getfloat('lce')
@@ -45,12 +45,12 @@ class Display(object):
         </body>
         </html>
         '''
-        with open(self.fpo, 'w') as fo:
+        with open(self.fp_out, 'w') as fo:
             fo.write(contents)
 
     def read_seq(self):
         df = pd.read_csv(self.bc_dp, sep='\t', index_col=0)
-        df = df[df['Organism'] == 'HUMAN']
+        df = df[df['Organism'] == 'YEAST']
         seqs = df['Sequence']
         form_seqs = []
         for seq in seqs:
