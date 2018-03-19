@@ -37,13 +37,14 @@ def main():
            'QATAAAAAAAAGMPGQFMPPMFYGVMPPRGVPFNGPNPQQMNPMGGMPKNGMPPQFRNGP' \
            'VYGVPPQGGFPRNANDNNQFYQQKQRQALGEQLYKKVSAKTSNEEAAGKITGMILDLPPQ' \
            'EVFPLLESDELFEQHYKEASAAYESFKKEQEQQTEQA'
-    wop = pab1[0:420] + pab1[505:]
+    print(len(pab1))
+    wop = pab1[0:300]
     #print(wop)
     #print(wop)
     motifs = tools_lc.count_lc_motifs(wop, k, lca, lce)
     #print(motifs)
     norm = NormScore()
-    #print(norm.lc_norm_score([wop]))
+    print(norm.lc_norm_score([wop]))
     ns = tools_lc.display_lc(pab1, k, lca, lce)
     #print(ns)
     nck = 'MAEEVVVVAKFDYVAQQEQELDIKKNERLWLLDDSKSWWRVRNSMNKTGFVPSNYVERKN' \
@@ -134,11 +135,11 @@ def main():
            'FKEAAGYLLSVLSMHEVNTNNKKGDVGSLLNTYNDTVIETLKRVFIAMNRDDLLQEVKPG' \
            'MDLKRFKGEFSF'
     norm = NormScore()
-    print(len(pex5))
-    print(norm.lc_norm_score([pex5[0:300]]))
-    print(pex5)
+    #print(len(pex5))
+    #print(norm.lc_norm_score([pex5[0:300]]))
+    #print(pex5)
     ns = tools_lc.display_lc(pex5,  k, lca, lce)
-    print(ns)
+    #print(ns)
     pex13 = 'MSSTAVPRPKPWETSASLEEPQRNAQSLSAMMTSNQQDSRPTEESNNSNSASESAPEVLP' \
             'RPAALNSSGTYGESNTIPGIYGNSNYGIPYDNNPYSMNSIYGNSIGRYGYGGSYYGNNYG' \
             'SFYGGGYGAGAGYGMNNGSGLGESTKATFQLIESLIGAVTGFAQMLESTYMATHNSFFTM' \
@@ -146,14 +147,14 @@ def main():
             'QKFNDSGTINSNEKATRRKISWKPLLFFLMAVFGFPYLLNKFITKLQTSGTIRASQGNGS' \
             'EPIDPSKLEFARALYDFVPENPEMEVALKKGDLMAILSKKDPLGRDSDWWKVRTKNGNIG' \
             'YIPYNYIEIIKRRKKIEHVDDETRTH'
-    print(norm.lc_norm_score([pex13]))
+    #print(norm.lc_norm_score([pex13]))
     pex14 = 'MSDVVSKDRKALFDSAVSFLKDESIKDAPLLKKIEFLKSKGLTEKEIEIAMKEPKKDGIV' \
             'GDEVSKKIGSTENRASQDMYLYEAMPPTLPHRDWKDYFVMATATAGLLYGAYEVTRRYVI' \
             'PNILPEAKSKLEGDKKEIDDQFSKIDTVLNAIEAEQAEFRKKESETLKELSDTIAELKQA' \
             'LVQTTRSREKIEDEFRIVKLEVVNMQNTIDKFVSDNDGMQELNNIQKEMESLKSLMNNRM' \
             'ESGNAQDNRLFSISPNGIPGIDTIPSASEILAKMGMQEESDKEKENGSDANKDDNAVPAW' \
             'KKAREQTIDSNASIPEWQKNTAANEISVPDWQNGQVEDSIP'
-    print(norm.lc_norm_score([pex14]))
+    #print(norm.lc_norm_score([pex14]))
 
 
 
