@@ -16,7 +16,7 @@ class Display(object):
     Output score
     1. Just write html page with sequences and score
     """
-    def __init__(self, seqs, fn_out, color=False):
+    def __init__(self, seqs, genes, fn_out, color=False):
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
         self.k = config['score'].getint('k')
@@ -25,6 +25,7 @@ class Display(object):
         self.fp_out = os.path.join(data_dp, 'display', fn_out)
         self.seqs = seqs
         self.color = color
+        self.genes = genes
 
     def write_body(self):
         contents = '''
