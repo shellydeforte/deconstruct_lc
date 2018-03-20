@@ -17,7 +17,7 @@ class PunctaScores(object):
         self.puncta_fp = os.path.join(data_dp, 'puncta', 'puncta_proteins.xlsx')
         self.orf_trans = os.path.join(data_dp, 'proteomes', 'orf_trans.fasta')
 
-    def run(self):
+    def run_plot(self):
         #st3_scores = self.insol_remove_puncta()
         st1_scores = self.get_scores('ST1')
         st2_scores = self.get_scores('ST2')
@@ -25,8 +25,27 @@ class PunctaScores(object):
         all_scores = [st1_scores, st2_scores, st3_scores]
         labs = ['ST1 (puncta)', 'ST2 (no puncta)', 'ST3 (insoluble->soluble)']
         self.matplot_box_plots(all_scores, labs)
-        #disp = display_lc.Display(seqs, 'puncta.html')
-        #disp.write_body()
+
+    def run_display(self):
+        st1_ids = self.get_ids('ST1')
+        st2_ids = self.get_ids('ST2')
+        st3_ids = self.get_ids('ST3')
+        st1_seqs, st1_genes = tools_fasta.get_yeast_seq_gene_from_ids(self.orf_trans, st1_ids)
+        st2_seqs, st2_genes = tools_fasta.get_yeast_seq_gene_from_ids(self.orf_trans, st2_ids)
+        st3_seqs, st2_genes = tools_fasta.get_yeast_seq_gene_from_ids(self.orf_trans, st3_ids)
+        disp = display_lc.Display(st1_seqs, 'st1.html')
+        disp.write_body()
+        disp = display_lc.Display(st2_seqs, 'st2.html')
+        disp.write_body()
+        disp = display_lc.Display(st3_seqs, 'st3.html')
+        disp.write_body()
+        disp = display_lc.Display(st1_seqs, 'st1_color.html', color=True)
+        disp.write_body()
+        disp = display_lc.Display(st2_seqs, 'st2_color.html', color=True)
+        disp.write_body()
+        disp = display_lc.Display(st3_seqs, 'st3_color.html', color=True)
+        disp.write_body()
+
 
     def insol_remove_puncta(self):
         st3_ids = self.get_ids('ST3')
@@ -38,7 +57,6 @@ class PunctaScores(object):
         ns = NormScore()
         scores = ns.lc_norm_score(seqs)
         return scores
-
 
     def matplot_box_plots(self, scores, labs):
         """
@@ -97,7 +115,7 @@ class PunctaScores(object):
 
 def main():
     ps = PunctaScores()
-    ps.run()
+    ps.run_display()
 
 
 if __name__ == '__main__':
