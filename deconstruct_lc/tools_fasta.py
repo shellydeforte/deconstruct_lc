@@ -81,6 +81,16 @@ def get_pid_gene_desc_seq(fasta_fp):
     return pids, genes, seqs, descs
 
 
+def get_yeast_seq_from_ids(orf_trans_fp, orf_ids):
+    sequences = []
+    with open(orf_trans_fp, 'r') as fasta_in:
+        for record in SeqIO.parse(fasta_in, 'fasta'):
+            pid = str(record.id)
+            if pid in orf_ids:
+                sequences.append(str(record.seq))
+    return sequences
+
+
 def get_lengths(seqs):
     lengths = [len(seq) for seq in seqs]
     return lengths
