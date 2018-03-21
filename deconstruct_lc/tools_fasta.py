@@ -48,6 +48,24 @@ def fasta_to_id_seq(fasta_fp, minlen=0, maxlen=float('inf'), unique=False):
     return pids, sequences
 
 
+def fasta_to_head_seq(fasta_fp, minlen=0, maxlen=float('inf'), unique=False):
+    sequences = []
+    headers = []
+    with open(fasta_fp, 'r') as file_in:
+        for record in SeqIO.parse(file_in, 'fasta'):
+            sequence = str(record.seq)
+            if minlen <= len(sequence) <= maxlen:
+                desc = str(record.description)
+                if unique:
+                    if sequence not in sequences:
+                        headers.append(desc)
+                        sequences.append(sequence)
+                else:
+                    headers.append(desc)
+                    sequences.append(sequence)
+    return headers, sequences
+
+
 def id_cleanup(protein_id):
     if '|' in protein_id:
         nid = protein_id.split('|')[1]
@@ -105,6 +123,15 @@ def get_yeast_seq_gene_from_ids(orf_trans_fp, orf_ids):
                 genes.append(gene)
     return sequences, genes
 
+
+def yeast_write_fasta_from_ids(orf_trans_fp, orf_ids, fasta_out):
+    records = []
+    with open(orf_trans_fp, 'r') as fasta_in:
+        for record in SeqIO.parse(fasta_in, 'fasta'):
+            pid = str(record.id)
+            if pid in orf_ids:
+                records.append(record)
+    SeqIO.write(records, fasta_out, "fasta")
 
 
 def get_lengths(seqs):
