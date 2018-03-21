@@ -9,10 +9,10 @@ from deconstruct_lc.data_bc import pull_uni
 
 class WriteGO(object):
     def __init__(self):
-        self.minlen = 100
-        self.maxlen = 2000
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
+        self.minlen = config['dataprep'].getint('minlen')
+        self.maxlen = config['dataprep'].getint('maxlen')
         self.fd = os.path.join(data_dp, 'bc_prep')
         self.now = datetime.now().strftime("%y%m%d")
         self.cb_fp = os.path.join(self.fd, '{}quickgo_bc.xlsx'.format(
