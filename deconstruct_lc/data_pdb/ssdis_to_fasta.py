@@ -35,6 +35,7 @@ class SsDis(object):
             SeqIO.write(sequence, output_sequence, 'fasta')
         with open(self.all_dis_fp, 'w') as output_disorder:
             SeqIO.write(disorder, output_disorder, 'fasta')
+        print("Done writing disorder and sequence files")
 
     def ss_to_fasta(self):
         """
@@ -59,6 +60,7 @@ class SsDis(object):
                     new_fasta.append(new_record)
         with open(ss_fpo, 'w') as output_handle:
             SeqIO.write(new_fasta, output_handle, 'fasta')
+        print("Done writing secondary structure")
 
     def _add_p(self, sequence):
         new_seq = ''
@@ -88,4 +90,5 @@ class SsDis(object):
                         assert len(seq_rec.seq) == len(dis_rec.seq) == len(
                             ss_rec.seq)
                         total_entries += 1
+        print("ss_dis fasta files verified.")
         print("There are {} total entries from ss_dis.txt".format(total_entries))
