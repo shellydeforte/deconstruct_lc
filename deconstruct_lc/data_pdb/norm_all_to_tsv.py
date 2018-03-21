@@ -1,13 +1,11 @@
 from Bio import SeqIO
 import os
 
-from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
 
 
 class FastaTsv(object):
-    def __init__(self):
-        config = read_config.read_config()
+    def __init__(self, config):
         data_dp = config['fps']['data_dp']
         pdb_dp = os.path.join(data_dp, 'data_pdb')
         self.norm_fpi = os.path.join(pdb_dp, 'pdb_norm_cd100.fasta')
@@ -27,7 +25,6 @@ class FastaTsv(object):
         Write sequence, missing, secondary structure if in the list of pids.
         """
         all_pids = self.get_pids(fasta)
-        count = 0
         with open(self.all_seq, 'r') as seq_fi, \
              open(self.all_dis, 'r') as dis_fi, \
              open(self.all_ss, 'r') as ss_fi:
@@ -39,8 +36,6 @@ class FastaTsv(object):
                                                     SeqIO.parse(ss_fi, 'fasta')):
                     pid = tools_fasta.id_cleanup(seq_rec.id)
                     if pid in all_pids:
-                        count += 1
-                        print(count)
                         seq = str(seq_rec.seq)
                         mseq = str(dis_rec.seq)
                         ss_seq = str(ss_rec.seq)
@@ -51,12 +46,3 @@ class FastaTsv(object):
     def get_pids(self, fasta):
         pids, seqs = tools_fasta.fasta_to_id_seq(fasta)
         return pids
-
-
-def main():
-    ft = FastaTsv()
-    ft.write_tsv()
-
-
-if __name__ == '__main__':
-    main()
