@@ -1,14 +1,8 @@
-import configparser
 import os
 import pandas as pd
-from scipy.stats import linregress
+
+from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
-
-
-config = configparser.ConfigParser()
-cfg_fp = os.path.join(os.path.join(os.path.dirname(__file__), '..',
-                                   'config.cfg'))
-config.read_file(open(cfg_fp, 'r'))
 
 
 class WriteTrain(object):
@@ -17,11 +11,11 @@ class WriteTrain(object):
     PID, y, seq, len
     """
     def __init__(self):
-        self.dp = os.path.join(config['filepaths']['data_dp'])
-        self.pdb_fpi = os.path.join(self.dp, 'pdb_prep',
-                                      'pdb_train_cd90.tsv')
-        self.bc_fpi = os.path.join(self.dp, 'bc_prep', 'bc_train_cd90.fasta')
-        self.fpo = config['filepaths']['train_fp']
+        config = read_config.read_config()
+        data_dp = config['fps']['data_dp']
+        self.pdb_fpi = os.path.join(data_dp, 'data_pdb', 'pdb_train_cd90.tsv')
+        self.bc_fpi = os.path.join(data_dp, 'data_bc', 'bc_train_cd90.fasta')
+        self.fpo = os.path.join(data_dp, 'train.tsv')
 
     def concat_train(self):
         bc_pids, bc_seqs = tools_fasta.fasta_to_id_seq(self.bc_fpi)
