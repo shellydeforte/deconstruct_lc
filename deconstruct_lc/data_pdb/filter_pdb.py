@@ -1,13 +1,11 @@
 from Bio import SeqIO
 import os
 
-from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
 
 
 class PdbFasta(object):
-    def __init__(self):
-        config = read_config.read_config()
+    def __init__(self, config):
         data_dp = config['fps']['data_dp']
         pdb_dp = os.path.join(data_dp, 'data_pdb')
         self.minlen = config['dataprep'].getint('minlen')
@@ -20,13 +18,12 @@ class PdbFasta(object):
         self.all_dis_fp = os.path.join(pdb_dp, 'all_dis.fasta')
         self.all_seq_fp = os.path.join(pdb_dp, 'all_seqs.fasta')
 
-
     def create_pdb_miss(self):
         """
         Apply the following filtering:
-        x-ray
-        eukaryote
-        standard amino acid alphabet
+        Only x-ray
+        Only eukaryote
+        Only standard amino acid alphabet
         do not apply any missing region or length filtering
         """
         diffraction = self.read_diffraction()
@@ -74,7 +71,7 @@ class PdbFasta(object):
 
     def read_euk_pdb(self):
         """
-        Create a list of PDB IDs that are eukaryotes, ie.
+        Create a set of PDB IDs that are eukaryotes, ie.
         {'3V6M_A', '3WGU_E', '4ITZ_B',...
         """
         euks = self._euk_tax()
@@ -94,14 +91,14 @@ class PdbFasta(object):
         Create a set of all taxonomic identifiers that are 'E' for eukaryote
         ie. {'348046', '160085', '143180',...
         """
-        tax_org = self.read_speclist()
+        tax_org = self._read_speclist()
         euks = []
         for item in tax_org:
             if tax_org[item] == 'E':
                 euks.append(item)
         return set(euks)
 
-    def read_speclist(self):
+    def _read_speclist(self):
         """
         Read spec list and create a tax: org dictionary, ie. '3320': 'E'
         """
@@ -154,13 +151,3 @@ class PdbFasta(object):
             if c not in aas:
                 return False
         return True
-
-
-def main():
-    pdb = PdbFasta()
-    pdb.create_pdb_miss()
-    pdb.create_pdb_nomiss()
-
-
-if __name__ == '__main__':
-    main()
