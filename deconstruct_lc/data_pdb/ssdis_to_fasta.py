@@ -4,19 +4,17 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 import os
 
-from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
 
 
-class ReadSsDis(object):
-    def __init__(self):
-        config = read_config.read_config()
+class SsDis(object):
+    def __init__(self, config):
         data_dp = config['fps']['data_dp']
-        self.pdb_dp = os.path.join(data_dp, 'data_pdb')
-        self.ss_dis_fp = os.path.join(self.pdb_dp, 'outside_data', 'ss_dis.txt')
-        self.all_dis_fp = os.path.join(self.pdb_dp, 'all_dis.fasta')
-        self.all_seq_fp = os.path.join(self.pdb_dp, 'all_seqs.fasta')
-        self.all_ss_fp = os.path.join(self.pdb_dp, 'all_ss.fasta')
+        pdb_dp = os.path.join(data_dp, 'data_pdb')
+        self.ss_dis_fp = os.path.join(pdb_dp, 'outside_data', 'ss_dis.txt')
+        self.all_dis_fp = os.path.join(pdb_dp, 'all_dis.fasta')
+        self.all_seq_fp = os.path.join(pdb_dp, 'all_seqs.fasta')
+        self.all_ss_fp = os.path.join(pdb_dp, 'all_ss.fasta')
 
     def seq_dis_to_fasta(self):
         """
@@ -24,7 +22,6 @@ class ReadSsDis(object):
         """
         sequence = []
         disorder = []
-        ss = []
         with open(self.ss_dis_fp, 'r') as handle:
             for record in SeqIO.parse(handle, 'fasta'):
                 rid = str(record.id)
@@ -76,6 +73,7 @@ class ReadSsDis(object):
         """
         Confirm that protein IDs and sequence lengths are the same
         """
+        total_entries = 0
         with open(self.all_seq_fp, 'r') as seq_fasta:
             with open(self.all_dis_fp, 'r') as dis_fasta:
                 with open(self.all_ss_fp, 'r') as ss_fasta:
@@ -89,14 +87,5 @@ class ReadSsDis(object):
                         assert seq_id == dis_id == ss_id
                         assert len(seq_rec.seq) == len(dis_rec.seq) == len(
                             ss_rec.seq)
-
-
-def main():
-    ssd = ReadSsDis()
-    ssd.seq_dis_to_fasta()
-    ssd.ss_to_fasta()
-    ssd.verify_ss_dis_to_fasta()
-
-
-if __name__ == '__main__':
-    main()
+                        total_entries += 1
+        print("There are {} total entries from ss_dis.txt".format(total_entries))
