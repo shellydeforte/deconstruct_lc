@@ -11,12 +11,12 @@ class BcScore(object):
     """Write individual BC files with pid, org, seq, lc score, length"""
     def __init__(self):
         config = read_config.read_config()
-        self.data_dp = config['fps']['data_dp']
-        self.bc_dp = os.path.join(self.data_dp, 'bc_prep')
-        self.bc_an_dp = os.path.join(self.data_dp, 'bc_analysis')
+        data_dp = config['fps']['data_dp']
+        bc_dp = os.path.join(data_dp, 'data_bc')
+        self.bc_an_dp = os.path.join(data_dp, 'bc_analysis')
         # Use fasta file with all bc sequences
-        self.fasta = os.path.join(self.bc_dp, 'quickgo_bc.fasta')
-        self.bc_ss = os.path.join(self.bc_dp, 'quickgo_bc.xlsx')
+        self.fasta = os.path.join(bc_dp, 'quickgo_bc.fasta')
+        self.bc_ss = os.path.join(bc_dp, 'quickgo_bc.xlsx')
         self.bc_score_fp = os.path.join(self.bc_an_dp, 'bc_all_score.tsv')
 
     def compile_bcs(self):
