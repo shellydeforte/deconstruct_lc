@@ -1,15 +1,13 @@
 import os
 import pandas as pd
 
-from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
 from deconstruct_lc import tools_lc
 from deconstruct_lc.scores.norm_score import NormScore
 
 
 class PdbAnalysis(object):
-    def __init__(self):
-        config = read_config.read_config()
+    def __init__(self, config):
         data_dp = config['fps']['data_dp']
         pdb_dp = os.path.join(data_dp, 'data_pdb')
         self.all_fpi = os.path.join(pdb_dp, 'pdb_all.tsv')
@@ -46,12 +44,3 @@ class PdbAnalysis(object):
         for seq in miss_seqs:
             miss.append(seq.count('X'))
         return miss
-
-
-def main():
-    pa = PdbAnalysis()
-    pa.write_analysis()
-
-
-if __name__ == '__main__':
-    main()
