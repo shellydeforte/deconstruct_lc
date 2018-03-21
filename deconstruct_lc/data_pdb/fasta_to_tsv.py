@@ -9,14 +9,14 @@ class FastaTsv(object):
     def __init__(self):
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
-        self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
-        self.norm_fpi = os.path.join(self.pdb_dp, 'pdb_norm_cd100.fasta')
-        self.all_fpi = os.path.join(self.pdb_dp, 'pdb_all.fasta')
-        self.norm_fpo = os.path.join(self.pdb_dp, 'pdb_norm_cd100.tsv')
-        self.all_fpo = os.path.join(self.pdb_dp, 'pdb_all.tsv')
-        self.all_seq = os.path.join(self.pdb_dp, 'all_seqs.fasta')
-        self.all_dis = os.path.join(self.pdb_dp, 'all_dis.fasta')
-        self.all_ss = os.path.join(self.pdb_dp, 'all_ss.fasta')
+        pdb_dp = os.path.join(data_dp, 'data_pdb')
+        self.norm_fpi = os.path.join(pdb_dp, 'pdb_norm_cd100.fasta')
+        self.all_fpi = os.path.join(pdb_dp, 'pdb_all.fasta')
+        self.norm_fpo = os.path.join(pdb_dp, 'pdb_norm_cd100.tsv')
+        self.all_fpo = os.path.join(pdb_dp, 'pdb_all.tsv')
+        self.all_seq = os.path.join(pdb_dp, 'all_seqs.fasta')
+        self.all_dis = os.path.join(pdb_dp, 'all_dis.fasta')
+        self.all_ss = os.path.join(pdb_dp, 'all_ss.fasta')
 
     def write_tsv(self):
         self.write_full(self.all_fpi, self.all_fpo)

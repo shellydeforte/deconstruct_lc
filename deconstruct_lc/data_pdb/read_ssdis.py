@@ -12,8 +12,8 @@ class ReadSsDis(object):
     def __init__(self):
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
-        self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
-        self.ss_dis_fp = os.path.join(self.pdb_dp, 'ss_dis.txt')
+        self.pdb_dp = os.path.join(data_dp, 'data_pdb')
+        self.ss_dis_fp = os.path.join(self.pdb_dp, 'outside_data', 'ss_dis.txt')
         self.all_dis_fp = os.path.join(self.pdb_dp, 'all_dis.fasta')
         self.all_seq_fp = os.path.join(self.pdb_dp, 'all_seqs.fasta')
         self.all_ss_fp = os.path.join(self.pdb_dp, 'all_ss.fasta')

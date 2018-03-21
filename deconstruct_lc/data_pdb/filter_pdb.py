@@ -7,18 +7,19 @@ from deconstruct_lc import tools_fasta
 
 class PdbFasta(object):
     def __init__(self):
-        self.minlen = 100
-        self.maxlen = 2000
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
-        self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
-        self.pdb_miss_fp = os.path.join(self.pdb_dp, 'pdb_all.fasta')
-        self.pdb_nomiss_fp = os.path.join(self.pdb_dp, 'pdb_train.fasta')
-        self.all_dis_fp = os.path.join(self.pdb_dp, 'all_dis.fasta')
-        self.all_seq_fp = os.path.join(self.pdb_dp, 'all_seqs.fasta')
-        self.entry_type_fp = os.path.join(self.pdb_dp, 'pdb_entry_type.txt')
-        self.taxonomy_fp = os.path.join(self.pdb_dp, 'pdb_chain_taxonomy.tsv')
-        self.speclist_fp = os.path.join(self.pdb_dp, 'speclist.txt')
+        pdb_dp = os.path.join(data_dp, 'data_pdb')
+        self.minlen = config['dataprep'].getint('minlen')
+        self.maxlen = config['dataprep'].getint('maxlen')
+        self.entry_type_fp = os.path.join(pdb_dp, 'outside_data', 'pdb_entry_type.txt')
+        self.taxonomy_fp = os.path.join(pdb_dp, 'outside_data', 'pdb_chain_taxonomy.tsv')
+        self.speclist_fp = os.path.join(pdb_dp, 'outside_data', 'speclist.txt')
+        self.pdb_miss_fp = os.path.join(pdb_dp, 'pdb_all.fasta')
+        self.pdb_nomiss_fp = os.path.join(pdb_dp, 'pdb_train.fasta')
+        self.all_dis_fp = os.path.join(pdb_dp, 'all_dis.fasta')
+        self.all_seq_fp = os.path.join(pdb_dp, 'all_seqs.fasta')
+
 
     def create_pdb_miss(self):
         """

@@ -11,12 +11,12 @@ class PdbAnalysis(object):
     def __init__(self):
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
-        self.pdb_dp = os.path.join(data_dp, 'pdb_prep')
-        self.all_fpi = os.path.join(self.pdb_dp, 'pdb_all.tsv')
-        self.an_fpo = os.path.join(self.pdb_dp, 'pdb_analysis.tsv')
-        self.k = int(config['score']['k'])
-        self.alph_lca = str(config['score']['lca'])
-        self.thresh_lce = float(config['score']['lce'])
+        pdb_dp = os.path.join(data_dp, 'data_pdb')
+        self.all_fpi = os.path.join(pdb_dp, 'pdb_all.tsv')
+        self.an_fpo = os.path.join(pdb_dp, 'pdb_analysis.tsv')
+        self.k = config['score'].getint('k')
+        self.alph_lca = config['score'].get('lca')
+        self.thresh_lce = config['score'].getfloat('lce')
 
     def write_analysis(self):
         df = pd.read_csv(self.all_fpi, sep='\t')
