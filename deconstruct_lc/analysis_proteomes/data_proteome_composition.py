@@ -17,7 +17,7 @@ class LcProteome(object):
         data_dp = config['fps']['data_dp']
         self.seg_dpi = os.path.join(data_dp, 'proteomes', 'euk_seg')
         self.fns = os.listdir(self.seg_dpi)
-        self.fpo = os.path.join(data_dp, 'proteomes_analysis', 'lc_composition.tsv')
+        self.fpo = os.path.join(data_dp, 'analysis_proteomes', 'lc_composition.tsv')
 
     def write_all_comps(self):
         aa_order = 'SGEQAPDTNKRLHVYFIMCW'
