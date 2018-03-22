@@ -12,9 +12,9 @@ class CompStats(object):
         config = read_config.read_config()
         data_dp = os.path.join(config['fps']['data_dp'])
         self.train_fpi = os.path.join(data_dp, 'train.tsv')
-        self.k = int(config['score']['k'])
-        self.lca = str(config['score']['lca'])
-        self.lce = float(config['score']['lce'])
+        self.k = config['score'].getint('k')
+        self.lca = config['score'].get('lca')
+        self.lce = config['score'].getfloat('lce')
 
     def comp_lc(self):
         """What is the composition inside LCE motifs?
