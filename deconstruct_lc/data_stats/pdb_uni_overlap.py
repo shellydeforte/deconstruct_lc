@@ -8,9 +8,9 @@ class Overlap(object):
     def __init__(self):
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
-        self.bc90 = os.path.join(data_dp, 'bc_prep', 'bc_train_cd90.fasta')
-        self.pdb90 = os.path.join(data_dp, 'pdb_prep', 'pdb_train_cd90.fasta')
-        self.pdb_chain = os.path.join(data_dp, 'pdb_prep', 'pdb_chain_uniprot.tsv')
+        self.bc90 = os.path.join(data_dp, 'data_bc', 'bc_train_cd90.fasta')
+        self.pdb90 = os.path.join(data_dp, 'data_pdb', 'pdb_train_cd90.fasta')
+        self.pdb_chain = os.path.join(data_dp, 'data_pdb', 'outside_data', 'pdb_chain_uniprot.tsv')
 
     def overlap(self):
         pdb_uni = self.read_pdb_uni()
