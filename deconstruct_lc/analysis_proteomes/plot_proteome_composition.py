@@ -13,7 +13,7 @@ class PlotLcProteome():
     def __init__(self):
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
-        self.fpi = os.path.join(data_dp, 'proteomes_analysis', 'lc_composition.tsv')
+        self.fpi = os.path.join(data_dp, 'analysis_proteomes', 'lc_composition.tsv')
         self.fig_fpo = os.path.join(data_dp, 'figures', 'lca_comp.png')
 
     def plot_lc_comp(self):
