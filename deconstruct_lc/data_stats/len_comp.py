@@ -13,7 +13,7 @@ class LenComp(object):
         config = read_config.read_config()
         data_dp = config['fps']['data_dp']
         self.aas = 'SGEQAPDTNKRLHVYFIMCW'
-        self.lca = str(config['score']['lca'])
+        self.lca = config['score'].get('lca')
         self.train_fp = os.path.join(data_dp, 'train.tsv')
         self.comp_fp = os.path.join(data_dp, 'len_comp', 'train_comp.tsv')
 
@@ -132,7 +132,7 @@ class LenComp(object):
 def main():
     lc = LenComp()
     lc.plot_lencomp()
-    lc.write_aa_comp()
+    #lc.write_aa_comp()
     lc.svm_comp()
     lc.svm_len()
 
