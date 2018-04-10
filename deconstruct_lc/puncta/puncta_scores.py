@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import statsmodels.stats.power as smp
+from scipy.stats import chi2_contingency
 
 from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
@@ -26,6 +28,47 @@ class PunctaScores(object):
         labs = ['ST1 (puncta)', 'ST2 (no puncta)', 'ST3 (insoluble->soluble)']
         self.matplot_box_plots(all_scores, labs)
 
+    def cont_table_power(self):
+        rows = 3
+        cols = 2
+        df = (rows - 1) * (cols - 1)
+        nbins = df + 1
+        alpha = 0.05
+        power = 0.8
+        st1_scores = self.get_scores('ST1')
+        st2_scores = self.get_scores('ST2')
+        col1 = self.bin_scores(st1_scores)
+        col2 = self.bin_scores(st2_scores)
+        n = sum(col1) + sum(col2)
+        print(n)
+        ct = np.array([col1, col2]).T
+        chi2, p, dof, ex = chi2_contingency(ct, correction=False)
+        es = np.sqrt(chi2 / n * df)  # cramer's v
+        print(es) # medium effect
+        sample_size = smp.GofChisquarePower().solve_power(es, n_bins=nbins, alpha=alpha,
+                                                power=power)
+        print(sample_size)
+
+    def bin_scores(self, scores):
+        bins = [0, 0, 0]
+        for score in scores:
+            if score <= 0:
+                bins[0] += 1
+            elif 20 >= score > 0:
+                bins[1] += 1
+            else:
+                bins[2] += 1
+        return bins
+
+    def bin_two(self, scores):
+        bins = [0, 0]
+        for score in scores:
+            if score <= 0:
+                bins[0] += 1
+            else:
+                bins[1] += 1
+        return bins
+
     def run_display(self):
         st1_ids = self.get_ids('ST1')
         st2_ids = self.get_ids('ST2')
@@ -45,7 +88,6 @@ class PunctaScores(object):
         disp.write_body()
         disp = display_lc.Display(st3_seqs, 'st3_color.html', color=True)
         disp.write_body()
-
 
     def insol_remove_puncta(self):
         st3_ids = self.get_ids('ST3')
@@ -115,7 +157,7 @@ class PunctaScores(object):
 
 def main():
     ps = PunctaScores()
-    ps.run_display()
+    ps.cont_table_power()
 
 
 if __name__ == '__main__':
