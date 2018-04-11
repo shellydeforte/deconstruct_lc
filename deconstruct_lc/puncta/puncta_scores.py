@@ -29,7 +29,7 @@ class PunctaScores(object):
         self.matplot_box_plots(all_scores, labs)
 
     def cont_table_power(self):
-        rows = 3
+        rows = 5
         cols = 2
         df = (rows - 1) * (cols - 1)
         nbins = df + 1
@@ -37,11 +37,12 @@ class PunctaScores(object):
         power = 0.8
         st1_scores = self.get_scores('ST1')
         st2_scores = self.get_scores('ST2')
-        col1 = self.bin_scores(st1_scores)
-        col2 = self.bin_scores(st2_scores)
+        col1 = self.bin_three(st1_scores)
+        col2 = self.bin_three(st2_scores)
         n = sum(col1) + sum(col2)
         print(n)
         ct = np.array([col1, col2]).T
+        print(ct)
         chi2, p, dof, ex = chi2_contingency(ct, correction=False)
         es = np.sqrt(chi2 / n * df)  # cramer's v
         print(es) # medium effect
@@ -67,6 +68,23 @@ class PunctaScores(object):
                 bins[0] += 1
             else:
                 bins[1] += 1
+        return bins
+
+    def bin_three(self, scores):
+        bins = [0, 0, 0, 0, 0]
+        for score in scores:
+            if score <= -20:
+                bins[0] += 1
+            elif -20 < score <= -10:
+                bins[1] += 1
+            elif -10 < score <= 0:
+                bins[2] += 1
+            elif 0 < score <= 20:
+                bins[3] += 1
+            elif score > 20:
+                bins[4] += 1
+            else:
+                print("Binning Problem")
         return bins
 
     def run_display(self):
