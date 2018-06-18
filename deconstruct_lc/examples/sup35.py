@@ -24,6 +24,9 @@ class Sup35(object):
         nm_domain = seq[0:253]
         c_domain = seq[253:]
         mc_domain = seq[123:]
+        print(nm_domain)
+        print(c_domain)
+        print(mc_domain)
         print(ns.lc_norm_score([nm_domain]))
         print(ns.lc_norm_score([c_domain]))
         print(ns.lc_norm_score([mc_domain]))
