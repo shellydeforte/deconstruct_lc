@@ -16,7 +16,9 @@ When we apply the low complexity score to these proteins, we can see that the pu
 The hypothesis is that high scoring proteins will be more likely to form puncta without stress, less likely to stain with ThT and more likely to dissolve with hexandiol.
 
 Here are the current to do items:
-x 1. Create a spreadsheet with the marcotte proteins and scores
-2. Get a list of metabolic proteins for the background (in progress)
-3. Perform chi-square or fisher's exact (probably fisher's exact) on each level of data
-x 4. Re-read the aggregate paper to check for their methods
+1. Get a list of metabolic proteins for the background (in progress)
+2. Perform chi-square or fisher's exact (probably fisher's exact) on each level of data
+
+Done
+1. Create a spreadsheet with the marcotte proteins and scores
+2. Re-read the aggregate paper to check for their methods
