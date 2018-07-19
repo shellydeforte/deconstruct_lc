@@ -6,6 +6,9 @@ from scipy.stats import chi2_contingency
 from deconstruct_lc import read_config
 
 class MarcotteAnalysis(object):
+    """
+    Chi square analysis for marcotte data against Huh
+    """
     def __init__(self):
         config = read_config.read_config()
         data_dp = os.path.join(config['fps']['data_dp'])
