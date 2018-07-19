@@ -13,6 +13,7 @@ class FormatMarcotte(object):
         self.marcotte_fpi = os.path.join(data_dp, 'experiment', 'marcotte_puncta_proteins.xlsx')
         self.huh_fpi = os.path.join(data_dp, 'experiment', 'huh_cytoplasmic.xlsx')
         self.huh_full = os.path.join(data_dp, 'experiment', 'Huh_WK_et_al_2003_go_terms.txt')
+        self.huh_fpout = os.path.join(data_dp, 'experiment', 'huh_scores.tsv')
         self.orf_trans = os.path.join(data_dp, 'proteomes', 'orf_trans.fasta')
         self.fpo = os.path.join(data_dp, 'experiment', 'marcotte_puncta_scores.tsv')
         self.manual = os.path.join(data_dp, 'experiment', 'cytoplasm_annotations_manual.txt')
@@ -27,12 +28,29 @@ class FormatMarcotte(object):
         yeast_ids = list(df['ORF'])
         genes = list(df['Gene'])
         seqs = tools_fasta.get_yeast_seq_from_ids(self.orf_trans, yeast_ids)
+        lengths = [len(seq) for seq in seqs]
         ns = NormScore()
         scores = ns.lc_norm_score(seqs)
         df_out = pd.DataFrame({'Gene': genes, 'ORF': yeast_ids,
-                               'LC Score': scores, 'Sequence': seqs},
-                              columns=['Gene', 'ORF', 'LC Score', 'Sequence'])
+                               'LC Score': scores, 'Sequence': seqs,
+                               'Length': lengths},
+                              columns=['Gene', 'ORF', 'LC Score', 'Length', 'Sequence'])
+        print(df_out.head())
         df_out.to_csv(self.fpo, sep='\t')
+
+    def huh_out(self):
+        huh_df = pd.read_excel(self.huh_fpi, sheetname='Sheet1')
+        huh_ids = set(list(huh_df['Gene Systematic Name']))
+        seqs, genes, orfs = tools_fasta.get_yeast_seq_gene_from_ids(self.orf_trans, huh_ids)
+        lengths = [len(seq) for seq in seqs]
+        ns = NormScore()
+        scores = ns.lc_norm_score(seqs)
+        df_out = pd.DataFrame({'Gene': genes, 'ORF': orfs,
+                               'LC Score': scores, 'Sequence': seqs,
+                               'Length': lengths},
+                              columns=['Gene', 'ORF', 'LC Score', 'Length', 'Sequence'])
+        print(df_out.head())
+        df_out.to_csv(self.huh_fpout, sep='\t')
 
     def check_cytoplasmic(self):
         marcotte_df = pd.read_excel(self.marcotte_fpi, 'ST1')
@@ -68,7 +86,7 @@ class FormatMarcotte(object):
 
 def main():
     fm = FormatMarcotte()
-    fm.check_annotations()
+    fm.huh_out()
 
 
 if __name__ == '__main__':
