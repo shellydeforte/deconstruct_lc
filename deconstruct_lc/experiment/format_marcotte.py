@@ -22,6 +22,8 @@ class FormatMarcotte(object):
         self.man_cytos = os.path.join(data_dp, 'experiment', 'cytosol_annotations_manual.txt')
         self.ht_cytos = os.path.join(data_dp, 'experiment', 'cytosol_annotations_high_throughput.txt')
         self.comp_cytos = os.path.join(data_dp, 'experiment', 'cytosol_annotations_computational.txt')
+        self.marcott_not_huh = os.path.join(data_dp, 'experiment', 'marcotte_notin_huh.tsv')
+        self.marcott_not_any = os.path.join(data_dp, 'experiment', 'marcotte_notcytoplasmic.tsv')
 
     def read_marcotte(self):
         df = pd.read_excel(self.marcotte_fpi, 'ST1')
@@ -57,11 +59,20 @@ class FormatMarcotte(object):
         marcotte_ids = list(marcotte_df['ORF'])
         #huh_df = pd.read_excel(self.huh_fpi, 'Sheet1')
         #huh_ids = list(huh_df['Gene Systematic Name'])
-        huh_df = pd.read_csv(self.huh_full, sep='\t', header=7)
-        huh_ids = list(huh_df['Gene Systematic Name'])
-        print(len(set(huh_ids)))
-        print(set(marcotte_ids) - set(huh_ids))
-        print(len(set(marcotte_ids) - set(huh_ids)))
+        huh_df = pd.read_csv(self.huh_full, sep='\t')
+        huh_ids = set(list(huh_df['Gene Systematic Name']))
+        huh_genes = set(list(huh_df['Gene']))
+        clean_huh = []
+        for item in huh_ids:
+            clean_huh.append(item[0:7])
+        print(clean_huh[0:10])
+        print(len(set(clean_huh)))
+        not_in = set(marcotte_ids) - set(clean_huh)
+        not_in_df = marcotte_df[marcotte_df['ORF'].isin(not_in)]
+        not_genes = not_in_df['Gene']
+        print(len(set(not_genes) - set(huh_genes)))
+        print(len(not_in))
+        #not_in_df.to_csv(self.marcott_not_huh, sep='\t')
 
     def check_annotations(self):
         marcotte_df = pd.read_excel(self.marcotte_fpi, 'ST1')
@@ -80,13 +91,15 @@ class FormatMarcotte(object):
         comp_cyt_ids = list(comp_cyt_df['Gene Systematic Name'])
         all_ids = set(manual_ids + ht_ids + comp_ids + man_cyt_ids + ht_cyt_ids)
         print(len(all_ids))
-        print(set(marcotte_ids) - all_ids)
+        not_in = set(marcotte_ids) - all_ids
         print(len(set(marcotte_ids) - all_ids))
+        marcotte_out = marcotte_df[marcotte_df['ORF'].isin(not_in)]
+        marcotte_out.to_csv(self.marcott_not_any, sep='\t')
 
 
 def main():
     fm = FormatMarcotte()
-    fm.huh_out()
+    fm.check_cytoplasmic()
 
 
 if __name__ == '__main__':

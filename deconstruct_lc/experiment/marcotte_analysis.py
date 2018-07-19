@@ -21,10 +21,11 @@ class MarcotteAnalysis(object):
         marc_df = marc_df[(marc_df['Length'] >= 100) & (marc_df['Length'] <= 2000)]
         huh_df = pd.read_csv(self.huh, sep='\t')
         huh_df = huh_df[(huh_df['Length'] >= 100) & (huh_df['Length'] <= 2000)]
-        huh_df = huh_df[huh_df['ORF']]
+        huh_df = huh_df[~huh_df['ORF'].isin(list(marc_df['ORF']))]
+        print(len(huh_df))
         mlt, mm, mgt = self.get_bins(marc_df)
         hlt, hm, hgt = self.get_bins(huh_df)
-        cont = np.array([[mlt, mm, mgt], [hlt, hm, hgt]]).T
+        cont = np.array([[mlt, mm, mgt], [hlt, hm, hgt]])
         print(cont)
         p = chi2_contingency(cont)[1]
         print(p)
