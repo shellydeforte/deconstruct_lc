@@ -58,6 +58,7 @@ class Display(object):
             es = self.format_string(seq, ranges)
             if self.color:
                 ns = self.add_colors(es)
+                #ns = self.add_tyr_arg(es)
                 form_seqs.append(ns)
             else:
                 form_seqs.append(es)
@@ -98,6 +99,17 @@ class Display(object):
                 ns += '<font color=\'green\'>' + aa + '</font>'
             elif aa == 'P':
                 ns += '<font color=\'brown\'>' + aa + '</font>'
+            else:
+                ns += aa
+        return ns
+
+    def add_tyr_arg(self, form_seq):
+        ns = ''
+        for aa in form_seq:
+            if aa == 'Y':
+                ns += '<font color=\'blue\'>' + aa + '</font>'
+            elif aa == 'R':
+                ns += '<font color=\'orange\'>' + aa + '</font>'
             else:
                 ns += aa
         return ns
