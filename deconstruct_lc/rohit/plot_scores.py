@@ -7,6 +7,7 @@ import numpy as np
 from deconstruct_lc import read_config
 from deconstruct_lc import tools_fasta
 from deconstruct_lc.scores.norm_score import NormScore
+from deconstruct_lc.display.display_lc import Display
 
 class PlotRohit(object):
     def __init__(self):
@@ -37,7 +38,11 @@ class PlotRohit(object):
             p1.text(df.Num_Tyr[line] + 0.2, df.Num_Arg[line], df.group[line],
                     horizontalalignment='left', size='medium', color='black',
                     weight='semibold')
-        sns.plt.show()
+        #sns.plt.show()
+        fasta_in = os.path.join(self.dp, 'HNRNPA1_P09651.fasta')
+        fn_out = os.path.join(self.dp, 'HNRNPA1.html')
+        dis = Display(fasta_in, fn_out, color=True)
+        dis.write_body()
 
         #fig, ax = plt.subplots()
         #for i, txt in enumerate(labels):
