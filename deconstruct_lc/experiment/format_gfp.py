@@ -25,9 +25,6 @@ class FormatGfp(object):
         ndf = pd.DataFrame({'Gene': df['gene name'], 'ORF': df['yORF']})
         ndf.to_csv(self.temp_out, sep='\t')
 
-    def get_nopuncta_scores(self):
-        pass
-
 
 def main():
     fg = FormatGfp()
