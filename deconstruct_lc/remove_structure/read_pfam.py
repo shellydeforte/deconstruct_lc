@@ -12,11 +12,13 @@ class Pfam(object):
         self.pfam_fp = os.path.join(data_dp, 'pfam', 'Pfam-A.regions.uniprot.tsv')
         self.sgd_uni_fp = os.path.join(data_dp, 'proteomes', 'yeast_pd.xlsx')
         self.puncta = os.path.join(data_dp, 'experiment', 'marcotte_puncta_proteins.xlsx')
-        self.puncta_map = os.path.join(data_dp, 'experiment', 'puncta_map.xlsx')
+        self.puncta_map_excel = os.path.join(data_dp, 'experiment', 'puncta_map.xlsx')
         self.nopuncta_map = os.path.join(data_dp, 'experiment', 'nopuncta_map.tsv')
         self.nopuncta_map_excel = os.path.join(data_dp, 'experiment', 'nopuncta_map.xlsx')
         self.pfam_puncta = os.path.join(data_dp, 'experiment', 'puncta_pfam.tsv')
         self.pfam_nopuncta = os.path.join(data_dp, 'experiment', 'nopuncta_pfam.tsv')
+        self.puncta_uni = os.path.join(data_dp, 'experiment', 'puncta_uni.txt')
+        self.nopuncta_uni = os.path.join(data_dp, 'experiment', 'nopuncta_uni.txt')
 
     def read_file(self):
         """
@@ -51,10 +53,22 @@ class Pfam(object):
         df = df[df['ORF'].isin(no_puncta_orfs)]
         df.to_csv(self.nopuncta_map, sep='\t')
 
+    def write_uni(self):
+        pdf = pd.read_excel(self.puncta_map_excel, sheetname='puncta_map')
+        punis = set(list(pdf['Uni_ID']))
+        with open(self.puncta_uni, 'w') as fo:
+            for puni in punis:
+                fo.write(puni+'\n')
+        npdf = pd.read_excel(self.nopuncta_map_excel, sheetname='nopuncta_map')
+        npunis = set(list(npdf['Uni_ID']))
+        with open(self.nopuncta_uni, 'w') as fo:
+            for npuni in npunis:
+                fo.write(npuni+'\n')
+
 
 def main():
     p = Pfam()
-    p.read_file()
+    p.write_uni()
 
 
 if __name__ == '__main__':
