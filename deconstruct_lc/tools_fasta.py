@@ -1,4 +1,3 @@
-import os
 import re
 from Bio import SeqIO
 
@@ -162,15 +161,4 @@ def remove_histag(seq):
         nseq += seq[indexes[i]:indexes[i+1]]
     nseq += seq[indexes[-1]:]
     return nseq
-
-
-def main():
-    seq = 'ABCHHHHHHHREBHHHHHHQ'
-    nseq = remove_histag(seq)
-    print(nseq)
-
-
-if __name__ == '__main__':
-    main()
-
 
