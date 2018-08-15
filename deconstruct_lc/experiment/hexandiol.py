@@ -20,18 +20,80 @@ class Hexandiol(object):
                                          'marcotte_puncta_proteins.xlsx')
         self.orf_trans = os.path.join(data_dp, 'proteomes', 'orf_trans.fasta')
         self.hex_fpi = os.path.join(data_dp, 'experiment', '180803_HD.xls')
+        self.tht_fpi = os.path.join(data_dp, 'experiment', '180803_ThT.xls')
         self.puncta_fpi = os.path.join(data_dp, 'experiment', 'marcotte_puncta_scores.tsv')
         self.npuncta_fpi = os.path.join(data_dp, 'experiment', 'marcotte_nopuncta_scores.tsv')
         self.nofasta = os.path.join(data_dp, 'experiment', 'hex_nop.fasta')
         self.yesfasta = os.path.join(data_dp, 'experiment', 'hex_yesp.fasta')
+        self.sg_ann = os.path.join(data_dp, 'experiment', 'cytoplasmic_stress_granule_annotations.txt')
 
-    def score_hist(self):
-        lc_df = pd.read_csv(self.puncta_fpi, sep='\t', index_col=0)
+    def remove_sg(self):
+        sg = pd.read_csv(self.sg_ann, sep='\t')
+        sg_orfs = list(sg['Gene Systematic Name'])
         hex_df = pd.read_excel(self.hex_fpi, sheetname='Hoja2')
         hex_df = hex_df[(hex_df['180708 48h'] == 'yes') & (hex_df['180706 6h '] == 'no')]
         no_df = hex_df[(hex_df['180803 48h HD 1h'] == 'no')]
         no_orf = list(no_df['ORF'])
+
         yes_df = hex_df[(hex_df['180803 48h HD 1h'] == 'yes')]
+        yes_orf = list(yes_df['ORF'])
+
+        sg_in = [pid for pid in no_orf if pid in sg_orfs]
+        yes_orf = list(set(yes_orf) - set(sg_orfs))
+        no_orf = list(set(no_orf) - set(sg_orfs))
+
+        lc_df = pd.read_csv(self.puncta_fpi, sep='\t', index_col=0)
+        no_lc = lc_df[lc_df['ORF'].isin(no_orf)]
+        yes_lc = lc_df[lc_df['ORF'].isin(yes_orf)]
+        yes_scores = list(yes_lc['LC Score'])
+        no_scores = list(no_lc['LC Score'])
+        sg_lc = lc_df[lc_df['ORF'].isin(sg_in)]
+        print(sg_lc[['ORF', 'LC Score']])
+        plt.xlabel('LC scores')
+        plt.ylabel('Number of proteins')
+        plt.hist(yes_scores, bins=20, range=(-60, 200), alpha=0.5, label='Does not dissolve with hexanediol')
+        plt.hist(no_scores, bins=20, range=(-60, 200), alpha=0.5, label='Dissolves with hexanediol')
+        plt.legend()
+        #plt.show()
+
+    def remove_subunit(self):
+        headers, seqs = tools_fasta.fasta_to_head_seq(self.nofasta)
+        print(len(headers))
+        total = 0
+        nosub_seqs = []
+        sub_seqs = []
+        sub_heads = []
+        ns = NormScore()
+        lengths = []
+        for header, seq in zip(headers, seqs):
+            if 'kinase' in header:
+                total += 1
+                sub_seqs.append(seq)
+                sub_heads.append(header)
+                lengths.append(len(seq))
+            else:
+                nosub_seqs.append(seq)
+        scores = ns.lc_norm_score(nosub_seqs)
+        sub_scores = ns.lc_norm_score(sub_seqs)
+        print(total)
+        print(np.mean(scores))
+        print(np.mean(sub_scores))
+        print(sub_scores)
+        for head, sub_score, length in zip(sub_heads, sub_scores, lengths):
+            print(head)
+            print(sub_score)
+            print(length)
+            print()
+
+    def score_hist(self):
+        lc_df = pd.read_csv(self.puncta_fpi, sep='\t', index_col=0)
+        hex_df = pd.read_excel(self.tht_fpi, sheetname='Hoja1')
+        hex_df = hex_df[(hex_df['180708 48h'] == 'yes')]
+        #no_df = hex_df[(hex_df['180803 48h HD 1h'] == 'no')]
+        no_df = hex_df[hex_df['180809 ThT'] == 'no']
+        no_orf = list(no_df['ORF'])
+        #yes_df = hex_df[(hex_df['180803 48h HD 1h'] == 'yes')]
+        yes_df = hex_df[hex_df['180809 ThT'] == 'yes']
         yes_orf = list(yes_df['ORF'])
         no_lc = lc_df[lc_df['ORF'].isin(no_orf)]
         yes_lc = lc_df[lc_df['ORF'].isin(yes_orf)]
@@ -39,8 +101,8 @@ class Hexandiol(object):
         no_scores = list(no_lc['LC Score'])
         plt.xlabel('LC scores')
         plt.ylabel('Number of proteins')
-        plt.hist(yes_scores, bins=20, range=(-60, 200), alpha=0.5, label='Does not dissolve with hexanediol')
-        plt.hist(no_scores, bins=20, range=(-60, 200), alpha=0.5, label='Dissolves with hexanediol')
+        plt.hist(yes_scores, bins=20, range=(-60, 200), alpha=0.5, normed=True, label='Stains with ThT')
+        plt.hist(no_scores, bins=20, range=(-60, 200), alpha=0.5, normed=True, label='Does not Stain with ThT')
         plt.legend()
         plt.show()
 
@@ -205,6 +267,41 @@ class Hexandiol(object):
         print(scores)
         print(scores.mean())
 
+    def check_scores(self):
+        ns = NormScore()
+        seq = 'MSTSASGPEHEFVSKFLTLATLTEPKLPKSYTKPLKDVTNLGVPLPTLKYKYKQNRAKKL' \
+              'KLHQDQQGQDNAAVHLTLKKIQAPKFSIEHDFSPSDTILQIKQHLISEEKASHISEIKLL' \
+              'LKGKVLHDNLFLSDLKVTPANSTITVMIKPNPTISKEPEAEKSTNSPAPAPPQELTVPWD' \
+              'DIEALLKNNFENDQAAVRQVMERLQKGWSLAK'
+        print(ns.lc_norm_score([seq])[0])
+
+    def check_tht(self):
+        lc_df = pd.read_csv(self.puncta_fpi, sep='\t', index_col=0)
+        hex_df = pd.read_excel(self.tht_fpi, sheetname='Hoja1')
+        hex_df = hex_df[(hex_df['180708 48h'] == 'yes')]
+        # aggregates
+        no_df = hex_df[(hex_df['180803 48h HD 1h'] == 'yes')]
+        no_df = no_df[no_df['180809 ThT'] == 'no']
+        no_orf = list(no_df['ORF'])
+        yes_df = hex_df[(hex_df['180803 48h HD 1h'] == 'no')]
+        yes_df = yes_df[yes_df['180809 ThT'] == 'no']
+        yes_orf = list(yes_df['ORF'])
+        no_lc = lc_df[lc_df['ORF'].isin(no_orf)]
+        yes_lc = lc_df[lc_df['ORF'].isin(yes_orf)]
+        yes_scores = list(yes_lc['LC Score'])
+        no_scores = list(no_lc['LC Score'])
+        plt.xlabel('LC scores')
+        plt.ylabel('Number of proteins')
+        print(len(yes_scores))
+        print(len(no_scores))
+        yes_lc = yes_lc.sort_values(by='LC Score')
+        print(yes_lc[['ORF', 'LC Score']])
+        plt.hist(yes_scores, bins=20, range=(-60, 200), alpha=0.5, normed=True, label='dissolves with hexandiol')
+        plt.hist(no_scores, bins=20, range=(-60, 200), alpha=0.5, normed=True, label='no hexanediol, no Tht')
+        plt.legend()
+        plt.show()
+
+
 
 class TyrMotifs(object):
     def __init__(self):
@@ -287,8 +384,8 @@ class TyrMotifs(object):
 
 
 def main():
-    tm = TyrMotifs()
-    tm.load_seqs()
+    tm = Hexandiol()
+    tm.check_tht()
 
 
 

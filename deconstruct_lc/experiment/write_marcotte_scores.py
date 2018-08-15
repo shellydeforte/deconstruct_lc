@@ -20,11 +20,11 @@ class MarcotteScores(object):
         df = pd.read_excel(self.marcotte_fpi, 'ST1')
         yeast_ids = list(df['ORF'])
         genes = list(df['Gene'])
-        seqs = tools_fasta.get_yeast_seq_from_ids(self.orf_trans, yeast_ids)
+        pids, seqs = tools_fasta.get_yeast_seq_from_ids(self.orf_trans, yeast_ids)
         lengths = [len(seq) for seq in seqs]
         ns = NormScore()
         scores = ns.lc_norm_score(seqs)
-        df_out = pd.DataFrame({'Gene': genes, 'ORF': yeast_ids,
+        df_out = pd.DataFrame({'Gene': genes, 'ORF': pids,
                                'LC Score': scores, 'Sequence': seqs,
                                'Length': lengths},
                               columns=['Gene', 'ORF', 'LC Score', 'Length', 'Sequence'])
@@ -50,8 +50,7 @@ class MarcotteScores(object):
 
 def main():
     ms = MarcotteScores()
-    ms.write_nopuncta()
-
+    ms.write_puncta()
 
 
 if __name__ == '__main__':

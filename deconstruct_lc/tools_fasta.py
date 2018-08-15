@@ -100,12 +100,14 @@ def get_pid_gene_desc_seq(fasta_fp):
 
 def get_yeast_seq_from_ids(orf_trans_fp, orf_ids):
     sequences = []
+    npids = []
     with open(orf_trans_fp, 'r') as fasta_in:
         for record in SeqIO.parse(fasta_in, 'fasta'):
             pid = str(record.id)
             if pid in orf_ids:
+                npids.append(pid)
                 sequences.append(str(record.seq))
-    return sequences
+    return npids, sequences
 
 
 def get_yeast_seq_gene_from_ids(orf_trans_fp, orf_ids):
