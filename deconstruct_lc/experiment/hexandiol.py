@@ -88,7 +88,7 @@ class Hexandiol(object):
     def score_hist(self):
         lc_df = pd.read_csv(self.puncta_fpi, sep='\t', index_col=0)
         hex_df = pd.read_excel(self.tht_fpi, sheetname='Hoja1')
-        hex_df = hex_df[(hex_df['180708 48h'] == 'yes')]
+        hex_df = hex_df[(hex_df['180708 48h'] == 'yes') | (hex_df['180708 48h'] == 'yes?')]
         #no_df = hex_df[(hex_df['180803 48h HD 1h'] == 'no')]
         no_df = hex_df[hex_df['180809 ThT'] == 'no']
         no_orf = list(no_df['ORF'])
@@ -385,7 +385,7 @@ class TyrMotifs(object):
 
 def main():
     tm = Hexandiol()
-    tm.check_tht()
+    tm.score_hist()
 
 
 

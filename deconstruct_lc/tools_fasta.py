@@ -127,6 +127,25 @@ def get_yeast_seq_gene_from_ids(orf_trans_fp, orf_ids):
     return sequences, genes, orfs
 
 
+def get_yeast_desc_from_ids(orf_trans_fp, orf_ids):
+    sequences = []
+    genes = []
+    orfs = []
+    descriptions = []
+    with open(orf_trans_fp, 'r') as fasta_in:
+        for record in SeqIO.parse(fasta_in, 'fasta'):
+            pid = str(record.id)
+            if pid in orf_ids:
+                full_description = str(record.description)
+                descriptions.append(full_description)
+                fd_sp = full_description.split(',')
+                gene = fd_sp[0].split(' ')[1]
+                sequences.append(str(record.seq))
+                genes.append(gene)
+                orfs.append(pid)
+    return sequences, genes, orfs, descriptions
+
+
 def yeast_write_fasta_from_ids(orf_trans_fp, orf_ids, fasta_out):
     records = []
     with open(orf_trans_fp, 'r') as fasta_in:
