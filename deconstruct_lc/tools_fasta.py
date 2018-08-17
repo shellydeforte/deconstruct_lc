@@ -146,6 +146,17 @@ def get_yeast_desc_from_ids(orf_trans_fp, orf_ids):
     return sequences, genes, orfs, descriptions
 
 
+def get_one_yeast_desc(orf_trans_fp, orf_id):
+    with open(orf_trans_fp, 'r') as fasta_in:
+        for record in SeqIO.parse(fasta_in, 'fasta'):
+            pid = str(record.id)
+            if pid == orf_id:
+                seq = record.seq
+                desc = str(record.description)
+                return seq, desc
+    return None
+
+
 def yeast_write_fasta_from_ids(orf_trans_fp, orf_ids, fasta_out):
     records = []
     with open(orf_trans_fp, 'r') as fasta_in:
