@@ -1,7 +1,6 @@
 # deconstruct_lc
-Scripts associated with the paper "Deconstructing protein sequence complexity to reveal the building blocks of structure and phase separation"
+Scripts associated with the paper "Deconstructing protein sequence complexity to reveal the building blocks of structure and phase separation". This repository includes in-progress scripts, and will be revised upon publication.
 
-This project is currently in development.
 
 # Experiments
 
@@ -14,13 +13,3 @@ When we apply the low complexity score to these proteins, we can see that the pu
 3. For those proteins that do not stain with ThT, we will check for dissolution under hexandiol treatment
 
 The hypothesis is that high scoring proteins will be more likely to form puncta without stress, less likely to stain with ThT and more likely to dissolve with hexandiol.
-
-Here are the current to do items:
-
-Waiting
-1. Figure out what the background proteins are (Waiting for Edward Marcotte)
-
-Done
-1. Create a spreadsheet with the marcotte proteins and scores
-2. Re-read the aggregate paper to check for their methods
-3. Create a framework for chi-square analysis
